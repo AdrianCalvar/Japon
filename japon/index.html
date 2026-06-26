@@ -289,6 +289,59 @@
       border-radius:999px;
     }
 
+    /* ---------- THOUGHT (pensamiento) — solo el texto rojo, sin imagen, como un momento antes de las cards ---------- */
+    .state--thought{
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(244,236,224,1) 0%, rgba(238,226,205,.92) 65%, rgba(214,197,161,.78) 100%);
+    }
+    .state--thought::before{
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(200,56,42,.06) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(184,137,62,.10) 0%, transparent 40%);
+    }
+    .thought{
+      position:relative;z-index:1;
+      width:100%;max-width:560px;
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      gap:1.5rem;padding:2rem 1.5rem;min-height:60vh;justify-content:center;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+    }
+    .thought__node{
+      font-family:var(--ui);font-size:.65rem;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--vermilion);font-weight:600;
+      display:flex;align-items:center;gap:.5rem;
+      opacity:0;transform:translateY(6px);
+      animation:thoughtIn 800ms var(--ease-out) 150ms forwards;
+    }
+    .thought__node::before{
+      content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+      background:var(--vermilion);opacity:.6;flex-shrink:0;
+    }
+    .thought__text{
+      font-family:var(--serif);font-style:italic;font-weight:500;
+      font-size:clamp(1.45rem,1.1rem+1.4vw,2rem);
+      line-height:1.35;color:var(--vermilion-deep);
+      max-width:26ch;
+      opacity:0;transform:translateY(14px);
+      animation:thoughtIn 1100ms var(--ease-out) 500ms forwards;
+    }
+    .thought__hint{
+      font-family:var(--ui);font-size:.62rem;letter-spacing:.22em;
+      text-transform:uppercase;color:var(--ink-mute);
+      margin-top:.5rem;
+      opacity:0;
+      animation:thoughtPulse 2400ms ease-in-out 1800ms infinite,
+                 thoughtIn 600ms ease 1800ms forwards;
+    }
+    @keyframes thoughtIn{to{opacity:1;transform:translateY(0)}}
+    @keyframes thoughtPulse{0%,100%{opacity:.55}50%{opacity:.9}}
+    @media (prefers-reduced-motion:reduce){
+      .thought__node,.thought__text,.thought__hint{
+        opacity:1;transform:none;animation:none;
+      }
+    }
+
     /* ---------- TRANSITION (entre actos → siguiente pregunta) — mapa a pantalla completa ---------- */
     .state--transition{
       position:fixed;inset:0;z-index:3;
@@ -580,6 +633,15 @@
   <!-- Contenedor donde se generan los actos dinámicamente -->
   <div id="actHost"></div>
 
+  <!-- STATE: PENSAMIENTO — solo el texto rojo, como un momento antes de las cards con foto -->
+  <section class="state state--thought" id="s-thought" aria-label="Pensamiento">
+    <article class="thought" role="button" tabindex="0" aria-label="Toca para continuar">
+      <div class="thought__node" id="thoughtNode"></div>
+      <p class="thought__text" id="thoughtText"></p>
+      <div class="thought__hint">toca para continuar</div>
+    </article>
+  </section>
+
   <!-- STATE: TRANSICIÓN MAPA (entre actos → siguiente pregunta) — mapa a pantalla completa -->
   <section class="state state--transition" id="s-transition" aria-hidden="true" aria-label="Viajando al siguiente nodo">
     <div class="transition">
@@ -666,6 +728,9 @@
           <path data-conn="naka-kioto" d="M 470 175 Q 440 240, 405 340" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
           <path data-conn="alpes-kioto" d="M 470 235 Q 440 290, 405 340" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
           <path data-conn="kioto-onsen" d="M 405 340 Q 490 320, 580 275" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <!-- Conexiones opcionales (excursiones desde nodo principal) -->
+          <path data-conn="tok-kamakura" d="M 615 215 Q 622 230, 622 248" stroke="#C8382A" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.22" stroke-dasharray="2 5"/>
+          <path data-conn="kioto-koyasan" d="M 392 352 Q 380 375, 370 392" stroke="#C8382A" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.22" stroke-dasharray="2 5"/>
 
           <!-- ====== NODOS (colocados geográficamente) ====== -->
           <!-- Tokio: este de Honshu, ~615,195 -->
@@ -721,6 +786,18 @@
           <g data-node="kinosaki" data-zone="onsen">
             <circle cx="345" cy="305" r="5" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.5" opacity="0.85"/>
             <text x="345" y="290" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="13" fill="#1A1612" font-style="italic" opacity="0.85">Kinosaki</text>
+          </g>
+
+          <!-- Kamakura: costa sur de Tokio (excursión opcional), ~622,248 -->
+          <g data-node="kamakura" data-zone="tokio">
+            <circle cx="622" cy="248" r="4" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.2" opacity="0.7"/>
+            <text x="635" y="251" text-anchor="start" font-family="'Cormorant Garamond', serif" font-size="11" fill="#1A1612" font-style="italic" opacity="0.7">Kamakura</text>
+          </g>
+
+          <!-- Kōya-san: montaña al sur de Kioto/Osaka (excursión opcional), ~370,392 -->
+          <g data-node="koyasan" data-zone="kioto">
+            <circle cx="370" cy="392" r="4" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.2" opacity="0.7"/>
+            <text x="345" y="395" text-anchor="end" font-family="'Cormorant Garamond', serif" font-size="11" fill="#1A1612" font-style="italic" opacity="0.7">Kōya-san</text>
           </g>
         </svg>
       </div>
@@ -794,29 +871,29 @@
         ryokan:     './images/ryokan.png',
 
         // Unsplash (37 URLs validadas con curl HTTP 200)
-        akiba:      './images/unsplash/akiba.jpg',  // Akihabara neón
-        yanesen:    './images/unsplash/yanesen.jpg',  // barrio viejo Tokio
+        yanesen:    './images/unsplash/yanesen.webp',  // barrio viejo Tokio
+        akiba:    './images/unsplash/akiba.jpg',  
+        
         nezu:       './images/unsplash/nezu.jpg',  // santuario torii
         gatos:      './images/unsplash/gatos.jpg',  // gato interior
-        tsukiji:    './images/unsplash/tsukiji.jpg',  // mercado pescado
         sumida:     './images/unsplash/sumida.jpg',  // río Tokio
         harajuku:   './images/unsplash/harajuku.jpg',  // calle Takeshita
         mandarake:  './images/unsplash/mandarake.jpg',  // tienda coleccionables
-        mugiwara:   './images/unsplash/mugiwara.jpg',  // tienda pop
+        mugiwara:   './images/unsplash/mugiwara.jpeg',  // tienda pop
         sunshine:   './images/unsplash/sunshine.jpg',  // centro comercial
         nakamise:   './images/unsplash/nakamise.jpg',  // calle tradicional
         shodo:      './images/unsplash/shodo.jpg',  // pincel tinta
-        shinkansen: './images/unsplash/shinkansen.jpg',  // tren bala
+        nagoya: './images/unsplash/nagoya.jpg',  // ciudad Nagoya
         nakaPath:   './images/unsplash/nakaPath.jpg',  // empedrado pueblo
         nakaBosque: './images/unsplash/nakaBosque.jpg', // paisaje bosque
         miyagawa:   './images/unsplash/miyagawa.jpg',  // mercado al aire libre
-        sanmachi:   './images/unsplash/sanmachi.jpg',  // calles históricas
+        sanmachi:   './images/unsplash/sanmachi.webp',  // calles históricas
         shirakawa:  './images/unsplash/shirakawa.jpg',  // gassho-zukuri (villa rural)
         wagyu:      './images/unsplash/wagyu.jpg',  // carne wagyu A5
         fuji:       './images/unsplash/fuji.jpg',  // monte Fuji nevado
         kioto:      './images/unsplash/kioto.jpg',  // templos Kioto
         inari:      './images/unsplash/inari.jpg',  // torii naranjas
-        kiyomizu:   './images/unsplash/kiyomizu.jpg',  // terraza Kiyomizu
+        kiyomizu:   './images/unsplash/kiyomizu2.webp',  // terraza Kiyomizu
         kinkaku:    './images/unsplash/kinkaku.jpg',  // pabellón dorado
         nara:       './images/unsplash/nara.jpg',  // ciervos Nara
         honen:      './images/unsplash/honen.jpg',  // templo zen pequeño
@@ -829,15 +906,12 @@
         sotoyu:     './images/unsplash/sotoyu.jpg',  // onsen público madera bambú
         matsuba:    './images/unsplash/matsuba.jpg',  // paisaje rural
         // 6 extras para romper repeticiones (inari/nara/harajuku/shinkansen/honen/sensoji/sushi/ryokan)
-        inari2:     './images/unsplash/inari2.jpg',   // torii diferentes
         inari3:     './images/unsplash/inari3.jpg',   // torii atardecer
-        nara2:      './images/unsplash/nara2.jpg',   // torii diferente escena
         nara3:      './images/unsplash/nara3.jpg',   // ciervos / templo
         shinkansen2:'./images/unsplash/shinkansen2.jpg',   // tren bala
         wagyu2:     './images/unsplash/wagyu2.jpg',  // carne/plancha japonesa
         // 3 extras extra para romper sunshine/kiyomizu/inari
         sunshine2:  './images/unsplash/sunshine2.jpg',  // vitrina / moda
-        kiyomizu2:  './images/unsplash/kiyomizu2.jpg',  // templo madera
         inari4:     './images/unsplash/inari4.jpg'   // torii lateral
       };
       // SVG decorativo cuando un acto no tiene imagen (sin letra suelta)
@@ -854,96 +928,96 @@
 
       const QUESTIONS = [
         {
-          id: 1, node: 'tokio', nodeLabel: 'Nodo 1 · Tokio',
-          title: 'Imagínate el primer día. ¿Qué prefieres oír al despertar?',
+          id: 1, node: 'tokio', nodeLabel: 'Tokio',
+          title: 'Imagínate el primer día. ¿Qué quieres oír antes de que Tokio se despierte?',
           options: [
             {
               value: 'neon',
               label: 'El cruce de Shibuya, el neón y los pasos de mil personas',
-              micro: 'Ya huelo el sushi que vamos a cenar y todavía no hemos salido del hotel. Como en Bangkok, pero distinto.',
+              micro: 'Te imagino cruzando Shibuya con los ojos enormes. Yo a tu lado, fingiendo que controlo.',
               acts: [
-                { place: 'Akihabara', image: IMG.akiba, caption: 'Tokio · Akihabara antes de las 11h',
-                  text: 'Akihabara mañana temprano, antes de las 11h. Radio Kaikan para las novedades. Nakano Broadway a mediodía, con Mandarake, para las figuras raras a 30–60% menos que en el centro.',
-                  tag: 'comercio' },
-                { place: 'Sensoji', image: IMG.sensoji, caption: 'Asakusa · Sensoji al amanecer',
-                  text: 'Sensoji al amanecer, antes de las 7:30h, o iluminado entre las 17 y las 20h. Si quieres la foto en yukata, ese día.',
-                  tag: 'templo' },
-                { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku NEWoMan · omakase',
-                  text: 'Cena en Sushi Tokyo Ten (Shinjuku NEWoMan): omakase de 20–25 pases, 8.800–9.900 ¥. Reserva con días, sobre todo en fin de semana.',
-                  tag: 'cena' },
-                { place: 'Omoide Yokocho', image: PLACEHOLDER_SVGS.brush, caption: 'Shinjuku · izakaya de callejón',
-                  text: 'Si te cansas del sushi, Omoide Yokocho: callejones de bares minúsculos, yakitori, humo, ambiente único. 2.000–4.000 ¥ con bebidas, sin reserva.',
-                  tag: 'cena' }
+                { place: 'Akihabara', image: IMG.akiba, caption: 'Tokio · antes que nadie',
+                  text: 'Akihabara a las diez de la mañana. Radio Kaikan en silencio. Las figuras que te flipan están dentro, en algún piso, en alguna vitrina. Tú las encuentras. Yo cargo con las bolsas.',
+                  tag: 'figuras' },
+                { place: 'Sensoji', image: IMG.sensoji, caption: 'Asakusa · a las siete',
+                  text: 'Sensoji antes de que abran las tiendas. La linterna roja del Kaminarimon brilla sola, sin nadie delante. Es la foto que todo el mundo quiere y casi nadie aguanta esperar.',
+                  tag: 'amanecer' },
+                { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku · 20 pases',
+                  text: 'Cena en Sushi Tokyo Ten, Shinjuku. Omakase de veinte piezas, una detrás de otra. El chef te mira a los ojos antes de cada una. Tú le devuelves la mirada. Yo cuento los bocados.',
+                  tag: 'sushi' },
+                { place: 'Omoide Yokocho', image: PLACEHOLDER_SVGS.brush, caption: 'Shinjuku · humo y yakitori',
+                  text: 'Si un día no te apetece sushi: Omoide Yokocho. Callejones de madera, humo, yakitori, cerveza. Nos sentamos en la barra, pedimos lo que apunta el dedo y hablamos con el de al lado.',
+                  tag: 'callejón' }
               ]
             },
             {
               value: 'calm',
-              label: 'Una posada de madera, el río y el bosque',
-              micro: 'Te imagino en Tsumago, descalza en el tatami. Como en Pai, pero en japonés.',
+              label: 'Tokio que sobrevive: callejones, gatos y musgo',
+              micro: 'Te imagino en Yanaka, con un gato en el regazo y sin saber qué hora es.',
               acts: [
-                { place: 'Yanesen', image: IMG.yanesen, caption: 'Yanaka · barrio viejo de Tokio',
-                  text: 'Yanesen (Yanaka, Nezu, Sendagi): el Tokio que sobrevive a 1945. Calles estrechas, templos pequeños, galerías y gatos. Sin turistas, sin prisa.',
+                { place: 'Yanesen', image: IMG.yanesen, caption: 'Yanaka · el Tokio viejo',
+                  text: 'Yanaka, Nezu, Sendagi. El Tokio que sobrevivió a 1945. Calles estrechas, talleres abiertos, galerías, gatos en cada esquina. Sin prisa, sin listas, sin fotos con el móvil por delante.',
                   tag: 'barrio' },
-                { place: 'Nezu-jinja', image: IMG.nezu, caption: 'Bunkyo · torii en fila',
-                  text: 'Nezu-jinja al abrir: un pasillo de torii bermellón escondido en Bunkyo. La mitad de la gente de Fushimi Inari, sin perder la magia.',
-                  tag: 'templo' },
-                { place: 'Café de gatos', image: IMG.gatos, caption: 'Yanaka · siesta con michis',
-                  text: 'Café de gatos en Yanaka antes de la cena. Porque sí, porque vamos, porque es Tokio y porque nos lo merecemos.',
-                  tag: 'descanso' }
+                { place: 'Nezu-jinja', image: IMG.nezu, caption: 'Bunkyo · torii sin gente',
+                  text: 'Nezu-jinja abre a las nueve. Un pasillo de torii bermellón escondido entre casas bajas. Si vas a Fushimi Inari más tarde, aquí ya te has quedado con la mejor foto del día.',
+                  tag: 'torii' },
+                { place: 'Café de gatos', image: IMG.gatos, caption: 'Yanaka · una hora de michis',
+                  text: 'Café de gatos en Yanaka antes de la cena. Una hora en una sala pequeña, con michis en el regazo. Porque Tokio nos lo permite. Porque nos lo merecemos.',
+                  tag: 'michis' }
               ]
             },
             {
               value: 'market',
-              label: 'Tsukiji outer market a las 6 de la mañana, con niebla',
-              micro: 'Vas a probar el mejor atún de tu vida. No te voy a decir de qué puesto. Vas a flipar.',
+              label: 'Tsukiji a las 6 de la mañana, con niebla',
+              micro: 'Vas a probar el mejor atún de tu vida. No te voy a decir de qué puesto.',
               acts: [
-                { place: 'Tsukiji outer', image: IMG.tsukiji, caption: 'Tsukiji · sushi a las 6:00h',
-                  text: 'Tsukiji outer market desde las 6:00h: tamagoyaki, uni, atún rojo, takoyaki, cuchillería japonesa. No hay turistas aún. Solo locales y pescado.',
-                  tag: 'mercado' },
-                { place: 'Sumida', image: IMG.sumida, caption: 'Sumida · río y Asakusa al amanecer',
-                  text: 'Caminata por el río Sumida hasta Asakusa, con Sensoji abriendo al fondo. La postal que todo el mundo busca, sin la gente que la estropea.',
-                  tag: 'paseo' },
-                { place: 'Harajuku Takeshita', image: IMG.harajuku, caption: 'Harajuku · tarde de domingo',
-                  text: 'Harajuku Takeshita-dori por la tarde: crêpes, kawaii, moda que no entenderemos. Para compensar la sobriedad de la mañana.',
-                  tag: 'paseo' }
+                { place: 'Tsukiji outer', image: IMG.sushi, caption: 'Tsukiji · 6h, sin turistas',
+                  text: 'Tsukiji outer market a las seis. Tamagoyaki, uni, atún rojo. Los locales ya están desayunando. Tú pruebas el primer bocado del viaje. Yo grabo tu cara.',
+                  tag: 'primer bocado' },
+                { place: 'Sumida', image: IMG.sumida, caption: 'Sumida · Sensoji al fondo',
+                  text: 'Caminata por el río Sumida hasta Asakusa. Sensoji abriendo al fondo, las barcas pasando. La postal que todo el mundo busca —solo que a esta hora es nuestra.',
+                  tag: 'río' },
+                { place: 'Harajuku Takeshita', image: IMG.harajuku, caption: 'Harajuku · el ruido vuelve',
+                  text: 'Harajuku Takeshita-dori por la tarde. Crêpes, tiendas de colores, gente disfrazada sin que nadie mire. Después del silencio de la mañana, Tokio nos devuelve el ruido.',
+                  tag: 'tarde' }
               ]
             }
           ]
         },
         {
-          id: 2, node: 'tokio', nodeLabel: 'Nodo 1 · Tokio · rincón friki',
-          title: 'De Tokio, ¿qué quieres traerte?',
+          id: 2, node: 'tokio', nodeLabel: 'Tokio · la maleta',
+          title: 'Y cuando volvamos, ¿qué te traes en la maleta?',
           options: [
             {
               value: 'onepiece',
               label: 'Una figura de One Piece, firmada, de Nakano Broadway',
-              micro: 'Te veo eligiendo un Luffy edición limitada en Mandarake. Yo pago y finjo no entender.',
+              micro: 'Te veo eligiendo un Luffy edición limitada. Yo pago y finjo no entender.',
               acts: [
-                { place: 'Mandarake Nakano', image: IMG.mandarake, caption: 'Nakano Broadway · 4 plantas de manga',
-                  text: 'Mandarake en Nakano Broadway, 4 plantas dedicadas al manga y las figuras de serie. Precios 30–60% más bajos que en Akihabara.',
-                  tag: 'comercio' },
-                { place: 'Mugiwara Store', image: IMG.mugiwara, caption: 'Magnet by Shibuya 109 · 6ª planta',
-                  text: 'Mugiwara Store en Magnet by Shibuya 109, 6ª planta: el flagship One Piece más grande del mundo, 10.000+ artículos, exclusivos de tienda. Horario 10:00–21:00.',
-                  tag: 'comercio' },
-                { place: 'Ikebukuro Sunshine City', image: IMG.sunshine, caption: 'Ikebukuro · tiendas oficiales',
-                  text: 'Ikebukuro Sunshine City: tiendas oficiales de Pokémon Center, Sanrio, Jump. Más limpio y moderno que Akihabara, orientado a líneas "cute".',
-                  tag: 'comercio' }
+                { place: 'Nakano Broadway', image: IMG.mandarake, caption: 'Nakano · cuatro plantas',
+                  text: 'Nakano Broadway, cuatro plantas de Mandarake. Figuras de hace veinte años, ediciones limitadas, vinilos. Tú te quedas ahí dentro hasta que me echen.',
+                  tag: 'manga' },
+                { place: 'Mugiwara Store', image: IMG.mugiwara, caption: 'Shibuya · flagship One Piece',
+                  text: 'Mugiwara Store en Shibuya, flagship de One Piece. Diez mil artículos en seis plantas. Entras queriendo una cosa, sales con una caja.',
+                  tag: '10.000' },
+                { place: 'Sunshine City', image: IMG.sunshine, caption: 'Ikebukuro · tiendas oficiales',
+                  text: 'Sunshine City en Ikebukuro. Pokémon Center, Sanrio, Jump. Tiendas oficiales, modernas, sin polvo. Si Nakano es el zoológico, esto es el museo.',
+                  tag: 'oficial' }
               ]
             },
             {
               value: 'hanko',
               label: 'Un sello hanko con tu nombre en katakana',
-              micro: 'Tu nombre en rojo, sobre papel. Te lo voy a regalar el último día, cuando ya no te lo esperas.',
+              micro: 'Tu nombre, en rojo, en un papel. Te lo voy a regalar el último día, cuando ya no te lo esperas.',
               acts: [
-                { place: 'Asakusa Nakamise', image: IMG.nakamise, caption: 'Asakusa · tiendas de sellos',
-                  text: 'Nakamise en Asakusa: las tiendas de sellos llevan siglos grabando nombres. Elige el kanji que más te guste, ellos lo tallan en 30 minutos.',
-                  tag: 'souvenir' },
-                { place: 'Taller de caligrafía', image: IMG.shodo, caption: 'Kioto · shodō en directo',
-                  text: 'Una hora de shodō (caligrafía) en Kioto: pincel, tinta, papel washi. Te vas a casa con tu nombre escrito por ti misma.',
-                  tag: 'taller' },
-                { place: 'Sensoji al atardecer', image: PLACEHOLDER_SVGS.kanji, caption: 'Asakusa · luz dorada',
-                  text: 'Sensoji al atardecer, con el sello ya en el bolsillo y el sol cayendo sobre la pagoda de cinco pisos.',
-                  tag: 'templo' }
+                { place: 'Nakamise', image: IMG.nakamise, caption: 'Asakusa · tienda de sellos',
+                  text: 'Nakamise en Asakusa. Hay una tienda donde llevan siglos grabando nombres en katakana. Tú eliges, ellos tallan. Te vas con un sello que va a firmar todo lo que escribas en japonés en tu vida.',
+                  tag: 'sello' },
+                { place: 'Taller de shodō', image: IMG.shodo, caption: 'Kioto · caligrafía',
+                  text: 'Una hora de shodō en Kioto. Pincel, tinta, papel washi. La maestra te corrige la postura. Tú escribes tu nombre y te lo quedas mirando como si fuera un retrato.',
+                  tag: 'caligrafía' },
+                { place: 'Sensoji al atardecer', image: IMG.sensoji, caption: 'Asakusa · luz dorada',
+                  text: 'Sensoji al atardecer. El sello en el bolsillo, el sol cayendo sobre la pagoda. La luz dorada hace que todo parezca una postal —solo que esta vez es nuestra.',
+                  tag: 'atardecer' }
               ]
             },
             {
@@ -951,81 +1025,113 @@
               label: 'Una foto contigo en yukata frente a Sensoji',
               micro: 'Esa foto la vamos a hacer al amanecer, antes de que abran las tiendas. Como en Koh Samui, pero con kimono.',
               acts: [
-                { place: 'Tienda de yukata', image: IMG.sunshine2, caption: 'Asakusa · alquiler de yukata',
-                  text: 'Alquiler de yukata en Asakusa, abren a las 8:00h. Eliges el color, te lo ponen en 10 minutos. Pelo, geta, bolso a juego.',
-                  tag: 'estilismo' },
-                { place: 'Sensoji al amanecer', image: IMG.inari2, caption: 'Asakusa · sin gente todavía',
-                  text: 'Sensoji a las 7:00h, sin gente todavía. La luz es de postal. Te voy a tomar la mano y no te voy a soltar en dos horas.',
-                  tag: 'foto' },
-                { place: 'Sushi Tokyo Ten', image: IMG.wagyu2, caption: 'Shinjuku · después de la foto',
-                  text: 'Después de la foto, Sushi Tokyo Ten en Shinjuku: te mereces un omakase de 20 pases. La yukata y el sushi, para el recuerdo.',
+                { place: 'Tienda de yukata', image: IMG.nakamise, caption: 'Asakusa · a las ocho',
+                  text: 'Tienda de yukata en Asakusa. Tú eliges el color. Yo te espero fuera con un café. En diez minutos sales con la yukata puesta, geta, pelo recogido. Te van a mirar. Vas a brillar.',
+                  tag: 'yukata' },
+                { place: 'Sensoji al amanecer', image: IMG.sensoji, caption: 'Asakusa · antes que nadie',
+                  text: 'Sensoji a las siete. Las tiendas todavía cerradas, la luz entrando de lado. Te tomo la mano y no te la suelto hasta que el sol termina de salir.',
+                  tag: 'amanecer' },
+                { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku · después de la foto',
+                  text: 'Después de la foto, sushi. Sushi Tokyo Ten en Shinjuku, omakase de veinte pases. La yukata y el sushi juntos en la misma noche. Eso no se nos va a olvidar.',
                   tag: 'cena' }
               ]
             }
           ]
         },
         {
-          id: 3, node: 'intermedio', nodeLabel: 'Nodo 2 · El intermedio',
+          id: 3, node: 'tokio', nodeLabel: 'Tokio · un día fuera',
+          title: 'Cuatro días en Tokio dan para mucho. Pero a una hora hay mar, cedros viejos y un Daibutsu de bronce al aire libre. ¿Salimos un día?',
+          options: [
+            {
+              value: 'kamakura',
+              label: 'Kamakura: mar, Daibutsu y templos zen del siglo XIII',
+              micro: 'Un día de mar, de cedros viejos, de caminar sin metro. Una hora de Tokio.',
+              acts: [
+                { place: 'Kita-Kamakura', image: IMG.honen, caption: 'Kita-Kamakura · zen del XIII',
+                  text: 'Bajamos en Kita-Kamakura, una parada antes. Engaku-ji y Kencho-ji, dos templos zen del siglo XIII. Cedros de ochocientos años, casi nadie. Es el tipo de sitio donde te callas sin darte cuenta.',
+                  tag: 'zen' },
+                { place: 'Tsurugaoka', image: IMG.sensoji, caption: 'Kamakura · santuario principal',
+                  text: 'Tsurugaoka Hachimangu, el santuario principal. Escalinata larga, ambiente de pueblo costero, perros, escuelas. Bajamos andando veinte minutos hasta el centro.',
+                  tag: 'santuario' },
+                { place: 'Hasedera', image: IMG.fuji, caption: 'Hasedera · vistas al Pacífico',
+                  text: 'Hasedera, los jardines escalonados con vistas al Pacífico. Mil estatuas Jizō custodian a los niños muertos. Es el momento más sereno del día, el que se te queda cuando llegas a casa.',
+                  tag: 'pacífico' },
+                { place: 'Daibutsu', image: IMG.kinkaku, caption: 'Kotoku-in · once metros al aire libre',
+                  text: 'Kotoku-in. El Daibutsu de bronce al aire libre, once metros. Podemos entrar dentro de la estatua por veinte yenes. Es la foto que ya te has hecho mil veces en la cabeza.',
+                  tag: 'bronce' }
+              ]
+            },
+            {
+              value: 'tokioEntero',
+              label: 'Tokio entero. Sin excursiones.',
+              micro: 'Cuatro o cinco días en la ciudad dan para más de lo que parece. Nos quedamos.',
+              acts: [
+                { place: 'Volver a Yanaka', image: IMG.yanesen, caption: 'Yanaka · al atardecer',
+                  text: 'Volver a Yanaka al atardecer, cuando los gatos salen y las farolas se encienden. Es el Tokio que se vive sin guía, el que se descubre volviendo.',
+                  tag: 'atardecer' },
+                { place: 'Shimokitazawa', image: PLACEHOLDER_SVGS.brush, caption: 'Shimokitazawa · vinilos y cafés',
+                  text: 'Shimokitazawa o Koenji, lo que pida el cuerpo. Tiendas de vinilos, cafés pequeños, gente con prisa por nada. Para perdernos a propósito.',
+                  tag: 'perdernos' },
+                { place: 'Un día perdido', image: PLACEHOLDER_SVGS.kanji, caption: 'El día que no hicimos nada',
+                  text: 'Un día para no hacer nada. Para volver al café que nos gustó, para sentarnos en un parque, para mirar cómo vive la gente. Lo que recordaremos al final.',
+                  tag: 'nada' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 4, node: 'intermedio', nodeLabel: 'El intermedio',
           title: 'Un día entero, los dos solos, sin reloj. ¿Dónde?',
           options: [
             {
               value: 'nakasendo',
               label: 'Caminar 8 km por el Nakasendō, de Magome a Tsumago',
-              micro: 'La mochila la llevo yo. Tú solo tienes que mirarte alrededor y decir "adiós" muy bajito cuando lleguemos.',
+              micro: 'La mochila la llevo yo. Tú solo tienes que mirar alrededor y decir "adiós" muy bajito cuando lleguemos.',
               acts: [
-                { place: 'Shinkansen → Nagoya', image: IMG.shinkansen, caption: 'Tokio → Nagoya · ~1h40m',
-                  text: 'Shinkansen de Tokio a Nagoya en ~1h40m. Asiento junto a la ventana: mío.',
-                  tag: 'logística' },
-                { place: 'Takkyubin', image: IMG.nakaPath, caption: 'Tokio → Kioto · mochila ligera',
-                  text: 'Mandamos la maleta por Takkyubin desde Tokio al hotel de Kioto. En el Nakasendō caminamos solo con mochila ligera.',
-                  tag: 'logística' },
+                { place: 'Shinkansen → Nagoya', image: IMG.nagoya, caption: 'Tokio → Nagoya · ventanilla',
+                  text: 'Shinkansen Tokio → Nagoya. Una hora cuarenta de ventanilla. El Fuji aparece a la izquierda. No te aviso —cuando lo veas, lo ves.',
+                  tag: 'ventanilla' },
                 { place: 'Magome → Tsumago', image: IMG.nakasendo, caption: 'Kiso · 8 km por bosque',
-                  text: 'Magome → Tsumago: 8 km por bosque, sin coches. Posadas edo del siglo XVII que no han cambiado visualmente desde entonces.',
-                  tag: 'pueblo' },
-                { place: 'Taxi de vuelta', image: IMG.nakaBosque, caption: 'Tsumago → Magome · 200 ¥',
-                  text: 'Si no quieres repetir ruta, servicio de taxi entre Magome y Tsumago por 200 ¥. Cinco minutos, sin步行 extra.',
-                  tag: 'logística' }
+                  text: 'Magome → Tsumago. Ocho kilómetros por bosque, sin coches. Las posadas son las mismas del 1600. La gente que te cruza te saluda. Tú vas en silencio. Yo detrás.',
+                  tag: '8 km' },
+                { place: 'Ryokan en Tsumago', image: IMG.ryokan, caption: 'Tsumago · descalzos',
+                  text: 'El ryokan de Tsumago al final del día. Cena descalzos sobre el tatami, futón preparado, el pueblo en silencio afuera. No hay wifi. No lo necesitamos.',
+                  tag: 'tatami' }
               ]
             },
             {
               value: 'alpes',
               label: 'Takayama al amanecer y Shirakawa-go entre nieblas',
-              micro: 'Vas a probar el mejor miso de tu vida. Y te voy a obligar a comer la croqueta de Hida Beef aunque no quieras.',
+              micro: 'Vas a probar el mejor miso de tu vida. Y la croqueta de Hida Beef te la comes, quieras o no.',
               acts: [
-                { place: 'Miyagawa Morning Market', image: IMG.miyagawa, caption: 'Takayama · 8:00h',
-                  text: 'Miyagawa Morning Market a las 8:00h (cierra al mediodía). Locales venden verduras, miso casero, artesanía. No trampa turística.',
-                  tag: 'mercado' },
                 { place: 'Sanmachi Suji', image: IMG.sanmachi, caption: 'Takayama · sake breweries',
-                  text: 'Sanmachi Suji: calles históricas de sake breweries. Prueba nihonshu local en las bodegas abiertas. Vas a flipar con un sake que no te voy a decir cuál es.',
+                  text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake por vasos, el dueño nos explica qué estamos bebiendo. No te digo cuál —te lo descubres tú.',
                   tag: 'sake' },
-                { place: 'Shirakawa-go', image: IMG.shirakawa, caption: 'Gassho-zukuri entre arrozales',
-                  text: 'Bus a Shirakawa-go desde Takayama (reserva con 40 min de antelación en temporada alta). Cruzar Deai-bashi, encontrar el "San-goya" (tres cabañas en los campos de arroz, no en la calle principal).',
-                  tag: 'pueblo' },
-                { place: 'Croqueta de Hida Beef', image: IMG.wagyu, caption: 'Shirakawa-go · obligatoria',
-                  text: 'La croqueta de Hida Beef, obligatoria. Crujiente, caliente, con un sabor que no vas a olvidar.',
-                  tag: 'cena' }
+                { place: 'Shirakawa-go', image: IMG.shirakawa, caption: 'Gassho-zukuri · entre nieblas',
+                  text: 'Bus a Shirakawa-go. Las casas gassho-zukuri entre los arrozales. Cruzamos el Deai-bashi, buscamos el San-goya —tres cabañas perdidas en los campos—. La niebla va y viene. No hace falta nada más.',
+                  tag: 'niebla' },
+                { place: 'Croqueta de Hida Beef', image: IMG.wagyu, caption: 'Shirakawa-go · la croqueta',
+                  text: 'La croqueta de Hida Beef, en la calle, con las manos frías. Crujiente, caliente, con un sabor que no se va a ir en mucho tiempo.',
+                  tag: 'croqueta' }
               ]
             },
             {
               value: 'direct',
-              label: 'No me hace falta intermedio, dispara a Kioto',
-              micro: 'Vale, pesada, nos vamos a Kioto. Pero el shinkansen lo elijo yo: el asiento junto a la ventana es mío.',
+              label: 'Sin intermedio. Directos a Kioto.',
+              micro: 'Vale. Sin intermedio. Pero el shinkansen lo elijo yo —el asiento de la ventana es mío—.',
               acts: [
-                { place: 'Tokaido Shinkansen', image: IMG.shinkansen2, caption: 'Tokio → Kioto · ~2h15m',
-                  text: 'Tokaido Shinkansen directo de Tokio a Kioto en ~2h15m. Salimos temprano, llegamos a comer.',
-                  tag: 'logística' },
-                { place: 'Reserva con días', image: IMG.kiyomizu2, caption: 'Asiento junto a la ventana',
-                  text: 'Reserva con días, sobre todo en temporada alta. Asiento junto a la ventana: mío.',
-                  tag: 'logística' },
-                { place: 'Kioto nos espera', image: IMG.inari3, caption: 'Kioto · llegada',
-                  text: 'Kioto nos espera. Templos, callejones, silencio. Lo que viene después, ya lo decides tú.',
-                  tag: 'destino' }
+                { place: 'Tokaido Shinkansen', image: IMG.shinkansen2, caption: 'Tokio → Kioto · ventanilla',
+                  text: 'Tokaido Shinkansen Tokio → Kioto. Dos horas y cuarto. Ventanilla. El Fuji a la izquierda, si quiere aparecer. Tú leyendo, yo mirando el mapa.',
+                  tag: 'ventanilla' },
+                { place: 'Kioto aparece', image: IMG.kioto, caption: 'Kioto · llegada',
+                  text: 'Kioto aparece después de un túnel. Templos, callejones, silencio. Lo que viene después, lo decides tú.',
+                  tag: 'llegada' }
               ]
             }
           ]
         },
         {
-          id: 4, node: 'kioto', nodeLabel: 'Nodo 3 · Kioto',
+          id: 5, node: 'kioto', nodeLabel: 'Kioto',
           title: 'En Kioto hay dos formas de moverse: la de los turistas, y la nuestra. ¿Cuál?',
           options: [
             {
@@ -1034,58 +1140,99 @@
               micro: 'Los torii a las 6 de la mañana. Solo se oye el viento y tus pasos. Te voy a tomar la mano y no te voy a soltar en dos horas.',
               acts: [
                 { place: 'Fushimi Inari', image: IMG.inari, caption: 'Kioto · 10.000 torii al amanecer',
-                  text: 'Fushimi Inari Taisha al amanecer. Más de 10.000 puertas torii naranjas hasta la cima del Monte Inari (233m, 2–3h ida y vuelta). El 90% se queda abajo.',
-                  tag: 'templo' },
+                  text: 'Fushimi Inari al amanecer. Diez mil torii naranjas hasta la cima del monte. El 90% se queda abajo. Nosotros subimos. Arriba no hay nadie.',
+                  tag: 'cima' },
                 { place: 'Kiyomizu-dera', image: IMG.kiyomizu, caption: 'Kioto · terraza sobre el vacío',
-                  text: 'Kiyomizu-dera abriendo (6:00–8:00h). Templo construido sin un solo clavo sobre una ladera boscosa, terraza de madera volada sobre el vacío. Patrimonio UNESCO.',
-                  tag: 'templo' },
+                  text: 'Kiyomizu-dera abriendo a las seis. La terraza de madera sobre el vacío, la ciudad abajo. Sitio UNESCO —pero también el lugar donde te vas a quedar callada un rato.',
+                  tag: 'terraza' },
                 { place: 'Kinkaku-ji + Ryoan-ji', image: IMG.kinkaku, caption: 'Kioto · oro y 15 piedras',
-                  text: 'Kinkaku-ji (Pabellón Dorado, cubierto de pan de oro sobre el estanque, 500 ¥) y Ryoan-ji (el jardín zen de las 15 piedras que nunca se ven todas, 600 ¥) están a 10 minutos andando. Combo perfecto de mañana.',
-                  tag: 'templo' },
+                  text: 'Kinkaku-ji y Ryoan-ji están a diez minutos andando. El Pabellón Dorado, el jardín zen de las quince piedras. Combo perfecto de mañana —y excusa para ir en silencio juntos.',
+                  tag: 'oro' },
                 { place: 'Nara', image: IMG.nara, caption: 'Nara · Gran Buda + ciervos',
-                  text: 'Media jornada a Nara (45 min en tren): Gran Buda de Tōdai-ji, el edificio de madera más grande del mundo, y los ciervos sagrados que te van a morder la chaqueta.',
-                  tag: 'excursión' }
+                  text: 'Nara en tren, cuarenta y cinco minutos. El Gran Buda de Tōdai-ji, los ciervos que te van a comer la chaqueta si te descuidas. Las galletas: no compres más de un paquete.',
+                  tag: 'ciervos' }
               ]
             },
             {
               value: 'ninja',
-              label: 'Ninja-path: Honen-in, Kibune, Kurama y Nara',
-              micro: 'Vamos a ir a un sitio que sale en cero guías. Tú y yo. Y los ciervos de Nara.',
+              label: 'El camino ninja: Honen-in, Kibune, Kurama y Nara',
+              micro: 'Iremos a un sitio que no sale en las guías. Tú y yo. Y los ciervos de Nara.',
               acts: [
                 { place: 'Honen-in', image: IMG.honen, caption: 'Sakyō · templo casi secreto',
-                  text: 'Honen-in (gratis, junto a Philosopher\'s Path): pequeño, espectacular, casi nadie. Una puerta de paja, musgo, una arena rastrillada.',
-                  tag: 'templo' },
+                  text: 'Honen-in, gratis, junto a Philosopher\'s Path. Una puerta de paja, musgo, una arena rastrillada. Casi nadie. Si queremos una mañana callada, aquí.',
+                  tag: 'calma' },
                 { place: 'Kibune', image: IMG.kibune, caption: 'Kioto norte · santuario en bosque',
-                  text: 'Kibune: santuario en el bosque, escaleras de piedra iluminadas con farolillos. A 30 minutos de Demachiyanagi por la línea Eizan.',
-                  tag: 'templo' },
+                  text: 'Kibune, santuario en el bosque. Escaleras de piedra iluminadas con farolillos. Subimos, el agua suena abajo, no hay nadie más.',
+                  tag: 'bosque' },
                 { place: 'Kurama onsen', image: IMG.kurama, caption: 'Kioto norte · onsen en la montaña',
-                  text: 'Kurama: onsen pequeño en la montaña, junto al santuario del mismo nombre. A 5 minutos en funicular desde Kibune. Perfecto para medio día relajado.',
-                  tag: 'onsen' },
-                { place: 'Nara', image: IMG.nara2, caption: 'Nara · ciervos sagrados',
-                  text: 'Vuelta vía Nara para los ciervos sagrados de Tōdai-ji. Las galletas que venden en la entrada son la trampa.',
-                  tag: 'excursión' }
+                  text: 'Kurama onsen, en la montaña, junto al santuario. Funicular desde Kibune. Agua caliente, vapor, un bosque rojo. Medio día. Sin hablar.',
+                  tag: 'vapor' },
+                { place: 'Nara', image: IMG.nara3, caption: 'Nara · ciervos sagrados',
+                  text: 'Vuelta vía Nara para los ciervos sagrados. Las galletas que venden en la entrada son la trampa. Si solo quieres una, una.',
+                  tag: 'galletas' }
               ]
             },
             {
               value: 'mix',
-              label: 'Mezcla: decido sobre la marcha',
-              micro: 'Eso me gusta. Que el viaje sea nuestro y no un plan.',
+              label: 'Lo que el cuerpo pida',
+              micro: 'Eso me gusta. Que el viaje sea nuestro y no un un plan.',
               acts: [
                 { place: 'Fushimi Inari', image: IMG.inari4, caption: 'Si amanece claro',
-                  text: 'Si amanece claro: Fushimi Inari al amanecer, los torii solos, sin nadie. Si está nublado: nos quedamos en cama media hora más.',
-                  tag: 'templo' },
-                { place: 'Honen-in', image: IMG.kioto, caption: 'Cuando el cuerpo pida calma',
-                  text: 'Cuando el cuerpo pida calma: Honen-in, el templo gratis de Philosopher\'s Path, sin turistas. Siestas morales incluidas.',
-                  tag: 'templo' },
+                  text: 'Si amanece claro: Fushimi Inari a las seis, los torii solos. Si está nublado: nos quedamos en la cama media hora más. Las dos opciones me valen.',
+                  tag: 'si amanece' },
+                { place: 'Honen-in', image: IMG.honen, caption: 'Cuando pida calma',
+                  text: 'Cuando el cuerpo pida calma: Honen-in, el templo gratis de Philosopher\'s Path. Siestas morales en el jardín permitidas.',
+                  tag: 'siesta' },
                 { place: 'Nara', image: IMG.nara3, caption: 'Si hay ganas de ciervos',
-                  text: 'Si hay ganas de ciervos: 45 minutos en tren y Nara. Si no, café en un kissaten de四条河原町 mirando llover.',
-                  tag: 'excursión' }
+                  text: 'Si hay ganas de ciervos: Nara en tren, cuarenta y cinco minutos. Si no, café en un kissaten de Shijō mirando llover.',
+                  tag: 'café' }
               ]
             }
           ]
         },
         {
-          id: 5, node: 'onsen', nodeLabel: 'Nodo 4 · El último baño',
+          id: 6, node: 'kioto', nodeLabel: 'Kōya-san',
+          title: 'Kioto da para dos noches. Pero en la montaña, a dos horas, hay un monasterio budista donde los monjes te enseñan a comer en silencio y a caminar entre doscientas mil tumbas bajo cedros de ochocientos años. ¿Una noche fuera?',
+          options: [
+            {
+              value: 'koyasan',
+              label: 'Sí, Kōya-san: una noche en monasterio budista',
+              micro: 'Cenamos shōjin-ryori con los monjes. Dormimos en el shukubo. Antes del amanecer, la ceremonia del fuego. Y Okunoin de noche es algo que no se olvida.',
+              acts: [
+                { place: 'Nankai → Kōya-san', image: IMG.nagoya, caption: 'Osaka → Kōya-san · monte arriba',
+                  text: 'Tren desde Osaka-Namba hasta Gokurakubashi, funicular hasta la cima. Dos horas con el monte engrandeciendo a cada curva. La civilización se queda abajo.',
+                  tag: 'monte' },
+                { place: 'Okunoin al atardecer', image: IMG.shirakawa, caption: 'Okunoin · doscientas mil tumbas',
+                  text: 'Okunoin al caer la noche. Doscientas mil tumbas bajo cedros de ochocientos años, iluminadas con faroles. Es el cementerio más grande de Japón. De noche es otra cosa —perturbador en el buen sentido—.',
+                  tag: 'faroles' },
+                { place: 'Shōjin-ryori', image: IMG.kaiseki, caption: 'Shukubo · cena de monjes',
+                  text: 'Cena shōjin-ryori en el shukubo. Cocina vegetariana de monjes: tofu, sésamo, verduras de montaña, nada de carne ni pescado. Se come en silencio. Se saborea.',
+                  tag: 'silencio' },
+                { place: 'Fuego y Kongōbu-ji', image: IMG.kioto, caption: 'Antes del amanecer · fuego goma',
+                  text: 'Antes del amanecer, ceremonia del fuego goma con los monjes. Después, Kongōbu-ji y sus jardines de arena. Luego bajamos.',
+                  tag: 'fuego' }
+              ]
+            },
+            {
+              value: 'masKioto',
+              label: 'No, una noche más en Kioto',
+              micro: 'Vale. Kioto tiene más de lo que parece en dos días. Nos quedamos.',
+              acts: [
+                { place: 'Volver al que nos flipó', image: IMG.kinkaku, caption: 'El templo que más nos gustó',
+                  text: 'Volver al templo que más nos gustó. Sentarnos otra vez. Los mejores sitios se ven dos veces —la primera vez no te enteras de todo.',
+                  tag: 'volver' },
+                { place: 'Lo que dejamos pendiente', image: IMG.kioto, caption: 'La calle o el café pendiente',
+                  text: 'Algo que dejamos pendiente el primer día. Una calle, un café, un cruce. Volver para encontrarlo es parte del viaje.',
+                  tag: 'pendiente' },
+                { place: 'Higashiyama al anochecer', image: IMG.honen, caption: 'Higashiyama · al anochecer',
+                  text: 'Higashiyama al anochecer, o el barrio de Gion si nos cruzamos con una geisha. Lo que nos dé el cuerpo. Kioto de noche es otra ciudad.',
+                  tag: 'anochecer' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 7, node: 'onsen', nodeLabel: 'El último baño',
           title: 'El viaje termina en agua caliente. ¿Cómo lo terminas?',
           options: [
             {
@@ -1093,50 +1240,37 @@
               label: 'Hakone, onsen privado en la habitación, monte Fuji al fondo',
               micro: 'Nos vamos a quedar en una habitación donde se oye el agua. Tú entras primero, yo te espero fuera con un café.',
               acts: [
-                { place: 'Romancecar', image: IMG.romancecar, caption: 'Shinjuku → Hakone · ~85 min',
-                  text: 'Romancecar de Shinjuku a Hakone en ~85 minutos. Asiento junto a la ventana: mío. Última línea del viaje.',
-                  tag: 'logística' },
-                { place: 'Gora Setsugetsuka', image: IMG.ryokan, caption: 'Gora · onsen privado en cada cuarto',
-                  text: 'Gora Setsugetsuka (~$170–300, todas las habitaciones con onsen privado) si nos quedamos en relación calidad-precio. Si nos damos el capricho: Hakone Ginyu (~$400–675, onsen privado outdoor en cada habitación).',
-                  tag: 'ryokan' },
+                { place: 'Romancecar', image: IMG.romancecar, caption: 'Shinjuku → Hakone · última línea',
+                  text: 'Romancecar desde Shinjuku. Una hora y media. La ciudad se acaba, empieza el monte. Última línea del viaje en tren. Ventanilla.',
+                  tag: 'ventanilla' },
+                { place: 'Ryokan en Gora', image: IMG.ryokan, caption: 'Gora · onsen privado',
+                  text: 'Ryokan en Gora. Madera, tatami, onsen privado en la habitación. Toda la noche para no hacer nada. No tenemos que hacer nada.',
+                  tag: 'madera' },
                 { place: 'Kaiseki en yukata', image: IMG.kaiseki, caption: 'Habitación · cena servida',
-                  text: 'Cena kaiseki en yukata, servida en la habitación. Once platos de pescado de lago, setas de montaña, wagyu si lo eliges. Descalzos sobre el tatami.',
-                  tag: 'cena' },
+                  text: 'Cena kaiseki en yukata. Once platos servidos en la habitación. Descalzos sobre el tatami. Sin hablar de horarios, sin mirar el móvil.',
+                  tag: 'once platos' },
                 { place: 'Monte Fuji', image: IMG.fuji, caption: 'Si hay suerte · amanecer',
-                  text: 'Si hay suerte, el monte Fuji al fondo del onsen al amanecer. Si no, igualmente: estás en agua caliente, con ella, en Japón.',
-                  tag: 'paisaje' }
+                  text: 'Si el cielo se abre al amanecer, el Fuji está ahí, al fondo del onsen. Si no: da igual. El agua está caliente. Tú también.',
+                  tag: 'amanecer' }
               ]
             },
             {
               value: 'kinosaki',
-              label: 'Kinosaki, 7 baños públicos, yukata por el pueblo',
+              label: 'Kinosaki, 6 baños públicos, yukata por el pueblo',
               micro: 'Vas a recorrer el pueblo en yukata, con el gotō en la mano. Y vas a estar adorable.',
               acts: [
-                { place: 'Limited Express Kinosaki', image: IMG.limited, caption: 'Kioto → Kinosaki · ~2h30m',
-                  text: 'Limited Express Kinosaki desde Kioto en ~2h30m. JR Pass válido o ~4.500 ¥. Mínimo 1 noche: el último tren de vuelta a Osaka sale a las 18:30.',
-                  tag: 'logística' },
-                { place: 'Nishimuraya Honkan', image: IMG.nishimuraya, caption: 'Kinosaki · 165 años, Relais & Châteaux',
-                  text: 'Nishimuraya Honkan (~$400–900, Relais & Châteaux, 165 años, mejor kaiseki de la zona) o Yamamotoya (~$200–450, 350 años, tattoo-friendly) si preferimos algo más desenfadado.',
-                  tag: 'ryokan' },
-                { place: 'Ritual de los 6 sotoyu', image: IMG.sotoyu, caption: 'Yumepa del ryokan · 6 baños',
-                  text: 'Ritual de los 6 sotoyu con el yumepa del ryokan. Nota 2026: Satono-yu sigue cerrado por obras. Circuito óptimo primera noche: Mandara-yu (origen 720 d.C.) → Yanagi-yu → Ichino-yu después de las 21h (cueva, sin cola).',
-                  tag: 'onsen' },
-                { place: 'Tajimaya', image: IMG.matsuba, caption: 'Kinosaki · wagyu + cangrejo matsuba',
-                  text: 'Cena en Tajimaya (~$130–300): mejor wagyu + cangrejo matsuba de la zona. Si vas a Nishimuraya Honkan, su kaiseki es de otro planeta.',
+                { place: 'Limited Express', image: IMG.limited, caption: 'Kioto → Kinosaki · por la costa',
+                  text: 'Limited Express desde Kioto. Dos horas y media. La costa, el mar, los pueblos. Vamos leyendo, mirando por la ventana, sin hablar.',
+                  tag: 'ventanilla' },
+                { place: 'Ryokan en Kinosaki', image: IMG.nishimuraya, caption: 'Kinosaki · pueblo de onsen',
+                  text: 'Ryokan en Kinosaki. Madera vieja, kaiseki en la habitación, onsen en el pueblo. Tattoo-friendly, sin códigos, sin etiquetas.',
+                  tag: 'pueblo' },
+                { place: 'Ritual de los 6 sotoyu', image: IMG.sotoyu, caption: 'Seis baños · con el yumepa',
+                  text: 'Los seis sotoyu con el yumepa del ryokan. Mandara-yu al atardecer, Ichino-yu después de las nueve. Sales del baño con el yukata puesto y vuelves andando por el río.',
+                  tag: 'ritual' },
+                { place: 'Cena en el pueblo', image: IMG.matsuba, caption: 'Kinosaki · wagyu y cangrejo',
+                  text: 'Cena en un restaurante del pueblo: wagyu, cangrejo, sake local. Si el ryokan ya tiene kaiseki, mejor. Si no, aquí.',
                   tag: 'cena' }
-              ]
-            },
-            {
-              value: 'surprise',
-              label: 'Sorpréndeme',
-              micro: 'Perfecto. Voy a hacer lo que me dé la gana. Y te va a encantar.',
-              acts: [
-                { place: 'Lo que decida', image: PLACEHOLDER_SVGS.enso, caption: 'Aventura · sin anticipar',
-                  text: 'Depende de lo que me dé la gana esa semana. Lo que tengo claro: onsen, kaiseki, yukata. Puede ser Hakone o Kinosaki. O un pueblo que descubramos en el momento.',
-                  tag: 'sorpresa' },
-                { place: 'Cierra en agua caliente', image: PLACEHOLDER_SVGS.sakura, caption: 'Prometido · onsen final',
-                  text: 'Lo que sí: termina en agua caliente. Con ella. En Japón. Con un kaiseki delante.',
-                  tag: 'promesa' }
               ]
             }
           ]
@@ -1155,7 +1289,7 @@
       // ===================================================================
       // STATE
       // ===================================================================
-      const state = { q1:null, q2:null, q3:null, q4:null, q5:null };
+      const state = { q1:null, q2:null, q3:null, q4:null, q5:null, q6:null, q7:null };
       const topbar = document.getElementById('topbar');
 
       // ===================================================================
@@ -1170,7 +1304,7 @@
           onsen: 'q__map--onsen'
         };
         const html = QUESTIONS.map((q, idx) => {
-          const dots = Array.from({length: 5}, (_, i) =>
+          const dots = Array.from({length: 7}, (_, i) =>
             `<span class="${i < idx ? 'is-done' : (i === idx ? 'is-current' : '')}"></span>`
           ).join('');
           const optsHtml = q.options.map(o =>
@@ -1179,7 +1313,7 @@
             </button>`
           ).join('');
           return `
-            <section class="state state--question" id="s-q${q.id}" aria-label="Pregunta ${q.id} de 5">
+            <section class="state state--question" id="s-q${q.id}" aria-label="Pregunta ${q.id} de 7">
               <div class="q__map ${qBg[q.node]}" aria-hidden="true">
                 ${mapBgSvg(q.node, idx)}
               </div>
@@ -1187,7 +1321,7 @@
                 <div class="q__head">
                   <div class="q__node-tag">${q.nodeLabel}</div>
                   <div class="q__progress">
-                    <span>Pregunta ${q.id} de 5</span>
+                    <span>Pregunta ${q.id} de 7</span>
                     <div class="q__progress-dots">${dots}</div>
                   </div>
                   <h2 class="q__title">${q.title}</h2>
@@ -1203,10 +1337,10 @@
       function mapBgSvg(node, idx) {
         // Resaltar el nodo activo según la pregunta (mismo criterio que en showTransition)
         let activeId = null;
-        if (idx === 0 || idx === 1) activeId = 'tokio';
-        else if (idx === 2) activeId = (state.q3 === 'nakasendo' ? 'nakasendo' : (state.q3 === 'alpes' ? 'alpes' : (state.q3 === 'direct' ? 'tokio' : null)));
-        else if (idx === 3) activeId = 'kioto';
-        else if (idx === 4) activeId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+        if (idx === 0 || idx === 1 || idx === 2) activeId = 'tokio';
+        else if (idx === 3) activeId = (state.q4 === 'nakasendo' ? 'nakasendo' : (state.q4 === 'alpes' ? 'alpes' : (state.q4 === 'direct' ? 'tokio' : null)));
+        else if (idx === 4 || idx === 5) activeId = 'kioto';
+        else if (idx === 6) activeId = (state.q7 === 'kinosaki' ? 'kinosaki' : 'hakone');
 
         // Centro y zoom del viewBox según el nodo activo (encuadre geográfico real)
         const focus = {
@@ -1215,7 +1349,9 @@
           alpes:      { cx: 470, cy: 220, vbW: 340, vbH: 300 },
           kioto:      { cx: 405, cy: 340, vbW: 340, vbH: 300 },
           hakone:     { cx: 555, cy: 295, vbW: 340, vbH: 300 },
-          kinosaki:   { cx: 380, cy: 295, vbW: 340, vbH: 300 }
+          kinosaki:   { cx: 380, cy: 295, vbW: 340, vbH: 300 },
+          kamakura:   { cx: 622, cy: 248, vbW: 320, vbH: 280 },
+          koyasan:    { cx: 370, cy: 392, vbW: 340, vbH: 300 }
         }[activeId] || { cx: 400, cy: 250, vbW: 600, vbH: 450 };
 
         const vbX = Math.max(0, focus.cx - focus.vbW / 2);
@@ -1273,7 +1409,6 @@
               <div class="act__photo-wrap">${photoHtml}</div>
               <p class="act__place">${act.place}</p>
               <p class="act__caption">${act.caption}</p>
-              <p class="act__micro">${opt.micro}</p>
               <p class="act__text">${act.text}</p>
               ${act.tag ? `<span class="act__tag">${act.tag}</span>` : ''}
               <button class="btn btn--ghost btn--small act__cta" data-action="${ctaAction}">${ctaLabel}</button>
@@ -1298,6 +1433,39 @@
       function clearActs() {
         document.getElementById('actHost').innerHTML = '';
       }
+
+      // ===================================================================
+      // THOUGHT (pensamiento) — vista previa con solo el texto rojo, antes de las cards
+      // Solo avanza cuando el usuario toca / pulsa tecla. Sin auto-advance.
+      // ===================================================================
+      let thoughtQId = null;
+
+      function showThought(qId) {
+        const q = QUESTIONS[qId - 1];
+        const opt = q.options.find(o => o.value === state['q' + qId]);
+        if (!opt) { go('s-act-' + qId + '-0'); return; }
+        thoughtQId = qId;
+        document.getElementById('thoughtNode').textContent = q.nodeLabel;
+        document.getElementById('thoughtText').textContent = opt.micro;
+        // Re-disparar las animaciones CSS (borrar + forzar reflow + re-add)
+        const node = document.getElementById('thoughtNode');
+        const txt = document.getElementById('thoughtText');
+        const hint = document.querySelector('#s-thought .thought__hint');
+        [node, txt, hint].forEach(el => { if (el) { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }});
+        go('s-thought');
+      }
+
+      function skipThought() {
+        if (thoughtQId == null) return;
+        const qId = thoughtQId;
+        thoughtQId = null;
+        go('s-act-' + qId + '-0');
+      }
+      // Click o tecla en el pensamiento → saltar a la primera card
+      document.getElementById('s-thought').addEventListener('click', skipThought);
+      document.getElementById('s-thought').addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); skipThought(); }
+      });
 
       // ===================================================================
       // TRANSITION (línea trazándose entre nodos)
@@ -1348,8 +1516,8 @@
             const n = child.getAttribute('data-node');
             // Todos los nodos visibles pero los previos atenuados
             let targetId = toNode;
-            if (toNode === 'intermedio') targetId = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
-            if (toNode === 'onsen') targetId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+            if (toNode === 'intermedio') targetId = (state.q4 === 'alpes' ? 'alpes' : 'nakasendo');
+            if (toNode === 'onsen') targetId = (state.q7 === 'kinosaki' ? 'kinosaki' : 'hakone');
             const c = child.querySelector('circle');
             if (c) {
               if (n === targetId) {
@@ -1377,9 +1545,9 @@
           kioto: 'Kioto', hakone: 'Hakone', kinosaki: 'Kinosaki', intermedio: '—', onsen: '—'
         };
         let realFrom = fromNode, realTo = toNode;
-        if (realFrom === 'intermedio') realFrom = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
-        if (realTo === 'intermedio') realTo = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
-        if (realTo === 'onsen') realTo = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+        if (realFrom === 'intermedio') realFrom = (state.q4 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (realTo === 'intermedio') realTo = (state.q4 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (realTo === 'onsen') realTo = (state.q7 === 'kinosaki' ? 'kinosaki' : 'hakone');
         document.getElementById('transitionFrom').textContent = nodeLabels[realFrom] || realFrom;
         document.getElementById('transitionTo').textContent = nodeLabels[realTo] || realTo;
 
@@ -1396,8 +1564,8 @@
         }
         // Pulso en el nodo destino
         let targetId = toNode;
-        if (toNode === 'intermedio') targetId = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
-        if (toNode === 'onsen') targetId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+        if (toNode === 'intermedio') targetId = (state.q4 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (toNode === 'onsen') targetId = (state.q7 === 'kinosaki' ? 'kinosaki' : 'hakone');
         const targetG = svg.querySelector(`[data-node="${targetId}"]`);
         if (targetG) {
           const c = targetG.querySelector('circle');
@@ -1408,7 +1576,7 @@
       // ===================================================================
       // NAVIGATION
       // ===================================================================
-      const order = ['s-postal','s-q1','s-q2','s-q3','s-q4','s-q5','s-mapa','s-despedida'];
+      const order = ['s-postal','s-q1','s-q2','s-q3','s-q4','s-q5','s-q6','s-q7','s-mapa','s-despedida'];
 
       function activate(id) {
         document.querySelectorAll('.state').forEach(el => el.removeAttribute('data-active'));
@@ -1423,10 +1591,11 @@
         if (id === 's-postal') {
           topbar.classList.remove('is-visible');
           // reset
-          state.q1=state.q2=state.q3=state.q4=state.q5=null;
+          state.q1=state.q2=state.q3=state.q4=state.q5=state.q6=state.q7=null;
           document.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
           document.querySelectorAll('.q__card,.q').forEach(c => c.classList.remove('is-revealed'));
           clearActs();
+          thoughtQId = null;
         } else {
           topbar.classList.add('is-visible');
         }
@@ -1451,7 +1620,7 @@
         }
 
         // q{i+1} → siguiente pregunta (con posible transición)
-        const m = a && a.match(/^q([1-6])$/);
+        const m = a && a.match(/^q([1-8])$/);
         if (m) {
           const next = +m[1];
           handleQuestionTransition(next);
@@ -1481,7 +1650,7 @@
         }
         // construir TODOS los actos de la opción elegida
         buildActsFor(qId);
-        go('s-act-' + qId + '-0');
+        showThought(qId);
       });
 
       // ===================================================================
@@ -1489,31 +1658,30 @@
       // ===================================================================
       function handleQuestionTransition(nextQId) {
         // Casos:
-        // nextQId=2 → acabamos Q1, vamos a Tokio→Intermedio (entre Q1 y Q2? No, Q2 sigue siendo Tokio)
-        //   No hay transición entre Q1→Q2 (mismo nodo: Tokio)
-        // nextQId=3 → Q2→Q3, transición Tokio→Intermedio
-        // nextQId=4 → Q3→Q4, transición Intermedio→Kioto
-        // nextQId=5 → Q4→Q5, transición Kioto→Onsen
-        // nextQId=6 → último baño → mapa final (no transición, va al mapa)
-        if (nextQId === 2) { go('s-q2'); return; }
-        if (nextQId === 6) { go('s-mapa'); return; }
+        // nextQId=2,3 → mismo nodo (Tokio), sin transición
+        // nextQId=4 → Tokio → Intermedio (la conexión tok-naka se dibuja)
+        // nextQId=5 → Intermedio → Kioto
+        // nextQId=6 → mismo nodo (Kioto/Kansai), sin transición
+        // nextQId=7 → Kioto → Onsen (según q7: hakone o kinosaki)
+        // nextQId=8 → último baño → mapa final (no transición, va al mapa)
+        if (nextQId === 2 || nextQId === 3) { go('s-q' + nextQId); return; }
+        if (nextQId === 6) { go('s-q6'); return; }
+        if (nextQId === 8) { go('s-mapa'); return; }
 
         // Determinar conexión según la opción de la pregunta actual
         let connKey = null, fromNode = null, toNode = null, labelText = null;
-        if (nextQId === 3) {
-          // Q2→Q3: tránsito Tokio→Intermedio (animamos a un punto intermedio genérico)
+        if (nextQId === 4) {
+          // Q3→Q4: Tokio → Intermedio
           connKey = 'tok-naka';
           labelText = 'Tokio → el intermedio';
           toNode = 'intermedio'; fromNode = 'tokio';
-        } else if (nextQId === 4) {
-          connKey = state.q3 === 'nakasendo' ? 'naka-kioto' : 'alpes-kioto';
-          labelText = state.q3 === 'nakasendo' ? 'Nakasendō → Kioto' : 'Alpes → Kioto';
-          toNode='kioto'; fromNode='intermedio';
         } else if (nextQId === 5) {
-          // Q5 opción determina Hakone o Kinosaki
-          if (state.q5 === 'kinosaki') {
+          connKey = state.q4 === 'nakasendo' ? 'naka-kioto' : 'alpes-kioto';
+          labelText = state.q4 === 'nakasendo' ? 'Nakasendō → Kioto' : 'Alpes → Kioto';
+          toNode='kioto'; fromNode='intermedio';
+        } else if (nextQId === 7) {
+          if (state.q7 === 'kinosaki') {
             connKey='kioto-onsen'; labelText='Kioto → Kinosaki'; toNode='onsen'; fromNode='kioto';
-            // mover visualmente el onsen a Kinosaki: lo trataremos igual, ambos están en el sur
           } else {
             connKey='kioto-onsen'; labelText='Kioto → Hakone'; toNode='onsen'; fromNode='kioto';
           }
@@ -1577,6 +1745,8 @@
               return;
             }
             if (active.id === 's-transition') return; // ignorar Esc durante transición
+            // En el pensamiento, Esc también avanza a la primera card
+            if (active.id === 's-thought') { skipThought(); return; }
             // genérico: ir al anterior en orden
             const idx = order.indexOf(active.id);
             if (idx > 0) go(order[idx-1]);
@@ -1591,13 +1761,22 @@
         const svg = document.getElementById('mapaSvg');
         const conns = {
           'tok-naka':{solid:false}, 'tok-alpes':{solid:false}, 'tok-kioto':{solid:false},
-          'naka-kioto':{solid:false}, 'alpes-kioto':{solid:false}, 'kioto-onsen':{solid:false}
+          'tok-kamakura':{solid:false}, 'naka-kioto':{solid:false}, 'alpes-kioto':{solid:false},
+          'kioto-onsen':{solid:false}, 'kioto-koyasan':{solid:false}
         };
-        if (state.q3 === 'nakasendo') { conns['tok-naka'].solid=true; conns['naka-kioto'].solid=true; }
-        else if (state.q3 === 'alpes') { conns['tok-alpes'].solid=true; conns['alpes-kioto'].solid=true; }
-        else if (state.q3 === 'direct') { conns['tok-kioto'].solid=true; }
+        // Q3 (Tokio excursión): conexión Tokio → Kamakura si eligió salir
+        if (state.q3 === 'kamakura') conns['tok-kamakura'].solid = true;
 
-        if (state.q5) conns['kioto-onsen'].solid = true;
+        // Q4 (Intermedio): ruta principal
+        if (state.q4 === 'nakasendo') { conns['tok-naka'].solid=true; conns['naka-kioto'].solid=true; }
+        else if (state.q4 === 'alpes') { conns['tok-alpes'].solid=true; conns['alpes-kioto'].solid=true; }
+        else if (state.q4 === 'direct') { conns['tok-kioto'].solid=true; }
+
+        // Q6 (Kōya-san): conexión Kioto → Kōya-san si eligió
+        if (state.q6 === 'koyasan') conns['kioto-koyasan'].solid = true;
+
+        // Q7 (Onsen): siempre que haya elegido
+        if (state.q7) conns['kioto-onsen'].solid = true;
 
         Object.keys(conns).forEach(k => {
           const p = svg.querySelector('[data-conn="'+k+'"]');
@@ -1615,6 +1794,8 @@
         const alpes = svg.querySelector('[data-node="alpes"]');
         const hakone = svg.querySelector('[data-node="hakone"]');
         const kinosaki = svg.querySelector('[data-node="kinosaki"]');
+        const kamakura = svg.querySelector('[data-node="kamakura"]');
+        const koyasan = svg.querySelector('[data-node="koyasan"]');
         function setNodeActive(g, active) {
           if (!g) return;
           const c = g.querySelector('circle');
@@ -1631,24 +1812,31 @@
             txt.forEach(t => t.setAttribute('opacity','0.35'));
           }
         }
-        setNodeActive(naka, state.q3 === 'nakasendo');
-        setNodeActive(alpes, state.q3 === 'alpes');
-        if (state.q5 === 'hakone') { setNodeActive(hakone,true); setNodeActive(kinosaki,false); }
-        else if (state.q5 === 'kinosaki') { setNodeActive(hakone,false); setNodeActive(kinosaki,true); }
-        else if (state.q5 === 'surprise') { setNodeActive(hakone,true); setNodeActive(kinosaki,true); }
+        setNodeActive(naka, state.q4 === 'nakasendo');
+        setNodeActive(alpes, state.q4 === 'alpes');
+        setNodeActive(kamakura, state.q3 === 'kamakura');
+        setNodeActive(koyasan, state.q6 === 'koyasan');
+        if (state.q7 === 'hakone') { setNodeActive(hakone,true); setNodeActive(kinosaki,false); }
+        else if (state.q7 === 'kinosaki') { setNodeActive(hakone,false); setNodeActive(kinosaki,true); }
         else { setNodeActive(hakone,false); setNodeActive(kinosaki,false); }
 
-        // Scrapbook — 4 polaroids elegidas según respuestas
+        // Scrapbook — polaroids elegidas según respuestas (4–6 según extras)
         const scrap = document.getElementById('scrapbook');
         scrap.innerHTML = '';
         const items = [];
         items.push({img: IMG.sensoji, cap: 'Tokio · el primer amanecer', rot: -3});
         items.push({img: IMG.sushi, cap: 'Shinjuku · sushi a las once', rot: 2});
-        if (state.q3 === 'nakasendo') items.push({img: IMG.nakasendo, cap: 'Magome → Tsumago · 8 km', rot: -1.5});
-        else if (state.q3 === 'alpes') items.push({img: IMG.shirakawa, cap: 'Takayama + Shirakawa-go', rot: -1.5});
-        else if (state.q3 === 'direct') items.push({img: IMG.inari, cap: 'Tokio → Kioto · shinkansen', rot: -1.5});
+        // Q3 (excursión Tokio): Kamakura si salió, si no, no añade
+        if (state.q3 === 'kamakura') items.push({img: IMG.kinkaku, cap: 'Kamakura · Daibutsu al aire libre', rot: 2.5});
+        // Q4 (Intermedio): según ruta
+        if (state.q4 === 'nakasendo') items.push({img: IMG.nakasendo, cap: 'Magome → Tsumago · 8 km', rot: -1.5});
+        else if (state.q4 === 'alpes') items.push({img: IMG.shirakawa, cap: 'Takayama + Shirakawa-go', rot: -1.5});
+        else if (state.q4 === 'direct') items.push({img: IMG.inari, cap: 'Tokio → Kioto · shinkansen', rot: -1.5});
         else items.push({img: IMG.nakasendo, cap: 'El intermedio · por decidir', rot: -1.5});
-        items.push({img: IMG.ryokan, cap: state.q5 === 'hakone' ? 'Hakone · onsen privado' : (state.q5 === 'kinosaki' ? 'Kinosaki · 6 sotoyu' : 'El último baño'), rot: 3});
+        // Q6 (Kōya-san): solo si eligió
+        if (state.q6 === 'koyasan') items.push({img: IMG.shirakawa, cap: 'Kōya-san · Okunoin de noche', rot: -2.5});
+        // Q7 (Onsen): siempre (es el cierre)
+        items.push({img: IMG.ryokan, cap: state.q7 === 'hakone' ? 'Hakone · onsen privado' : (state.q7 === 'kinosaki' ? 'Kinosaki · 6 sotoyu' : 'El último baño'), rot: 3});
 
         items.forEach((it, i) => {
           const fig = document.createElement('figure');
@@ -1661,15 +1849,20 @@
 
         // Resumen
         const sm = document.getElementById('mapaSummary');
-        const intLabel = state.q3 === 'nakasendo' ? 'Nakasendō (2–3 noches)'
-                       : state.q3 === 'alpes' ? 'Alpes japoneses (2–3 noches)'
-                       : state.q3 === 'direct' ? 'Tokio → Kioto directo'
+        const intLabel = state.q4 === 'nakasendo' ? 'Nakasendō (2–3 noches)'
+                       : state.q4 === 'alpes' ? 'Alpes japoneses (2–3 noches)'
+                       : state.q4 === 'direct' ? 'Tokio → Kioto directo'
                        : 'El intermedio, por decidir';
-        const onsenLabel = state.q5 === 'hakone' ? 'Hakone'
-                         : state.q5 === 'kinosaki' ? 'Kinosaki'
-                         : state.q5 === 'surprise' ? 'Hakone o Kinosaki'
+        const onsenLabel = state.q7 === 'hakone' ? 'Hakone (1–2 noches)'
+                         : state.q7 === 'kinosaki' ? 'Kinosaki (1–2 noches)'
                          : 'onsen, por decidir';
-        sm.innerHTML = '4–5 noches en Tokio · ' + intLabel + ' · 3–4 noches en Kioto · ' + onsenLabel + '.';
+        const partes = ['4–5 noches en Tokio'];
+        if (state.q3 === 'kamakura') partes.push('Kamakura (1 día)');
+        partes.push(intLabel);
+        partes.push('3–4 noches en Kioto');
+        if (state.q6 === 'koyasan') partes.push('Kōya-san (1 noche)');
+        partes.push(onsenLabel);
+        sm.innerHTML = partes.join(' · ') + '.';
       }
 
       // ===================================================================
