@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Crónica de un viaje anunciado · De Adrián, para Noelia</title>
+  <meta name="description" content="Una carta con cinco preguntas para Noelia. Japón nos espera.">
+  <meta name="theme-color" content="#F4ECE0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Cormorant+Infant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Great+Vibes&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- TOKENS ---------- */
+    :root{
+      --paper:#F4ECE0;--paper-deep:#E8DCC4;--paper-shadow:#D4C5A6;
+      --ink:#1A1612;--ink-soft:#4A3F33;--ink-mute:#7A6A5A;
+      --vermilion:#C8382A;--vermilion-deep:#9B2820;--gold:#B8893E;
+      --sakura:#F2C7C7;--moss:#5C6E4A;
+      --serif:'Cormorant Garamond','Cormorant Infant',Georgia,serif;
+      --body:'Cormorant Infant',Georgia,serif;
+      --script:'Great Vibes',cursive;
+      --ui:'Inter',-apple-system,sans-serif;
+      --ease-out:cubic-bezier(0.16,1,0.3,1);
+      --ease-soft:cubic-bezier(0.4,0,0.2,1);
+      --topbar-h:56px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{
+      font-family:var(--body);font-size:17px;line-height:1.75;
+      color:var(--ink);background:var(--paper);
+      min-height:100vh;min-height:100dvh;overflow-x:hidden;position:relative;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      text-rendering:optimizeLegibility;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
+      opacity:.022;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    a,button{-webkit-tap-highlight-color:transparent}
+    .skip-link{position:absolute;top:-100px;left:0;background:var(--ink);color:var(--paper);padding:.5rem 1rem;z-index:9999}
+    .skip-link:focus{top:0}
+
+    /* ---------- TOPBAR ---------- */
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      height:var(--topbar-h);padding:0 max(.75rem, env(safe-area-inset-left));
+      display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+      background:rgba(244,236,224,.85);backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(184,137,62,.18);
+      opacity:0;transform:translateY(-100%);transition:opacity 400ms var(--ease-out),transform 400ms var(--ease-out);
+    }
+    .topbar.is-visible{opacity:1;transform:translateY(0)}
+    .topbar__back{
+      display:inline-flex;align-items:center;gap:.5rem;background:transparent;border:0;
+      color:var(--ink-soft);font-family:var(--ui);font-size:.8rem;font-weight:500;
+      cursor:pointer;padding:.5rem .65rem;border-radius:6px;
+      transition:color 200ms ease,background 200ms ease;
+    }
+    .topbar__back:hover{color:var(--vermilion);background:rgba(200,56,42,.04)}
+    .topbar__back:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+    .topbar__back svg{flex-shrink:0}
+    .topbar__brand{font-family:var(--script);font-size:1.15rem;color:var(--vermilion);opacity:.85;white-space:nowrap}
+    @media (max-width:520px){
+      .topbar__back span,.topbar__brand span{display:none}
+      .topbar__brand::after{content:'旅';font-size:1.3rem}
+    }
+
+    /* ---------- STATE LAYOUT ---------- */
+    .state{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      padding:calc(var(--topbar-h) + 1rem) 1rem calc(1rem + env(safe-area-inset-bottom));
+      opacity:0;pointer-events:none;
+      transform:translateY(20px);
+      transition:opacity 600ms var(--ease-out),transform 600ms var(--ease-out);
+      overflow-y:auto;overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+    }
+    .state[data-active="true"]{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .state--no-topbar{padding-top:1rem}
+
+    /* ---------- POSTAL ---------- */
+    .postal{
+      width:100%;max-width:min(440px,94vw);
+      background:linear-gradient(135deg,var(--paper-deep) 0%,var(--paper) 50%,var(--paper-deep) 100%);
+      border-radius:4px;
+      box-shadow:0 30px 60px -20px rgba(26,22,18,.35),inset 0 0 60px rgba(184,137,62,.08);
+      padding:2.5rem 1.5rem 1.75rem;
+      border:1px solid rgba(26,22,18,.1);
+      position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
+    }
+    .postal::before,.postal::after{
+      content:'';position:absolute;left:.75rem;right:.75rem;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(184,137,62,.4),transparent);
+    }
+    .postal::before{top:.75rem}
+    .postal::after{bottom:.75rem}
+    .postal__seal{
+      width:84px;height:84px;margin-bottom:1.25rem;
+      position:relative;display:flex;align-items:center;justify-content:center;
+    }
+    .postal__seal svg{width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(200,56,42,.3))}
+    .postal__to{
+      font-family:var(--script);font-size:clamp(1.6rem,1.2rem+1.5vw,2.1rem);
+      color:var(--vermilion);margin-bottom:.5rem;line-height:1.2;
+    }
+    .postal__title{
+      font-family:var(--serif);font-style:italic;font-weight:500;
+      font-size:clamp(1.7rem,1.2rem+2.5vw,2.4rem);
+      text-align:center;line-height:1.15;color:var(--ink);
+      letter-spacing:-.01em;margin-bottom:1.25rem;
+    }
+    .postal__body{
+      font-family:var(--body);font-size:1rem;line-height:1.65;
+      color:var(--ink-soft);max-width:34ch;margin:0 auto 1.5rem;
+    }
+    .postal__cta-wrap{margin-top:.5rem;margin-bottom:.5rem;position:relative;z-index:5}
+    .postal__hint{
+      font-size:.7rem;color:var(--ink-mute);margin-top:.5rem;
+      font-style:italic;letter-spacing:.04em;opacity:0;
+      animation:hintIn 500ms var(--ease-out) 2.5s forwards;
+    }
+    @keyframes hintIn{to{opacity:.7}}
+    .btn{
+      font-family:var(--ui);font-size:.88rem;font-weight:500;letter-spacing:.04em;
+      text-transform:lowercase;color:var(--paper);background:var(--vermilion);
+      border:0;padding:.8rem 1.4rem;border-radius:999px;cursor:pointer;
+      transition:background 200ms ease,transform 200ms var(--ease-out),box-shadow 200ms ease;
+      box-shadow:0 6px 16px -4px rgba(200,56,42,.5);
+      display:inline-flex;flex-direction:column;align-items:center;line-height:1.2;
+    }
+    .btn:hover{background:var(--vermilion-deep);transform:translateY(-1px);box-shadow:0 8px 20px -4px rgba(200,56,42,.6)}
+    .btn:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+    .btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);box-shadow:none;padding:.65rem 1.2rem;font-size:.82rem}
+    .btn--ghost:hover{background:var(--ink);color:var(--paper)}
+    .btn--small{padding:.6rem 1.1rem;font-size:.78rem}
+    .btn__hover-text{
+      display:block;font-size:.65rem;opacity:0;transform:translateY(4px);
+      transition:opacity 200ms ease,transform 200ms ease;margin-top:3px;
+      font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;
+    }
+    .btn:hover .btn__hover-text{opacity:.85;transform:translateY(0)}
+
+    /* ---------- Q MAP BACKGROUND — mapa siempre visible detrás del contenido ---------- */
+    .q__map{
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      display:flex;align-items:center;justify-content:center;
+      opacity:.32;overflow:hidden;
+    }
+    .q__map svg{width:100%;height:100%;max-width:1400px}
+
+    /* ---------- QUESTION — contenido integrado al mapa, ocupa todo el alto ---------- */
+    .state--question{
+      z-index:2;
+      padding:calc(var(--topbar-h) + 1rem) 1rem calc(1.5rem + env(safe-area-inset-bottom));
+      flex-direction:column;justify-content:space-between;align-items:stretch;
+    }
+    .q{
+      width:100%;max-width:560px;margin:0 auto;
+      display:flex;flex-direction:column;gap:1rem;
+      flex:1 1 auto;
+    }
+    .q__head{
+      display:flex;flex-direction:column;gap:.5rem;
+      padding-top:clamp(1.5rem, 4vh, 4rem);
+    }
+    .q__node-tag{
+      font-family:var(--ui);font-size:.65rem;color:var(--vermilion);
+      letter-spacing:.18em;text-transform:uppercase;
+      font-weight:600;display:flex;align-items:center;gap:.5rem;
+    }
+    .q__node-tag::before{
+      content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+      background:var(--vermilion);opacity:.6;flex-shrink:0;
+    }
+    .q__progress{
+      font-family:var(--ui);font-size:.62rem;color:var(--ink-mute);
+      letter-spacing:.12em;text-transform:uppercase;
+      display:flex;align-items:center;gap:.5rem;justify-content:space-between;
+    }
+    .q__progress-dots{display:flex;gap:5px}
+    .q__progress-dots span{
+      width:6px;height:6px;border-radius:50%;
+      background:var(--ink-mute);opacity:.25;transition:all 300ms var(--ease-out);
+    }
+    .q__progress-dots span.is-done{background:var(--vermilion);opacity:1}
+    .q__progress-dots span.is-current{background:var(--ink);opacity:.7;transform:scale(1.4)}
+    .q__title{
+      font-family:var(--serif);font-size:clamp(1.25rem,.95rem+1.1vw,1.6rem);
+      font-weight:500;line-height:1.3;color:var(--ink);
+      max-width:30ch;
+    }
+    .q__options{
+      display:flex;flex-direction:column;gap:.6rem;
+      margin-top:auto;padding-top:1.5rem;
+    }
+    .q__option{
+      font-family:var(--body);font-size:.95rem;color:var(--ink);
+      background:transparent;border:1px solid rgba(26,22,18,.2);
+      border-radius:6px;padding:.85rem 1rem;text-align:left;
+      cursor:pointer;transition:all 200ms var(--ease-out);
+      display:flex;align-items:flex-start;gap:.65rem;line-height:1.4;width:100%;
+      min-height:48px;
+    }
+    .q__option:hover,.q__option:focus-visible{
+      border-color:var(--vermilion);background:rgba(200,56,42,.04);
+      transform:translateX(3px);outline:none;
+    }
+    .q__option.is-selected{border-color:var(--vermilion);background:rgba(200,56,42,.08)}
+    .q__option-icon{flex-shrink:0;width:20px;height:20px;color:var(--ink-soft);margin-top:1px}
+    .q__option.is-selected .q__option-icon{color:var(--vermilion)}
+    .q__option span{flex:1}
+    .q__option em{
+      display:block;font-style:normal;font-family:var(--ui);font-size:.7rem;
+      color:var(--vermilion);letter-spacing:.06em;margin-top:.2rem;opacity:.85;
+      text-transform:lowercase;
+    }
+
+    /* ---------- ACT (diapositiva) — contenido integrado, ocupa todo el alto ---------- */
+    .state--act{
+      z-index:2;
+      padding:calc(var(--topbar-h) + .75rem) 1rem calc(1rem + env(safe-area-inset-bottom));
+      flex-direction:column;justify-content:flex-start;align-items:stretch;
+    }
+    .act{
+      width:100%;max-width:480px;margin:0 auto;
+      display:flex;flex-direction:column;align-items:center;text-align:center;gap:.85rem;
+      padding:1rem 0 1.5rem;
+      flex:1 1 auto;
+    }
+    .act__head{
+      width:100%;display:flex;justify-content:space-between;align-items:center;
+      font-family:var(--ui);font-size:.65rem;letter-spacing:.15em;
+      text-transform:uppercase;color:var(--ink-mute);
+    }
+    .act__node{color:var(--vermilion);font-weight:600}
+    .act__counter{font-style:italic;text-transform:none;letter-spacing:.04em;font-family:var(--serif);color:var(--ink-soft);font-size:.85rem}
+    .act__photo-wrap{perspective:600px;display:flex;justify-content:center;width:100%;margin:.25rem 0}
+    .act__photo,.act__photo--none,.act__photo--svg{
+      width:100%;max-width:280px;aspect-ratio:4/5;
+      object-fit:cover;object-position:center;display:block;
+      background:#fff;padding:6px 6px 26px;
+      box-shadow:0 14px 30px -10px rgba(26,22,18,.45);
+      cursor:zoom-in;transform:rotate(-2deg);
+      transition:transform 400ms var(--ease-out);
+    }
+    .act__photo--svg{background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#fff}
+    @media (min-width:480px){.act__photo,.act__photo--none,.act__photo--svg{max-width:300px}}
+    .act__photo:hover,.act__photo:focus-visible{transform:rotate(0deg) scale(1.03);outline:none}
+    .act__photo--none{
+      background:linear-gradient(135deg,var(--paper-deep),var(--paper));
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--script);color:var(--vermilion);font-size:2.2rem;
+      min-height:280px;
+    }
+    .act__place{
+      font-family:var(--serif);
+      font-weight:500;
+      font-size:clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+      color:var(--vermilion-deep);
+      line-height:1.15;margin-top:.5rem;
+      letter-spacing:-.01em;
+    }
+    .act__caption{
+      font-family:var(--ui);font-size:.78rem;letter-spacing:.14em;
+      text-transform:uppercase;color:#5a4a3a;margin-top:-.2rem;
+      font-weight:500;
+    }
+    .act__micro{
+      font-family:'Cormorant Garamond',serif;
+      font-style:italic;font-weight:500;
+      font-size:1.2rem;
+      line-height:1.4;color:var(--vermilion-deep);
+      max-width:36ch;margin:.5rem auto 0;
+    }
+    .act__text{
+      font-family:var(--body);font-size:1.02rem;line-height:1.65;
+      color:#2e251c;max-width:38ch;margin-top:.5rem;
+      font-weight:400;
+    }
+    .act__cta{margin-top:auto;padding-top:1.25rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;width:100%}
+    .act__tag{
+      font-family:var(--ui);font-size:.62rem;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--gold);font-weight:600;
+      padding:.25rem .65rem;border:1px solid rgba(184,137,62,.35);
+      border-radius:999px;
+    }
+
+    /* ---------- TRANSITION (entre actos → siguiente pregunta) — mapa a pantalla completa ---------- */
+    .state--transition{
+      position:fixed;inset:0;z-index:3;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(244,236,224,1) 0%, rgba(238,226,205,.85) 60%, rgba(214,197,161,.7) 100%),
+        linear-gradient(180deg,var(--paper) 0%,var(--paper-deep) 100%);
+      opacity:0;pointer-events:none;
+      transition:opacity 400ms var(--ease-out);
+      overflow:hidden;
+    }
+    /* Patrón decorativo washi de fondo (líneas suaves como papel) */
+    .state--transition::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      z-index:0;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(184,137,62,.18) 0%, transparent 35%),
+        radial-gradient(circle at 85% 75%, rgba(200,56,42,.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(244,236,224,.3) 0%, transparent 60%),
+        repeating-linear-gradient(115deg, transparent 0, transparent 28px, rgba(184,137,62,.1) 28px, rgba(184,137,62,.1) 29px),
+        repeating-linear-gradient(25deg, transparent 0, transparent 64px, rgba(184,137,62,.07) 64px, rgba(184,137,62,.07) 65px);
+      opacity:1;
+    }
+    /* Marco decorativo interior (inspirado en pergamino) + kanji grande de fondo */
+    .state--transition::after{
+      content:'行';position:absolute;inset:0;pointer-events:none;
+      z-index:0;
+      border:1px solid rgba(184,137,62,.2);
+      margin:clamp(1rem, 4vh, 2rem);
+      border-radius:4px;
+      font-family:var(--script);
+      font-size:clamp(10rem, 50vh, 24rem);
+      color:rgba(184,137,62,.1);
+      display:flex;align-items:center;justify-content:center;
+      line-height:1;
+      letter-spacing:0;
+    }
+    .state--transition[data-active="true"]{opacity:1;pointer-events:auto}
+    .transition{
+      position:absolute;inset:0;width:100%;height:100%;
+      display:block;
+    }
+    .transition__map{
+      position:absolute;inset:0;width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
+      z-index:1;
+    }
+    .transition__map svg{
+      width:100%;height:100%;
+      display:block;filter:drop-shadow(0 14px 40px rgba(26,22,18,.18));
+    }
+    .transition__overlay{
+      position:absolute;left:0;right:0;bottom:clamp(2rem, 8vh, 5rem);
+      z-index:3;pointer-events:none;
+      display:flex;flex-direction:column;align-items:center;gap:.85rem;
+      padding:1rem 1.5rem;
+    }
+    .transition__label{
+      font-family:var(--script);
+      font-size:clamp(1.6rem,1.2rem+2vw,2.6rem);
+      color:var(--vermilion);text-align:center;line-height:1.15;
+      opacity:0;transform:translateY(8px);
+      animation:fadeUp 700ms var(--ease-out) 700ms forwards;
+      text-shadow:0 2px 18px rgba(244,236,224,.85), 0 1px 0 rgba(244,236,224,.7);
+    }
+    .transition__sub{
+      font-family:var(--ui);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--ink-soft);opacity:0;
+      animation:fadeUp 600ms var(--ease-out) 1100ms forwards;
+      text-shadow:0 1px 12px rgba(244,236,224,.85);
+    }
+    .transition__step{
+      position:absolute;font-family:var(--ui);font-size:.62rem;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--ink-soft);
+      opacity:0;animation:fadeIn 500ms ease forwards;
+      text-shadow:0 1px 8px rgba(244,236,224,.9);
+      background:rgba(244,236,224,.6);
+      padding:3px 10px;border-radius:999px;
+    }
+    .transition__step--from{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(-100%) translateX(-1rem);animation-delay:1300ms}
+    .transition__step--to{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(1rem);animation-delay:1900ms}
+
+    /* En transición, ocultamos el fondo normal para que el mapa de transición sea el fondo */
+    .state--transition ~ * .q__map{display:none}
+
+    @keyframes drawLine{to{stroke-dashoffset:0}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{to{opacity:1}}
+    .conn-draw{
+      stroke-dasharray:var(--len,1200);
+      stroke-dashoffset:var(--len,1200);
+      animation:drawLine 1500ms cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    .node-pulse{
+      transform-origin:center;transform-box:fill-box;
+      animation:pulse 700ms var(--ease-out) 1300ms 2;
+    }
+
+    /* ---------- LIGHTBOX ---------- */
+    .lightbox{
+      position:fixed;inset:0;z-index:5000;
+      background:rgba(26,22,18,.94);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:2rem 1rem;opacity:0;pointer-events:none;
+      transition:opacity 300ms var(--ease-out);
+    }
+    .lightbox:not([hidden]){opacity:1;pointer-events:auto}
+    .lightbox__close{
+      position:absolute;top:1rem;right:1.25rem;background:transparent;border:0;
+      color:var(--paper);font-size:2.2rem;cursor:pointer;padding:.5rem .75rem;
+      line-height:1;border-radius:6px;font-family:var(--ui);
+    }
+    .lightbox__close:hover{background:rgba(244,236,224,.1)}
+    .lightbox__close:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+    .lightbox__img{
+      max-width:92vw;max-height:75vh;object-fit:contain;display:block;
+      background:#fff;padding:.75rem;
+      box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      transform:scale(.96);
+      transition:transform 300ms var(--ease-out);
+    }
+    .lightbox:not([hidden]) .lightbox__img{transform:scale(1)}
+    .lightbox__caption{
+      font-family:var(--script);font-size:clamp(1.3rem,1rem+1vw,1.7rem);
+      color:var(--paper);margin-top:1.25rem;text-align:center;
+      max-width:80vw;line-height:1.3;
+    }
+    .lightbox[hidden]{display:none}
+
+    /* ---------- MAP STATE ---------- */
+    .mapa{
+      width:100%;max-width:780px;display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+      padding:1rem 0 2rem;
+    }
+    .mapa__title{
+      font-family:var(--script);font-size:clamp(2rem,1.5rem+2.5vw,3rem);
+      color:var(--vermilion);text-align:center;line-height:1.2;margin-bottom:.25rem;
+    }
+    .mapa__sub{
+      font-family:var(--body);font-style:italic;color:var(--ink-soft);
+      font-size:1rem;text-align:center;max-width:36ch;
+    }
+    .mapa__pergamino{
+      width:100%;max-width:640px;aspect-ratio:800/380;position:relative;
+      background:linear-gradient(180deg,var(--paper) 0%,var(--paper-deep) 100%);
+      border-radius:4px;box-shadow:0 16px 40px -16px rgba(26,22,18,.4);
+      border:1px solid rgba(184,137,62,.3);overflow:hidden;
+      padding:1rem;
+    }
+    .mapa__pergamino svg{width:100%;height:100%;display:block}
+    .mapa__summary{
+      max-width:560px;text-align:center;font-family:var(--body);font-style:italic;
+      color:var(--ink-soft);line-height:1.6;padding:0 1rem;font-size:.95rem;
+    }
+    .mapa__scrapbook{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;
+      width:100%;max-width:560px;padding:0 .5rem;
+    }
+    @media (min-width:640px){
+      .mapa__scrapbook{grid-template-columns:repeat(4,1fr);gap:1.25rem}
+    }
+    .mapa__polaroid{
+      background:#fff;padding:5px 5px 22px;
+      box-shadow:0 10px 24px -8px rgba(26,22,18,.4);
+      display:flex;flex-direction:column;align-items:center;gap:.4rem;
+      cursor:zoom-in;transition:transform 250ms var(--ease-out),box-shadow 250ms ease;
+      opacity:0;transform:scale(.85) rotate(var(--rot,0deg));
+      animation:scrapIn 600ms var(--ease-out) forwards;
+    }
+    .mapa__polaroid:hover{transform:scale(1.04) rotate(0deg);box-shadow:0 16px 32px -8px rgba(26,22,18,.5)}
+    .mapa__polaroid:focus-visible{outline:3px solid var(--vermilion);outline-offset:4px}
+    .mapa__polaroid img{width:100%;height:120px;object-fit:cover;display:block}
+    @media (min-width:640px){.mapa__polaroid img{height:140px}}
+    .mapa__polaroid figcaption{
+      font-family:var(--script);font-size:.95rem;color:var(--vermilion);
+      text-align:center;line-height:1.2;
+    }
+    @keyframes scrapIn{to{opacity:1;transform:scale(1) rotate(var(--rot,0deg))}}
+
+    .mapa__cta{margin-top:.5rem}
+
+    /* ---------- DESPEDIDA ---------- */
+    .despedida{
+      width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;
+      text-align:center;gap:1.25rem;padding:1rem 1rem 2rem;
+    }
+    .despedida__name{
+      font-family:var(--script);font-size:clamp(2.5rem,2rem+2.5vw,3.5rem);
+      color:var(--vermilion);line-height:1.1;
+    }
+    .despedida__block{
+      opacity:0;transform:translateY(10px);
+      animation:despIn 700ms var(--ease-out) forwards;
+    }
+    .despedida__block p{
+      font-family:var(--serif);font-size:clamp(1.05rem,.95rem+.5vw,1.3rem);
+      font-style:italic;line-height:1.5;color:var(--ink);
+      max-width:32ch;margin:0 auto;
+    }
+    .despedida__block--secondary p{color:var(--ink-soft);font-size:clamp(.95rem,.85rem+.5vw,1.1rem)}
+    .despedida__block--script p{
+      font-family:var(--script);color:var(--vermilion);
+      font-size:clamp(1.5rem,1.2rem+1.5vw,2rem);font-style:normal;line-height:1.3;
+    }
+    .despedida__divider{
+      display:flex;align-items:center;justify-content:center;gap:1rem;
+      color:var(--gold);opacity:0;animation:despIn 700ms var(--ease-out) forwards;
+    }
+    .despedida__divider::before,.despedida__divider::after{
+      content:'';width:50px;height:1px;background:var(--gold);opacity:.6;
+    }
+    .despedida__signoff{
+      font-family:var(--script);font-size:clamp(1.8rem,1.4rem+2vw,2.5rem);
+      color:var(--ink);margin-top:.5rem;opacity:0;animation:despIn 700ms var(--ease-out) forwards;
+    }
+    .despedida__seal{
+      width:90px;height:90px;opacity:0;animation:despIn 700ms var(--ease-out) forwards;
+    }
+    .despedida__block:nth-of-type(1){animation-delay:200ms}
+    .despedida__block:nth-of-type(2){animation-delay:500ms}
+    .despedida__block:nth-of-type(3){animation-delay:900ms}
+    .despedida__block--script{animation-delay:1300ms}
+    .despedida__divider{animation-delay:1700ms}
+    .despedida__signoff{animation-delay:2000ms}
+    .despedida__seal{animation-delay:2300ms}
+    .despedida__cta{opacity:0;animation:despIn 700ms var(--ease-out) 2600ms forwards}
+    @keyframes despIn{to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion:reduce){
+      .despedida__block,.despedida__divider,.despedida__signoff,.despedida__seal,.despedida__cta{
+        opacity:1;transform:none;animation:none;
+      }
+    }
+
+    /* ---------- MAPA PERGAMINO NODE LABELS ---------- */
+    .mapa__pergamino .node-pulse-anim{animation:pulse 2.4s var(--ease-out) infinite}
+    @media (prefers-reduced-motion:reduce){.mapa__pergamino .node-pulse-anim{animation:none}}
+
+    /* ---------- REDUCED MOTION ---------- */
+    @media (prefers-reduced-motion:reduce){
+      .state{transition:opacity 200ms ease}
+      .conn-draw,.node-pulse,.act__photo,.transition__label,.mapa__polaroid{
+        transition:none!important;animation:none!important;transform:none!important;
+      }
+      .postal__hint{animation:none;opacity:.7}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <!-- TOPBAR -->
+  <header class="topbar" id="topbar" role="banner">
+    <button class="topbar__back" data-action="back" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M3 12l9-9 1.5 1.5L7 11h14v2H7l6.5 6.5L12 21z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>volver al inicio</span>
+    </button>
+    <div class="topbar__brand"><span>旅 · Japón, pronto</span></div>
+  </header>
+
+  <main id="main">
+
+  <!-- STATE 0: POSTAL -->
+  <section class="state state--no-topbar" id="s-postal" data-active="true" aria-label="Postal">
+    <article class="postal" role="region" aria-label="Postal de Adrián para Noelia">
+      <div class="postal__seal" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#C8382A" stroke-width="1.5" opacity="0.4"/>
+          <circle cx="50" cy="50" r="42" fill="#C8382A" opacity="0.06"/>
+          <circle cx="50" cy="50" r="36" fill="#C8382A" opacity="0.92"/>
+          <text x="50" y="62" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="38" font-weight="600" font-style="italic">旅</text>
+        </svg>
+      </div>
+      <div class="postal__to">Noelia,</div>
+      <h1 class="postal__title">Crónica de un viaje<br>anunciado</h1>
+      <p class="postal__body">Llevamos años queriendo ir a Japón.<br>esta vez, no se nos escapa</p>
+      <div class="postal__cta-wrap">
+        <button class="btn" data-action="q1" aria-label="Abrir la postal">
+          Comienza el viaje
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <!-- Contenedor donde se generan las preguntas dinámicamente -->
+  <div id="qHost"></div>
+
+  <!-- Contenedor donde se generan los actos dinámicamente -->
+  <div id="actHost"></div>
+
+  <!-- STATE: TRANSICIÓN MAPA (entre actos → siguiente pregunta) — mapa a pantalla completa -->
+  <section class="state state--transition" id="s-transition" aria-hidden="true" aria-label="Viajando al siguiente nodo">
+    <div class="transition">
+      <div class="transition__map" aria-hidden="true">
+        <svg id="transitionSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet">
+          <!-- Se rellena por JS con el mapa real de Japón completo -->
+        </svg>
+      </div>
+      <div class="transition__overlay">
+        <span class="transition__step transition__step--from" id="transitionFrom">Tokio</span>
+        <span class="transition__step transition__step--to" id="transitionTo">Kioto</span>
+        <p class="transition__label" id="transitionLabel">Esto es nuestro viaje</p>
+        <span class="transition__sub" id="transitionSub">siguiente parada</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATE 6: MAPA -->
+  <section class="state" id="s-mapa" aria-label="El plan">
+    <div class="mapa">
+      <h2 class="mapa__title">El plan es nuestro.</h2>
+      <p class="mapa__sub">Mira. Ya está. Esto es lo que vamos a hacer.</p>
+
+      <div class="mapa__pergamino">
+        <svg id="mapaSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" aria-label="Mapa real de Japón con la ruta del viaje">
+          <defs>
+            <radialGradient id="landGrad" cx="50%" cy="40%" r="60%">
+              <stop offset="0" stop-color="#EFE3CD"/>
+              <stop offset="1" stop-color="#D6C5A1"/>
+            </radialGradient>
+            <filter id="paperGrain" x="0" y="0" width="100%" height="100%">
+              <feTurbulence baseFrequency="0.7" numOctaves="2" seed="3"/>
+              <feColorMatrix values="0 0 0 0 0.4  0 0 0 0 0.35  0 0 0 0 0.25  0 0 0 0.05 0"/>
+              <feComposite in2="SourceGraphic" operator="in"/>
+            </filter>
+          </defs>
+
+          <!-- Mar (fondo) -->
+          <rect width="800" height="500" fill="#F2EAD8"/>
+          <!-- Líneas de corriente marina (decorativo) -->
+          <g stroke="#B8893E" fill="none" stroke-linecap="round" opacity="0.25">
+            <path d="M 50 80 Q 200 60, 400 75 T 750 90" stroke-width="0.8"/>
+            <path d="M 60 130 Q 250 110, 500 125 T 760 140" stroke-width="0.6"/>
+            <path d="M 80 420 Q 300 410, 550 425 T 760 430" stroke-width="0.8"/>
+            <path d="M 100 470 Q 350 460, 600 470 T 770 475" stroke-width="0.6"/>
+          </g>
+
+          <!-- HOKKAIDO (norte) — silueta simplificada -->
+          <path d="M 360 20 Q 320 25, 300 50 L 310 75 Q 340 90, 400 85 L 450 80 Q 480 70, 490 50 L 480 30 Q 460 18, 420 18 Z"
+                fill="url(#landGrad)" stroke="#7A6A5A" stroke-width="1.2"/>
+
+          <!-- HONSHU (la principal) — silueta arqueada NE→SW -->
+          <path d="M 560 110 Q 600 95, 640 105 Q 680 120, 700 145 Q 720 175, 705 215 Q 700 245, 685 270
+                   Q 680 290, 660 305 Q 640 325, 620 340 Q 595 360, 560 365 Q 530 370, 500 360
+                   Q 470 355, 445 365 Q 420 378, 395 380 Q 370 378, 345 365 Q 320 355, 295 360
+                   Q 270 365, 250 355 Q 230 345, 225 325 Q 220 305, 235 285 Q 250 260, 265 235
+                   Q 280 215, 295 195 Q 310 180, 330 165 Q 350 150, 370 140 Q 395 130, 420 130
+                   Q 445 132, 475 138 Q 505 145, 535 138 Q 555 130, 560 110 Z"
+                fill="url(#landGrad)" stroke="#7A6A5A" stroke-width="1.4"/>
+
+          <!-- SHIKOKU (pequeña al sur de Honshu) -->
+          <path d="M 270 395 Q 250 400, 245 415 Q 255 430, 285 432 Q 320 430, 340 420 Q 350 408, 340 398 Q 310 390, 270 395 Z"
+                fill="url(#landGrad)" stroke="#7A6A5A" stroke-width="1.2"/>
+
+          <!-- KYUSHU (suroeste) -->
+          <path d="M 130 400 Q 110 410, 105 430 Q 110 455, 130 470 Q 155 480, 180 475 Q 205 470, 215 455 Q 220 440, 210 425 Q 195 410, 175 405 Q 150 398, 130 400 Z"
+                fill="url(#landGrad)" stroke="#7A6A5A" stroke-width="1.2"/>
+
+          <!-- Textos de las islas (atmósfera) -->
+          <text x="395" y="55" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="11" fill="#7A6A5A" font-style="italic" opacity="0.7" letter-spacing="2">HOKKAIDO</text>
+          <text x="465" y="225" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="13" fill="#7A6A5A" font-style="italic" opacity="0.7" letter-spacing="3">HONSHU 本州</text>
+          <text x="295" y="418" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="9" fill="#7A6A5A" font-style="italic" opacity="0.7" letter-spacing="2">SHIKOKU</text>
+          <text x="160" y="445" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="9" fill="#7A6A5A" font-style="italic" opacity="0.7" letter-spacing="2">KYUSHU</text>
+
+          <!-- Mar de Japón (etiqueta) -->
+          <text x="200" y="200" font-family="'Cormorant Garamond', serif" font-size="9" fill="#5A6A7A" font-style="italic" opacity="0.5" letter-spacing="2">sea of japan</text>
+          <!-- Océano Pacífico (etiqueta) -->
+          <text x="680" y="380" font-family="'Cormorant Garamond', serif" font-size="9" fill="#5A6A7A" font-style="italic" opacity="0.5" letter-spacing="2">pacific</text>
+
+          <!-- ====== CONEXIONES (estilo pincelada, no rectas) ====== -->
+          <path data-conn="tok-naka" d="M 615 195 Q 540 175, 475 175" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <path data-conn="tok-alpes" d="M 615 195 Q 540 220, 470 235" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <path data-conn="tok-kioto" d="M 615 195 Q 530 250, 405 340" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <path data-conn="naka-kioto" d="M 470 175 Q 440 240, 405 340" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <path data-conn="alpes-kioto" d="M 470 235 Q 440 290, 405 340" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+          <path data-conn="kioto-onsen" d="M 405 340 Q 490 320, 580 275" stroke="#C8382A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.25" stroke-dasharray="3 5"/>
+
+          <!-- ====== NODOS (colocados geográficamente) ====== -->
+          <!-- Tokio: este de Honshu, ~615,195 -->
+          <g data-node="tokio">
+            <circle cx="615" cy="195" r="6" fill="#C8382A"/>
+            <circle cx="615" cy="195" r="14" fill="none" stroke="#C8382A" stroke-width="1.5" opacity="0.4"/>
+            <text x="615" y="173" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="18" fill="#1A1612" font-weight="600">Tokio</text>
+            <text x="615" y="186" text-anchor="middle" font-family="Inter" font-size="8" fill="#7A6A5A" letter-spacing="2">東京 · 4–5 noches</text>
+          </g>
+
+          <!-- Alpes / Takayama: centro Honshu, ~470,235 -->
+          <g data-node="alpes" data-zone="alpes">
+            <circle cx="470" cy="235" r="5" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.5" opacity="0.85"/>
+            <text x="470" y="258" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="13" fill="#1A1612" font-style="italic" opacity="0.85">Alpes</text>
+            <text x="470" y="270" text-anchor="middle" font-family="Inter" font-size="7" fill="#7A6A5A" letter-spacing="1.5" opacity="0.85">TAKAYAMA</text>
+          </g>
+
+          <!-- Nakasendō: Kiso, centro-norte, ~470,175 -->
+          <g data-node="nakasendo" data-zone="naka">
+            <circle cx="475" cy="175" r="5" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.5" opacity="0.85"/>
+            <text x="490" y="172" text-anchor="start" font-family="'Cormorant Garamond', serif" font-size="13" fill="#1A1612" font-style="italic" opacity="0.85">Nakasendō</text>
+            <text x="490" y="184" text-anchor="start" font-family="Inter" font-size="7" fill="#7A6A5A" letter-spacing="1.5" opacity="0.85">KISO</text>
+          </g>
+
+          <!-- Kioto: sur-centro Honshu, ~405,340 -->
+          <g data-node="kioto">
+            <circle cx="405" cy="340" r="6" fill="#C8382A"/>
+            <circle cx="405" cy="340" r="14" fill="none" stroke="#C8382A" stroke-width="1.5" opacity="0.4"/>
+            <text x="405" y="365" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="18" fill="#1A1612" font-weight="600">Kioto</text>
+            <text x="405" y="378" text-anchor="middle" font-family="Inter" font-size="8" fill="#7A6A5A" letter-spacing="2">京都 · 3–4 noches</text>
+          </g>
+
+          <!-- Nara: sur de Kioto, ~430,375 -->
+          <g data-node="nara" data-zone="kioto">
+            <circle cx="430" cy="375" r="4" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.2" opacity="0.7"/>
+            <text x="445" y="378" text-anchor="start" font-family="'Cormorant Garamond', serif" font-size="11" fill="#1A1612" font-style="italic" opacity="0.7">Nara</text>
+          </g>
+
+          <!-- Hakone: sur de Tokio, ~580,275 -->
+          <g data-node="hakone" data-zone="onsen">
+            <circle cx="580" cy="275" r="5" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.5" opacity="0.85"/>
+            <text x="580" y="295" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="13" fill="#1A1612" font-style="italic" opacity="0.85">Hakone</text>
+          </g>
+
+          <!-- Monte Fuji (decorativo, cerca de Hakone) -->
+          <g opacity="0.55">
+            <path d="M 535 248 L 555 285 L 575 248 Q 565 245, 555 245 Q 545 245, 535 248 Z"
+                  fill="#9A8E7E" stroke="#7A6A5A" stroke-width="0.6"/>
+            <path d="M 545 250 L 555 270 L 565 250 Q 555 248, 545 250 Z" fill="#fff" opacity="0.7"/>
+          </g>
+
+          <!-- Kinosaki: norte de Kioto (costa del mar de Japón), ~370,310 -->
+          <g data-node="kinosaki" data-zone="onsen">
+            <circle cx="345" cy="305" r="5" fill="#F4ECE0" stroke="#7A6A5A" stroke-width="1.5" opacity="0.85"/>
+            <text x="345" y="290" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="13" fill="#1A1612" font-style="italic" opacity="0.85">Kinosaki</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="mapa__scrapbook" id="scrapbook"></div>
+
+      <p class="mapa__summary" id="mapaSummary"></p>
+
+      <button class="btn mapa__cta" data-action="despedida">Ver la despedida →</button>
+    </div>
+  </section>
+
+  <!-- STATE 7: DESPEDIDA -->
+  <section class="state" id="s-despedida" aria-label="Despedida">
+    <div class="despedida">
+      <div class="despedida__name">Noelia,</div>
+
+      <div class="despedida__block">
+        <p>Primero fue Tailandia, en nuestra luna de miel.<br>Fue el primero de los grandes.</p>
+      </div>
+
+      <div class="despedida__block despedida__block--secondary">
+        <p>Este será el segundo.</p>
+      </div>
+
+      <div class="despedida__block despedida__block--script">
+        <p>Y cuando acabemos, ¿quién sabe?<br>Quizás haya nuevas aventuras esperándonos.</p>
+      </div>
+
+      <div class="despedida__divider" aria-hidden="true"><span>✦</span></div>
+
+      <div class="despedida__signoff">te quiero</div>
+
+      <svg class="despedida__seal" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#C8382A" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="50" cy="50" r="40" fill="#C8382A" opacity="0.1"/>
+        <circle cx="50" cy="50" r="34" fill="#C8382A" opacity="0.92"/>
+        <text x="50" y="58" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="22" font-weight="600" font-style="italic">A · N</text>
+      </svg>
+
+      <button class="btn btn--ghost btn--small despedida__cta" data-action="back">volver al inicio</button>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lbCaption" hidden>
+    <button class="lightbox__close" aria-label="Cerrar">×</button>
+    <img class="lightbox__img" id="lbImg" src="" alt="">
+    <p class="lightbox__caption" id="lbCaption"></p>
+  </div>
+
+  <script>
+    (function(){
+      'use strict';
+
+      // ===================================================================
+      // DATA MODEL — QUESTIONS con opciones que contienen actos[] reales
+      // Cada opción NOMBRA locales concretos del plan.
+      // ===================================================================
+      const IMG = {
+        // 4 fotos propias — UNA por acto único. No se reutilizan.
+        // Sensoji.png → solo en Q1 acto Sensoji al amanecer
+        // comiendo sushi.png → solo en Q1 acto Sushi Tokyo Ten
+        // NAKASENDO.png → solo en Q3 acto Magome→Tsumago
+        // ryokan.png → solo en Q5 acto Gora Setsugetsuka
+        sensoji:    './images/Sensō-ji · Asakusa.png',
+        sushi:      './images/comiendo sushi.png',
+        nakasendo:  './images/NAKASENDO .png',
+        ryokan:     './images/ryokan.png',
+
+        // Unsplash (37 URLs validadas con curl HTTP 200)
+        akiba:      './images/unsplash/akiba.jpg',  // Akihabara neón
+        yanesen:    './images/unsplash/yanesen.jpg',  // barrio viejo Tokio
+        nezu:       './images/unsplash/nezu.jpg',  // santuario torii
+        gatos:      './images/unsplash/gatos.jpg',  // gato interior
+        tsukiji:    './images/unsplash/tsukiji.jpg',  // mercado pescado
+        sumida:     './images/unsplash/sumida.jpg',  // río Tokio
+        harajuku:   './images/unsplash/harajuku.jpg',  // calle Takeshita
+        mandarake:  './images/unsplash/mandarake.jpg',  // tienda coleccionables
+        mugiwara:   './images/unsplash/mugiwara.jpg',  // tienda pop
+        sunshine:   './images/unsplash/sunshine.jpg',  // centro comercial
+        nakamise:   './images/unsplash/nakamise.jpg',  // calle tradicional
+        shodo:      './images/unsplash/shodo.jpg',  // pincel tinta
+        shinkansen: './images/unsplash/shinkansen.jpg',  // tren bala
+        nakaPath:   './images/unsplash/nakaPath.jpg',  // empedrado pueblo
+        nakaBosque: './images/unsplash/nakaBosque.jpg', // paisaje bosque
+        miyagawa:   './images/unsplash/miyagawa.jpg',  // mercado al aire libre
+        sanmachi:   './images/unsplash/sanmachi.jpg',  // calles históricas
+        shirakawa:  './images/unsplash/shirakawa.jpg',  // gassho-zukuri (villa rural)
+        wagyu:      './images/unsplash/wagyu.jpg',  // carne wagyu A5
+        fuji:       './images/unsplash/fuji.jpg',  // monte Fuji nevado
+        kioto:      './images/unsplash/kioto.jpg',  // templos Kioto
+        inari:      './images/unsplash/inari.jpg',  // torii naranjas
+        kiyomizu:   './images/unsplash/kiyomizu.jpg',  // terraza Kiyomizu
+        kinkaku:    './images/unsplash/kinkaku.jpg',  // pabellón dorado
+        nara:       './images/unsplash/nara.jpg',  // ciervos Nara
+        honen:      './images/unsplash/honen.jpg',  // templo zen pequeño
+        kibune:     './images/unsplash/kibune.jpg',  // santuario bosque
+        kurama:     './images/unsplash/kurama.jpg',  // onsen al aire libre
+        romancecar: './images/unsplash/romancecar.jpg',  // tren turístico
+        kaiseki:    './images/unsplash/kaiseki.jpg',  // kaiseki presentado
+        limited:    './images/unsplash/limited.jpg',  // tren express
+        nishimuraya:'./images/unsplash/nishimuraya.jpg',  // ryokan histórico madera
+        sotoyu:     './images/unsplash/sotoyu.jpg',  // onsen público madera bambú
+        matsuba:    './images/unsplash/matsuba.jpg',  // paisaje rural
+        // 6 extras para romper repeticiones (inari/nara/harajuku/shinkansen/honen/sensoji/sushi/ryokan)
+        inari2:     './images/unsplash/inari2.jpg',   // torii diferentes
+        inari3:     './images/unsplash/inari3.jpg',   // torii atardecer
+        nara2:      './images/unsplash/nara2.jpg',   // torii diferente escena
+        nara3:      './images/unsplash/nara3.jpg',   // ciervos / templo
+        shinkansen2:'./images/unsplash/shinkansen2.jpg',   // tren bala
+        wagyu2:     './images/unsplash/wagyu2.jpg',  // carne/plancha japonesa
+        // 3 extras extra para romper sunshine/kiyomizu/inari
+        sunshine2:  './images/unsplash/sunshine2.jpg',  // vitrina / moda
+        kiyomizu2:  './images/unsplash/kiyomizu2.jpg',  // templo madera
+        inari4:     './images/unsplash/inari4.jpg'   // torii lateral
+      };
+      // SVG decorativo cuando un acto no tiene imagen (sin letra suelta)
+      // Cada SVG se elige por "motivo" para que no se repita visualmente
+      const PLACEHOLDER_SVGS = {
+        brush:    'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4ECE0"/><stop offset="1" stop-color="#E8DCC4"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><path d="M 30 200 Q 60 60, 170 100" stroke="#1A1612" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M 40 220 Q 80 100, 180 130" stroke="#1A1612" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/><circle cx="60" cy="220" r="2" fill="#1A1612" opacity="0.5"/><circle cx="170" cy="100" r="3" fill="#C8382A" opacity="0.6"/><circle cx="120" cy="170" r="1.5" fill="#1A1612" opacity="0.4"/></svg>'),
+        kanji:    'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><rect width="100%" height="100%" fill="#F4ECE0"/><text x="100" y="160" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="120" fill="#C8382A" opacity="0.8" font-style="italic">道</text><path d="M 30 220 Q 100 215, 170 220" stroke="#B8893E" stroke-width="0.8" fill="none" opacity="0.5"/></svg>'),
+        enso:     'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><rect width="100%" height="100%" fill="#F4ECE0"/><path d="M 100 130 m -60 0 a 60 60 0 1 1 110 -10 a 55 55 0 1 1 -100 20" stroke="#1A1612" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.55"/><path d="M 100 130 m -55 0 a 55 55 0 1 1 100 -10" stroke="#C8382A" stroke-width="1" fill="none" opacity="0.35"/></svg>'),
+        seigaiha: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><rect width="100%" height="100%" fill="#F4ECE0"/><g fill="none" stroke="#1A1612" stroke-width="0.8" opacity="0.45"><path d="M 0 80 Q 30 50, 60 80"/><path d="M 60 80 Q 90 50, 120 80"/><path d="M 120 80 Q 150 50, 180 80"/><path d="M 30 80 Q 60 50, 90 80"/><path d="M 90 80 Q 120 50, 150 80"/><path d="M 150 80 Q 180 50, 210 80"/></g><g fill="none" stroke="#1A1612" stroke-width="0.8" opacity="0.35"><path d="M 0 140 Q 30 110, 60 140"/><path d="M 60 140 Q 90 110, 120 140"/><path d="M 120 140 Q 150 110, 180 140"/><path d="M 30 140 Q 60 110, 90 140"/><path d="M 90 140 Q 120 110, 150 140"/><path d="M 150 140 Q 180 110, 210 140"/></g><g fill="none" stroke="#C8382A" stroke-width="1" opacity="0.4"><path d="M 100 200 Q 130 170, 160 200"/></g></svg>'),
+        sakura:   'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><rect width="100%" height="100%" fill="#F4ECE0"/><g fill="#F2C7C7" opacity="0.7"><circle cx="50" cy="70" r="6"/><circle cx="100" cy="120" r="8"/><circle cx="150" cy="80" r="7"/><circle cx="70" cy="180" r="5"/><circle cx="130" cy="200" r="6"/></g><g fill="#C8382A" opacity="0.4"><circle cx="50" cy="70" r="2"/><circle cx="100" cy="120" r="3"/><circle cx="150" cy="80" r="2"/><circle cx="70" cy="180" r="1.5"/><circle cx="130" cy="200" r="2"/></g></svg>')
+      };
+      // Fallback solo si la imagen Unsplash falla al cargar
+      const FALLBACK_IMG = PLACEHOLDER_SVGS.brush;
+
+      const QUESTIONS = [
+        {
+          id: 1, node: 'tokio', nodeLabel: 'Nodo 1 · Tokio',
+          title: 'Imagínate el primer día. ¿Qué prefieres oír al despertar?',
+          options: [
+            {
+              value: 'neon',
+              label: 'El cruce de Shibuya, el neón y los pasos de mil personas',
+              micro: 'Ya huelo el sushi que vamos a cenar y todavía no hemos salido del hotel. Como en Bangkok, pero distinto.',
+              acts: [
+                { place: 'Akihabara', image: IMG.akiba, caption: 'Tokio · Akihabara antes de las 11h',
+                  text: 'Akihabara mañana temprano, antes de las 11h. Radio Kaikan para las novedades. Nakano Broadway a mediodía, con Mandarake, para las figuras raras a 30–60% menos que en el centro.',
+                  tag: 'comercio' },
+                { place: 'Sensoji', image: IMG.sensoji, caption: 'Asakusa · Sensoji al amanecer',
+                  text: 'Sensoji al amanecer, antes de las 7:30h, o iluminado entre las 17 y las 20h. Si quieres la foto en yukata, ese día.',
+                  tag: 'templo' },
+                { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku NEWoMan · omakase',
+                  text: 'Cena en Sushi Tokyo Ten (Shinjuku NEWoMan): omakase de 20–25 pases, 8.800–9.900 ¥. Reserva con días, sobre todo en fin de semana.',
+                  tag: 'cena' },
+                { place: 'Omoide Yokocho', image: PLACEHOLDER_SVGS.brush, caption: 'Shinjuku · izakaya de callejón',
+                  text: 'Si te cansas del sushi, Omoide Yokocho: callejones de bares minúsculos, yakitori, humo, ambiente único. 2.000–4.000 ¥ con bebidas, sin reserva.',
+                  tag: 'cena' }
+              ]
+            },
+            {
+              value: 'calm',
+              label: 'Una posada de madera, el río y el bosque',
+              micro: 'Te imagino en Tsumago, descalza en el tatami. Como en Pai, pero en japonés.',
+              acts: [
+                { place: 'Yanesen', image: IMG.yanesen, caption: 'Yanaka · barrio viejo de Tokio',
+                  text: 'Yanesen (Yanaka, Nezu, Sendagi): el Tokio que sobrevive a 1945. Calles estrechas, templos pequeños, galerías y gatos. Sin turistas, sin prisa.',
+                  tag: 'barrio' },
+                { place: 'Nezu-jinja', image: IMG.nezu, caption: 'Bunkyo · torii en fila',
+                  text: 'Nezu-jinja al abrir: un pasillo de torii bermellón escondido en Bunkyo. La mitad de la gente de Fushimi Inari, sin perder la magia.',
+                  tag: 'templo' },
+                { place: 'Café de gatos', image: IMG.gatos, caption: 'Yanaka · siesta con michis',
+                  text: 'Café de gatos en Yanaka antes de la cena. Porque sí, porque vamos, porque es Tokio y porque nos lo merecemos.',
+                  tag: 'descanso' }
+              ]
+            },
+            {
+              value: 'market',
+              label: 'Tsukiji outer market a las 6 de la mañana, con niebla',
+              micro: 'Vas a probar el mejor atún de tu vida. No te voy a decir de qué puesto. Vas a flipar.',
+              acts: [
+                { place: 'Tsukiji outer', image: IMG.tsukiji, caption: 'Tsukiji · sushi a las 6:00h',
+                  text: 'Tsukiji outer market desde las 6:00h: tamagoyaki, uni, atún rojo, takoyaki, cuchillería japonesa. No hay turistas aún. Solo locales y pescado.',
+                  tag: 'mercado' },
+                { place: 'Sumida', image: IMG.sumida, caption: 'Sumida · río y Asakusa al amanecer',
+                  text: 'Caminata por el río Sumida hasta Asakusa, con Sensoji abriendo al fondo. La postal que todo el mundo busca, sin la gente que la estropea.',
+                  tag: 'paseo' },
+                { place: 'Harajuku Takeshita', image: IMG.harajuku, caption: 'Harajuku · tarde de domingo',
+                  text: 'Harajuku Takeshita-dori por la tarde: crêpes, kawaii, moda que no entenderemos. Para compensar la sobriedad de la mañana.',
+                  tag: 'paseo' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 2, node: 'tokio', nodeLabel: 'Nodo 1 · Tokio · rincón friki',
+          title: 'De Tokio, ¿qué quieres traerte?',
+          options: [
+            {
+              value: 'onepiece',
+              label: 'Una figura de One Piece, firmada, de Nakano Broadway',
+              micro: 'Te veo eligiendo un Luffy edición limitada en Mandarake. Yo pago y finjo no entender.',
+              acts: [
+                { place: 'Mandarake Nakano', image: IMG.mandarake, caption: 'Nakano Broadway · 4 plantas de manga',
+                  text: 'Mandarake en Nakano Broadway, 4 plantas dedicadas al manga y las figuras de serie. Precios 30–60% más bajos que en Akihabara.',
+                  tag: 'comercio' },
+                { place: 'Mugiwara Store', image: IMG.mugiwara, caption: 'Magnet by Shibuya 109 · 6ª planta',
+                  text: 'Mugiwara Store en Magnet by Shibuya 109, 6ª planta: el flagship One Piece más grande del mundo, 10.000+ artículos, exclusivos de tienda. Horario 10:00–21:00.',
+                  tag: 'comercio' },
+                { place: 'Ikebukuro Sunshine City', image: IMG.sunshine, caption: 'Ikebukuro · tiendas oficiales',
+                  text: 'Ikebukuro Sunshine City: tiendas oficiales de Pokémon Center, Sanrio, Jump. Más limpio y moderno que Akihabara, orientado a líneas "cute".',
+                  tag: 'comercio' }
+              ]
+            },
+            {
+              value: 'hanko',
+              label: 'Un sello hanko con tu nombre en katakana',
+              micro: 'Tu nombre en rojo, sobre papel. Te lo voy a regalar el último día, cuando ya no te lo esperas.',
+              acts: [
+                { place: 'Asakusa Nakamise', image: IMG.nakamise, caption: 'Asakusa · tiendas de sellos',
+                  text: 'Nakamise en Asakusa: las tiendas de sellos llevan siglos grabando nombres. Elige el kanji que más te guste, ellos lo tallan en 30 minutos.',
+                  tag: 'souvenir' },
+                { place: 'Taller de caligrafía', image: IMG.shodo, caption: 'Kioto · shodō en directo',
+                  text: 'Una hora de shodō (caligrafía) en Kioto: pincel, tinta, papel washi. Te vas a casa con tu nombre escrito por ti misma.',
+                  tag: 'taller' },
+                { place: 'Sensoji al atardecer', image: PLACEHOLDER_SVGS.kanji, caption: 'Asakusa · luz dorada',
+                  text: 'Sensoji al atardecer, con el sello ya en el bolsillo y el sol cayendo sobre la pagoda de cinco pisos.',
+                  tag: 'templo' }
+              ]
+            },
+            {
+              value: 'yukata',
+              label: 'Una foto contigo en yukata frente a Sensoji',
+              micro: 'Esa foto la vamos a hacer al amanecer, antes de que abran las tiendas. Como en Koh Samui, pero con kimono.',
+              acts: [
+                { place: 'Tienda de yukata', image: IMG.sunshine2, caption: 'Asakusa · alquiler de yukata',
+                  text: 'Alquiler de yukata en Asakusa, abren a las 8:00h. Eliges el color, te lo ponen en 10 minutos. Pelo, geta, bolso a juego.',
+                  tag: 'estilismo' },
+                { place: 'Sensoji al amanecer', image: IMG.inari2, caption: 'Asakusa · sin gente todavía',
+                  text: 'Sensoji a las 7:00h, sin gente todavía. La luz es de postal. Te voy a tomar la mano y no te voy a soltar en dos horas.',
+                  tag: 'foto' },
+                { place: 'Sushi Tokyo Ten', image: IMG.wagyu2, caption: 'Shinjuku · después de la foto',
+                  text: 'Después de la foto, Sushi Tokyo Ten en Shinjuku: te mereces un omakase de 20 pases. La yukata y el sushi, para el recuerdo.',
+                  tag: 'cena' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 3, node: 'intermedio', nodeLabel: 'Nodo 2 · El intermedio',
+          title: 'Un día entero, los dos solos, sin reloj. ¿Dónde?',
+          options: [
+            {
+              value: 'nakasendo',
+              label: 'Caminar 8 km por el Nakasendō, de Magome a Tsumago',
+              micro: 'La mochila la llevo yo. Tú solo tienes que mirarte alrededor y decir "adiós" muy bajito cuando lleguemos.',
+              acts: [
+                { place: 'Shinkansen → Nagoya', image: IMG.shinkansen, caption: 'Tokio → Nagoya · ~1h40m',
+                  text: 'Shinkansen de Tokio a Nagoya en ~1h40m. Asiento junto a la ventana: mío.',
+                  tag: 'logística' },
+                { place: 'Takkyubin', image: IMG.nakaPath, caption: 'Tokio → Kioto · mochila ligera',
+                  text: 'Mandamos la maleta por Takkyubin desde Tokio al hotel de Kioto. En el Nakasendō caminamos solo con mochila ligera.',
+                  tag: 'logística' },
+                { place: 'Magome → Tsumago', image: IMG.nakasendo, caption: 'Kiso · 8 km por bosque',
+                  text: 'Magome → Tsumago: 8 km por bosque, sin coches. Posadas edo del siglo XVII que no han cambiado visualmente desde entonces.',
+                  tag: 'pueblo' },
+                { place: 'Taxi de vuelta', image: IMG.nakaBosque, caption: 'Tsumago → Magome · 200 ¥',
+                  text: 'Si no quieres repetir ruta, servicio de taxi entre Magome y Tsumago por 200 ¥. Cinco minutos, sin步行 extra.',
+                  tag: 'logística' }
+              ]
+            },
+            {
+              value: 'alpes',
+              label: 'Takayama al amanecer y Shirakawa-go entre nieblas',
+              micro: 'Vas a probar el mejor miso de tu vida. Y te voy a obligar a comer la croqueta de Hida Beef aunque no quieras.',
+              acts: [
+                { place: 'Miyagawa Morning Market', image: IMG.miyagawa, caption: 'Takayama · 8:00h',
+                  text: 'Miyagawa Morning Market a las 8:00h (cierra al mediodía). Locales venden verduras, miso casero, artesanía. No trampa turística.',
+                  tag: 'mercado' },
+                { place: 'Sanmachi Suji', image: IMG.sanmachi, caption: 'Takayama · sake breweries',
+                  text: 'Sanmachi Suji: calles históricas de sake breweries. Prueba nihonshu local en las bodegas abiertas. Vas a flipar con un sake que no te voy a decir cuál es.',
+                  tag: 'sake' },
+                { place: 'Shirakawa-go', image: IMG.shirakawa, caption: 'Gassho-zukuri entre arrozales',
+                  text: 'Bus a Shirakawa-go desde Takayama (reserva con 40 min de antelación en temporada alta). Cruzar Deai-bashi, encontrar el "San-goya" (tres cabañas en los campos de arroz, no en la calle principal).',
+                  tag: 'pueblo' },
+                { place: 'Croqueta de Hida Beef', image: IMG.wagyu, caption: 'Shirakawa-go · obligatoria',
+                  text: 'La croqueta de Hida Beef, obligatoria. Crujiente, caliente, con un sabor que no vas a olvidar.',
+                  tag: 'cena' }
+              ]
+            },
+            {
+              value: 'direct',
+              label: 'No me hace falta intermedio, dispara a Kioto',
+              micro: 'Vale, pesada, nos vamos a Kioto. Pero el shinkansen lo elijo yo: el asiento junto a la ventana es mío.',
+              acts: [
+                { place: 'Tokaido Shinkansen', image: IMG.shinkansen2, caption: 'Tokio → Kioto · ~2h15m',
+                  text: 'Tokaido Shinkansen directo de Tokio a Kioto en ~2h15m. Salimos temprano, llegamos a comer.',
+                  tag: 'logística' },
+                { place: 'Reserva con días', image: IMG.kiyomizu2, caption: 'Asiento junto a la ventana',
+                  text: 'Reserva con días, sobre todo en temporada alta. Asiento junto a la ventana: mío.',
+                  tag: 'logística' },
+                { place: 'Kioto nos espera', image: IMG.inari3, caption: 'Kioto · llegada',
+                  text: 'Kioto nos espera. Templos, callejones, silencio. Lo que viene después, ya lo decides tú.',
+                  tag: 'destino' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 4, node: 'kioto', nodeLabel: 'Nodo 3 · Kioto',
+          title: 'En Kioto hay dos formas de moverse: la de los turistas, y la nuestra. ¿Cuál?',
+          options: [
+            {
+              value: 'impres',
+              label: 'Imprescindibles al amanecer: Fushimi Inari, Kiyomizu, Kinkaku-ji',
+              micro: 'Los torii a las 6 de la mañana. Solo se oye el viento y tus pasos. Te voy a tomar la mano y no te voy a soltar en dos horas.',
+              acts: [
+                { place: 'Fushimi Inari', image: IMG.inari, caption: 'Kioto · 10.000 torii al amanecer',
+                  text: 'Fushimi Inari Taisha al amanecer. Más de 10.000 puertas torii naranjas hasta la cima del Monte Inari (233m, 2–3h ida y vuelta). El 90% se queda abajo.',
+                  tag: 'templo' },
+                { place: 'Kiyomizu-dera', image: IMG.kiyomizu, caption: 'Kioto · terraza sobre el vacío',
+                  text: 'Kiyomizu-dera abriendo (6:00–8:00h). Templo construido sin un solo clavo sobre una ladera boscosa, terraza de madera volada sobre el vacío. Patrimonio UNESCO.',
+                  tag: 'templo' },
+                { place: 'Kinkaku-ji + Ryoan-ji', image: IMG.kinkaku, caption: 'Kioto · oro y 15 piedras',
+                  text: 'Kinkaku-ji (Pabellón Dorado, cubierto de pan de oro sobre el estanque, 500 ¥) y Ryoan-ji (el jardín zen de las 15 piedras que nunca se ven todas, 600 ¥) están a 10 minutos andando. Combo perfecto de mañana.',
+                  tag: 'templo' },
+                { place: 'Nara', image: IMG.nara, caption: 'Nara · Gran Buda + ciervos',
+                  text: 'Media jornada a Nara (45 min en tren): Gran Buda de Tōdai-ji, el edificio de madera más grande del mundo, y los ciervos sagrados que te van a morder la chaqueta.',
+                  tag: 'excursión' }
+              ]
+            },
+            {
+              value: 'ninja',
+              label: 'Ninja-path: Honen-in, Kibune, Kurama y Nara',
+              micro: 'Vamos a ir a un sitio que sale en cero guías. Tú y yo. Y los ciervos de Nara.',
+              acts: [
+                { place: 'Honen-in', image: IMG.honen, caption: 'Sakyō · templo casi secreto',
+                  text: 'Honen-in (gratis, junto a Philosopher\'s Path): pequeño, espectacular, casi nadie. Una puerta de paja, musgo, una arena rastrillada.',
+                  tag: 'templo' },
+                { place: 'Kibune', image: IMG.kibune, caption: 'Kioto norte · santuario en bosque',
+                  text: 'Kibune: santuario en el bosque, escaleras de piedra iluminadas con farolillos. A 30 minutos de Demachiyanagi por la línea Eizan.',
+                  tag: 'templo' },
+                { place: 'Kurama onsen', image: IMG.kurama, caption: 'Kioto norte · onsen en la montaña',
+                  text: 'Kurama: onsen pequeño en la montaña, junto al santuario del mismo nombre. A 5 minutos en funicular desde Kibune. Perfecto para medio día relajado.',
+                  tag: 'onsen' },
+                { place: 'Nara', image: IMG.nara2, caption: 'Nara · ciervos sagrados',
+                  text: 'Vuelta vía Nara para los ciervos sagrados de Tōdai-ji. Las galletas que venden en la entrada son la trampa.',
+                  tag: 'excursión' }
+              ]
+            },
+            {
+              value: 'mix',
+              label: 'Mezcla: decido sobre la marcha',
+              micro: 'Eso me gusta. Que el viaje sea nuestro y no un plan.',
+              acts: [
+                { place: 'Fushimi Inari', image: IMG.inari4, caption: 'Si amanece claro',
+                  text: 'Si amanece claro: Fushimi Inari al amanecer, los torii solos, sin nadie. Si está nublado: nos quedamos en cama media hora más.',
+                  tag: 'templo' },
+                { place: 'Honen-in', image: IMG.kioto, caption: 'Cuando el cuerpo pida calma',
+                  text: 'Cuando el cuerpo pida calma: Honen-in, el templo gratis de Philosopher\'s Path, sin turistas. Siestas morales incluidas.',
+                  tag: 'templo' },
+                { place: 'Nara', image: IMG.nara3, caption: 'Si hay ganas de ciervos',
+                  text: 'Si hay ganas de ciervos: 45 minutos en tren y Nara. Si no, café en un kissaten de四条河原町 mirando llover.',
+                  tag: 'excursión' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 5, node: 'onsen', nodeLabel: 'Nodo 4 · El último baño',
+          title: 'El viaje termina en agua caliente. ¿Cómo lo terminas?',
+          options: [
+            {
+              value: 'hakone',
+              label: 'Hakone, onsen privado en la habitación, monte Fuji al fondo',
+              micro: 'Nos vamos a quedar en una habitación donde se oye el agua. Tú entras primero, yo te espero fuera con un café.',
+              acts: [
+                { place: 'Romancecar', image: IMG.romancecar, caption: 'Shinjuku → Hakone · ~85 min',
+                  text: 'Romancecar de Shinjuku a Hakone en ~85 minutos. Asiento junto a la ventana: mío. Última línea del viaje.',
+                  tag: 'logística' },
+                { place: 'Gora Setsugetsuka', image: IMG.ryokan, caption: 'Gora · onsen privado en cada cuarto',
+                  text: 'Gora Setsugetsuka (~$170–300, todas las habitaciones con onsen privado) si nos quedamos en relación calidad-precio. Si nos damos el capricho: Hakone Ginyu (~$400–675, onsen privado outdoor en cada habitación).',
+                  tag: 'ryokan' },
+                { place: 'Kaiseki en yukata', image: IMG.kaiseki, caption: 'Habitación · cena servida',
+                  text: 'Cena kaiseki en yukata, servida en la habitación. Once platos de pescado de lago, setas de montaña, wagyu si lo eliges. Descalzos sobre el tatami.',
+                  tag: 'cena' },
+                { place: 'Monte Fuji', image: IMG.fuji, caption: 'Si hay suerte · amanecer',
+                  text: 'Si hay suerte, el monte Fuji al fondo del onsen al amanecer. Si no, igualmente: estás en agua caliente, con ella, en Japón.',
+                  tag: 'paisaje' }
+              ]
+            },
+            {
+              value: 'kinosaki',
+              label: 'Kinosaki, 7 baños públicos, yukata por el pueblo',
+              micro: 'Vas a recorrer el pueblo en yukata, con el gotō en la mano. Y vas a estar adorable.',
+              acts: [
+                { place: 'Limited Express Kinosaki', image: IMG.limited, caption: 'Kioto → Kinosaki · ~2h30m',
+                  text: 'Limited Express Kinosaki desde Kioto en ~2h30m. JR Pass válido o ~4.500 ¥. Mínimo 1 noche: el último tren de vuelta a Osaka sale a las 18:30.',
+                  tag: 'logística' },
+                { place: 'Nishimuraya Honkan', image: IMG.nishimuraya, caption: 'Kinosaki · 165 años, Relais & Châteaux',
+                  text: 'Nishimuraya Honkan (~$400–900, Relais & Châteaux, 165 años, mejor kaiseki de la zona) o Yamamotoya (~$200–450, 350 años, tattoo-friendly) si preferimos algo más desenfadado.',
+                  tag: 'ryokan' },
+                { place: 'Ritual de los 6 sotoyu', image: IMG.sotoyu, caption: 'Yumepa del ryokan · 6 baños',
+                  text: 'Ritual de los 6 sotoyu con el yumepa del ryokan. Nota 2026: Satono-yu sigue cerrado por obras. Circuito óptimo primera noche: Mandara-yu (origen 720 d.C.) → Yanagi-yu → Ichino-yu después de las 21h (cueva, sin cola).',
+                  tag: 'onsen' },
+                { place: 'Tajimaya', image: IMG.matsuba, caption: 'Kinosaki · wagyu + cangrejo matsuba',
+                  text: 'Cena en Tajimaya (~$130–300): mejor wagyu + cangrejo matsuba de la zona. Si vas a Nishimuraya Honkan, su kaiseki es de otro planeta.',
+                  tag: 'cena' }
+              ]
+            },
+            {
+              value: 'surprise',
+              label: 'Sorpréndeme',
+              micro: 'Perfecto. Voy a hacer lo que me dé la gana. Y te va a encantar.',
+              acts: [
+                { place: 'Lo que decida', image: PLACEHOLDER_SVGS.enso, caption: 'Aventura · sin anticipar',
+                  text: 'Depende de lo que me dé la gana esa semana. Lo que tengo claro: onsen, kaiseki, yukata. Puede ser Hakone o Kinosaki. O un pueblo que descubramos en el momento.',
+                  tag: 'sorpresa' },
+                { place: 'Cierra en agua caliente', image: PLACEHOLDER_SVGS.sakura, caption: 'Prometido · onsen final',
+                  text: 'Lo que sí: termina en agua caliente. Con ella. En Japón. Con un kaiseki delante.',
+                  tag: 'promesa' }
+              ]
+            }
+          ]
+        }
+      ];
+
+      // Mapa de nodo a las conexiones que se animan para llegar
+      // (la transición se inserta entre la última diapositiva de Q_i y la primera de Q_{i+1})
+      // Conexiones posibles (origen-destino): tokio-intermedio, intermedio-kioto, kioto-onsen
+      const NODE_PAIRS = [
+        { from: 'tokio',      to: 'intermedio', conn: 'tok-naka',   label: 'Tokio → el intermedio' },
+        { from: 'intermedio', to: 'kioto',      conn: 'naka-kioto', label: 'El intermedio → Kioto' },
+        { from: 'kioto',      to: 'onsen',      conn: 'kioto-onsen',label: 'Kioto → el último baño' }
+      ];
+
+      // ===================================================================
+      // STATE
+      // ===================================================================
+      const state = { q1:null, q2:null, q3:null, q4:null, q5:null };
+      const topbar = document.getElementById('topbar');
+
+      // ===================================================================
+      // BUILD QUESTIONS (inyecta en #qHost al inicio)
+      // ===================================================================
+      function buildQuestions() {
+        const host = document.getElementById('qHost');
+        const qBg = {
+          tokio: 'q__map--tokio',
+          intermedio: 'q__map--intermedio',
+          kioto: 'q__map--kioto',
+          onsen: 'q__map--onsen'
+        };
+        const html = QUESTIONS.map((q, idx) => {
+          const dots = Array.from({length: 5}, (_, i) =>
+            `<span class="${i < idx ? 'is-done' : (i === idx ? 'is-current' : '')}"></span>`
+          ).join('');
+          const optsHtml = q.options.map(o =>
+            `<button class="q__option" data-q="${q.id}" data-value="${o.value}">
+              <span>${o.label}</span>
+            </button>`
+          ).join('');
+          return `
+            <section class="state state--question" id="s-q${q.id}" aria-label="Pregunta ${q.id} de 5">
+              <div class="q__map ${qBg[q.node]}" aria-hidden="true">
+                ${mapBgSvg(q.node, idx)}
+              </div>
+              <div class="q">
+                <div class="q__head">
+                  <div class="q__node-tag">${q.nodeLabel}</div>
+                  <div class="q__progress">
+                    <span>Pregunta ${q.id} de 5</span>
+                    <div class="q__progress-dots">${dots}</div>
+                  </div>
+                  <h2 class="q__title">${q.title}</h2>
+                </div>
+                <div class="q__options">${optsHtml}</div>
+              </div>
+            </section>`;
+        }).join('');
+        host.innerHTML = html;
+      }
+
+      // SVG del fondo de cada pregunta — reutiliza el mapaSvg con zoom al área del nodo activo
+      function mapBgSvg(node, idx) {
+        // Resaltar el nodo activo según la pregunta (mismo criterio que en showTransition)
+        let activeId = null;
+        if (idx === 0 || idx === 1) activeId = 'tokio';
+        else if (idx === 2) activeId = (state.q3 === 'nakasendo' ? 'nakasendo' : (state.q3 === 'alpes' ? 'alpes' : (state.q3 === 'direct' ? 'tokio' : null)));
+        else if (idx === 3) activeId = 'kioto';
+        else if (idx === 4) activeId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+
+        // Centro y zoom del viewBox según el nodo activo (encuadre geográfico real)
+        const focus = {
+          tokio:      { cx: 615, cy: 195, vbW: 320, vbH: 280 },
+          nakasendo:  { cx: 470, cy: 200, vbW: 340, vbH: 300 },
+          alpes:      { cx: 470, cy: 220, vbW: 340, vbH: 300 },
+          kioto:      { cx: 405, cy: 340, vbW: 340, vbH: 300 },
+          hakone:     { cx: 555, cy: 295, vbW: 340, vbH: 300 },
+          kinosaki:   { cx: 380, cy: 295, vbW: 340, vbH: 300 }
+        }[activeId] || { cx: 400, cy: 250, vbW: 600, vbH: 450 };
+
+        const vbX = Math.max(0, focus.cx - focus.vbW / 2);
+        const vbY = Math.max(0, focus.cy - focus.vbH / 2);
+
+        // Clonar el contenido del mapa final y aplicarle el viewBox con zoom
+        const mapaEl = document.getElementById('mapaSvg');
+        if (!mapaEl) {
+          // Antes de que mapaSvg exista en DOM, devolvemos un placeholder SVG silencioso
+          return `<svg viewBox="0 0 ${focus.vbW} ${focus.vbH}" xmlns="http://www.w3.org/2000/svg" style="opacity:.7"></svg>`;
+        }
+        const finalSvg = mapaEl.cloneNode(true);
+        finalSvg.removeAttribute('id');
+        finalSvg.setAttribute('viewBox', `${vbX} ${vbY} ${focus.vbW} ${focus.vbH}`);
+        finalSvg.removeAttribute('preserveAspectRatio');
+        finalSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        // Quitar textos del clon (atmósfera, no compite con el contenido del acto)
+        finalSvg.querySelectorAll('text').forEach(t => t.remove());
+        return finalSvg.outerHTML;
+      }
+
+      // ===================================================================
+      // BUILD ACT (diapositiva)
+      // ===================================================================
+      function buildAct(qId, actIdx) {
+        const host = document.getElementById('actHost');
+        const q = QUESTIONS[qId - 1];
+        const opt = q.options.find(o => o.value === state['q' + qId]);
+        if (!opt || !opt.acts || !opt.acts[actIdx]) return;
+        const act = opt.acts[actIdx];
+        const total = opt.acts.length;
+        const isLast = actIdx === total - 1;
+        const qBg = {
+          tokio: 'q__map--tokio',
+          intermedio: 'q__map--intermedio',
+          kioto: './images/unsplash/kioto.jpg',
+          onsen: 'q__map--onsen'
+        }[q.node];
+        const ctaAction = isLast ? `q${qId + 1}` : `act-${qId}-${actIdx + 1}`;
+        const ctaLabel = isLast ? 'Siguiente →' : 'Siguiente →';
+        const photoHtml = act.image
+          ? (act.image.startsWith('data:image/svg')
+              ? `<div class="act__photo act__photo--svg" style="background-image:url('${act.image}')" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" tabindex="0" role="img" aria-label="${act.place}"></div>`
+              : `<img class="act__photo" src="${act.image}" alt="${act.place}" loading="lazy" decoding="async" tabindex="0" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">`)
+          : `<div class="act__photo act__photo--none" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" tabindex="0" role="img" aria-label="${act.place}">${act.place.charAt(0)}</div>`;
+
+        const html = `
+          <section class="state state--act" id="s-act-${qId}-${actIdx}" aria-label="Acto ${actIdx + 1} de ${total}: ${act.place}">
+            <div class="q__map ${qBg}" aria-hidden="true">${mapBgSvg(q.node, qId - 1)}</div>
+            <article class="act">
+              <div class="act__head">
+                <span class="act__node">${q.nodeLabel}</span>
+                <span class="act__counter">Acto ${actIdx + 1} de ${total}</span>
+              </div>
+              <div class="act__photo-wrap">${photoHtml}</div>
+              <p class="act__place">${act.place}</p>
+              <p class="act__caption">${act.caption}</p>
+              <p class="act__micro">${opt.micro}</p>
+              <p class="act__text">${act.text}</p>
+              ${act.tag ? `<span class="act__tag">${act.tag}</span>` : ''}
+              <button class="btn btn--ghost btn--small act__cta" data-action="${ctaAction}">${ctaLabel}</button>
+            </article>
+          </section>`;
+        host.insertAdjacentHTML('beforeend', html);
+      }
+
+      // Construye todos los actos para una pregunta (solo la opción actual)
+      function buildActsFor(qId) {
+        const q = QUESTIONS[qId - 1];
+        const opt = q.options.find(o => o.value === state['q' + qId]);
+        if (!opt || !opt.acts) return;
+        opt.acts.forEach((_, idx) => buildAct(qId, idx));
+      }
+
+      // Quita de DOM todos los actos de una pregunta (usado al cambiar de opción)
+      function removeActsFor(qId) {
+        document.querySelectorAll(`#actHost .state[id^="s-act-${qId}-"]`).forEach(el => el.remove());
+      }
+
+      function clearActs() {
+        document.getElementById('actHost').innerHTML = '';
+      }
+
+      // ===================================================================
+      // TRANSITION (línea trazándose entre nodos)
+      // ===================================================================
+      function showTransition(fromNode, toNode, connKey, labelText) {
+        const svg = document.getElementById('transitionSvg');
+        // El mapa ocupa todo el SVG (width/height 100%). Ajustamos el viewBox al
+        // aspect ratio del contenedor para que el contenido (0..500 en y) quede centrado
+        // verticalmente al usar preserveAspectRatio=slice
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const mapRatio = 800 / 500; // 1.6
+        const containerRatio = vw / vh;
+        let vbW = 800, vbH = 500, vbX = 0, vbY = 0;
+        if (containerRatio < mapRatio) {
+          // Contenedor más vertical: expandimos alto manteniendo x
+          vbH = 800 / containerRatio;
+          vbY = 250 - vbH / 2; // Centra el contenido (que va de 0 a 500) verticalmente
+        } else if (containerRatio > mapRatio) {
+          // Contenedor más horizontal: expandimos ancho
+          vbW = 500 * containerRatio;
+          vbX = 400 - vbW / 2;
+        }
+        svg.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        // Clonar el mapa real completo de Japón (silueta + nodos + todas las conexiones)
+        const finalSvg = document.getElementById('mapaSvg').cloneNode(true);
+        finalSvg.querySelectorAll('.node-pulse-anim').forEach(n => n.classList.remove('node-pulse-anim'));
+        svg.innerHTML = '';
+        // Copiar TODO el contenido (silueta del archipiélago, gradientes, etc.)
+        // pero ajustar opacidades: previos muy tenues, actual brillante
+        Array.from(finalSvg.children).forEach(child => {
+          const isConn = child.hasAttribute && child.hasAttribute('data-conn');
+          const isNode = child.hasAttribute && child.hasAttribute('data-node');
+          if (isConn) {
+            const k = child.getAttribute('data-conn');
+            if (k === connKey) {
+              // Conexión que se va a trazar: empezamos invisible y la animación la dibuja
+              child.removeAttribute('stroke-dasharray');
+              child.setAttribute('opacity', '0.95');
+              child.setAttribute('data-conn-active', '1');
+            } else {
+              // Otras rutas: tenues, dashed
+              child.setAttribute('opacity', '0.22');
+              child.setAttribute('stroke-dasharray', '3 7');
+            }
+            svg.appendChild(child);
+          } else if (isNode) {
+            const n = child.getAttribute('data-node');
+            // Todos los nodos visibles pero los previos atenuados
+            let targetId = toNode;
+            if (toNode === 'intermedio') targetId = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
+            if (toNode === 'onsen') targetId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+            const c = child.querySelector('circle');
+            if (c) {
+              if (n === targetId) {
+                c.setAttribute('stroke', '#C8382A');
+                c.setAttribute('stroke-width', '3.5');
+              } else if (n === fromNode) {
+                c.setAttribute('stroke', '#1A1612');
+                c.setAttribute('stroke-width', '2');
+              } else {
+                c.setAttribute('stroke', 'rgba(26,22,18,0.35)');
+                c.setAttribute('stroke-width', '1.5');
+              }
+            }
+            svg.appendChild(child);
+          } else {
+            // Silueta del archipiélago, gradientes, elementos decorativos
+            svg.appendChild(child);
+          }
+        });
+
+        // Etiquetas de la transición
+        document.getElementById('transitionLabel').textContent = labelText || 'Esto es nuestro viaje';
+        const nodeLabels = {
+          tokio: 'Tokio', nakasendo: 'Nakasendō', alpes: 'Alpes',
+          kioto: 'Kioto', hakone: 'Hakone', kinosaki: 'Kinosaki', intermedio: '—', onsen: '—'
+        };
+        let realFrom = fromNode, realTo = toNode;
+        if (realFrom === 'intermedio') realFrom = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (realTo === 'intermedio') realTo = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (realTo === 'onsen') realTo = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+        document.getElementById('transitionFrom').textContent = nodeLabels[realFrom] || realFrom;
+        document.getElementById('transitionTo').textContent = nodeLabels[realTo] || realTo;
+
+        // Calcular longitud y animar la línea
+        const line = svg.querySelector(`[data-conn="${connKey}"]`);
+        if (line) {
+          try {
+            const len = line.getTotalLength();
+            line.style.setProperty('--len', len);
+            // Forzar reflow y arrancar animación
+            void line.getBoundingClientRect();
+            line.classList.add('conn-draw');
+          } catch(e) { /* ignore */ }
+        }
+        // Pulso en el nodo destino
+        let targetId = toNode;
+        if (toNode === 'intermedio') targetId = (state.q3 === 'alpes' ? 'alpes' : 'nakasendo');
+        if (toNode === 'onsen') targetId = (state.q5 === 'kinosaki' ? 'kinosaki' : 'hakone');
+        const targetG = svg.querySelector(`[data-node="${targetId}"]`);
+        if (targetG) {
+          const c = targetG.querySelector('circle');
+          if (c) c.classList.add('node-pulse');
+        }
+      }
+
+      // ===================================================================
+      // NAVIGATION
+      // ===================================================================
+      const order = ['s-postal','s-q1','s-q2','s-q3','s-q4','s-q5','s-mapa','s-despedida'];
+
+      function activate(id) {
+        document.querySelectorAll('.state').forEach(el => el.removeAttribute('data-active'));
+        const next = document.getElementById(id);
+        if (next) next.setAttribute('data-active','true');
+      }
+
+      function go(id, opts = {}) {
+        // Si llegamos a una pregunta por primera vez tras postal, generar actos vacíos
+        // (los actos se generan al elegir opción, así que aquí solo activamos).
+        if (id === 's-mapa') buildMapa();
+        if (id === 's-postal') {
+          topbar.classList.remove('is-visible');
+          // reset
+          state.q1=state.q2=state.q3=state.q4=state.q5=null;
+          document.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
+          document.querySelectorAll('.q__card,.q').forEach(c => c.classList.remove('is-revealed'));
+          clearActs();
+        } else {
+          topbar.classList.add('is-visible');
+        }
+        activate(id);
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+
+      // ===================================================================
+      // ACCIONES: q1, q2, ..., q5, mapa, despedida, back, next-act, q{i+1} desde último acto
+      // ===================================================================
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const a = btn.getAttribute('data-action');
+        if (a === 'back') { go('s-postal'); return; }
+
+        // next-act-N-M → siguiente diapositiva (ya construida; solo navegar)
+        if (a && a.startsWith('act-')) {
+          const [_, qId, actIdx] = a.split('-');
+          go('s-act-' + qId + '-' + actIdx);
+          return;
+        }
+
+        // q{i+1} → siguiente pregunta (con posible transición)
+        const m = a && a.match(/^q([1-6])$/);
+        if (m) {
+          const next = +m[1];
+          handleQuestionTransition(next);
+          return;
+        }
+
+        if (a === 'mapa') { go('s-mapa'); return; }
+        if (a === 'despedida') { go('s-despedida'); return; }
+      });
+
+      // Selección de opción: marcar + construir TODOS los actos + ir a la primera diapositiva
+      document.addEventListener('click', e => {
+        const opt = e.target.closest('.q__option');
+        if (!opt) return;
+        const qId = +opt.getAttribute('data-q');
+        const value = opt.getAttribute('data-value');
+        // Si ya hay una opción elegida con actos generados, limpiarlos antes
+        removeActsFor(qId);
+        state['q' + qId] = value;
+        const card = opt.closest('.q__card') || opt.closest('.q');
+        if (card) {
+          card.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
+          opt.classList.add('is-selected');
+          card.classList.add('is-revealed');
+        } else {
+          opt.classList.add('is-selected');
+        }
+        // construir TODOS los actos de la opción elegida
+        buildActsFor(qId);
+        go('s-act-' + qId + '-0');
+      });
+
+      // ===================================================================
+      // TRANSICIÓN DE MAPA ENTRE PREGUNTAS
+      // ===================================================================
+      function handleQuestionTransition(nextQId) {
+        // Casos:
+        // nextQId=2 → acabamos Q1, vamos a Tokio→Intermedio (entre Q1 y Q2? No, Q2 sigue siendo Tokio)
+        //   No hay transición entre Q1→Q2 (mismo nodo: Tokio)
+        // nextQId=3 → Q2→Q3, transición Tokio→Intermedio
+        // nextQId=4 → Q3→Q4, transición Intermedio→Kioto
+        // nextQId=5 → Q4→Q5, transición Kioto→Onsen
+        // nextQId=6 → último baño → mapa final (no transición, va al mapa)
+        if (nextQId === 2) { go('s-q2'); return; }
+        if (nextQId === 6) { go('s-mapa'); return; }
+
+        // Determinar conexión según la opción de la pregunta actual
+        let connKey = null, fromNode = null, toNode = null, labelText = null;
+        if (nextQId === 3) {
+          // Q2→Q3: tránsito Tokio→Intermedio (animamos a un punto intermedio genérico)
+          connKey = 'tok-naka';
+          labelText = 'Tokio → el intermedio';
+          toNode = 'intermedio'; fromNode = 'tokio';
+        } else if (nextQId === 4) {
+          connKey = state.q3 === 'nakasendo' ? 'naka-kioto' : 'alpes-kioto';
+          labelText = state.q3 === 'nakasendo' ? 'Nakasendō → Kioto' : 'Alpes → Kioto';
+          toNode='kioto'; fromNode='intermedio';
+        } else if (nextQId === 5) {
+          // Q5 opción determina Hakone o Kinosaki
+          if (state.q5 === 'kinosaki') {
+            connKey='kioto-onsen'; labelText='Kioto → Kinosaki'; toNode='onsen'; fromNode='kioto';
+            // mover visualmente el onsen a Kinosaki: lo trataremos igual, ambos están en el sur
+          } else {
+            connKey='kioto-onsen'; labelText='Kioto → Hakone'; toNode='onsen'; fromNode='kioto';
+          }
+        }
+
+        if (!connKey) { go('s-q' + nextQId); return; }
+
+        showTransition(fromNode, toNode, connKey, labelText);
+        go('s-transition');
+        // Tras 2400ms ir a la siguiente pregunta (línea 1500ms + label 700ms + sub 500ms + margen)
+        setTimeout(() => go('s-q' + nextQId), 2400);
+      }
+
+      // ===================================================================
+      // LIGHTBOX
+      // ===================================================================
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lbImg');
+      const lbCap = document.getElementById('lbCaption');
+      let lbReturn = null;
+
+      function openLb(src, alt, cap, returnEl) {
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        lbCap.textContent = cap || '';
+        lbReturn = returnEl || null;
+        lb.hidden = false;
+        lb.querySelector('.lightbox__close').focus();
+      }
+      function closeLb() {
+        lb.hidden = true;
+        if (lbReturn && typeof lbReturn.focus === 'function') lbReturn.focus();
+      }
+
+      document.addEventListener('click', e => {
+        const t = e.target.closest('[data-lightbox]');
+        if (!t) return;
+        const cap = t.getAttribute('data-lightbox-caption') || '';
+        const place = t.getAttribute('data-lightbox-place') || '';
+        const caption = place ? `${cap} — ${place}` : cap;
+        if (t.tagName === 'IMG') {
+          openLb(t.src, t.alt, caption, t);
+        } else {
+          // placeholder (no imagen): no abrimos lightbox real, sólo tooltip-like
+          // (opcional: podríamos no hacer nada)
+        }
+      });
+      lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+      lb.querySelector('.lightbox__close').addEventListener('click', closeLb);
+
+      // Esc: cerrar lightbox o volver atrás
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          if (!lb.hidden) { closeLb(); return; }
+          const active = document.querySelector('.state[data-active="true"]');
+          if (active && active.id !== 's-postal') {
+            // Si estamos en un acto, volver a su pregunta
+            if (active.id.startsWith('s-act-')) {
+              const qId = active.id.split('-')[2];
+              go('s-q' + qId);
+              return;
+            }
+            if (active.id === 's-transition') return; // ignorar Esc durante transición
+            // genérico: ir al anterior en orden
+            const idx = order.indexOf(active.id);
+            if (idx > 0) go(order[idx-1]);
+          }
+        }
+      });
+
+      // ===================================================================
+      // MAPA FINAL
+      // ===================================================================
+      function buildMapa() {
+        const svg = document.getElementById('mapaSvg');
+        const conns = {
+          'tok-naka':{solid:false}, 'tok-alpes':{solid:false}, 'tok-kioto':{solid:false},
+          'naka-kioto':{solid:false}, 'alpes-kioto':{solid:false}, 'kioto-onsen':{solid:false}
+        };
+        if (state.q3 === 'nakasendo') { conns['tok-naka'].solid=true; conns['naka-kioto'].solid=true; }
+        else if (state.q3 === 'alpes') { conns['tok-alpes'].solid=true; conns['alpes-kioto'].solid=true; }
+        else if (state.q3 === 'direct') { conns['tok-kioto'].solid=true; }
+
+        if (state.q5) conns['kioto-onsen'].solid = true;
+
+        Object.keys(conns).forEach(k => {
+          const p = svg.querySelector('[data-conn="'+k+'"]');
+          if (!p) return;
+          if (conns[k].solid) {
+            p.setAttribute('opacity','0.85');
+            p.removeAttribute('stroke-dasharray');
+          } else {
+            p.setAttribute('opacity','0.18');
+            p.setAttribute('stroke-dasharray','4 6');
+          }
+        });
+
+        const naka = svg.querySelector('[data-node="nakasendo"]');
+        const alpes = svg.querySelector('[data-node="alpes"]');
+        const hakone = svg.querySelector('[data-node="hakone"]');
+        const kinosaki = svg.querySelector('[data-node="kinosaki"]');
+        function setNodeActive(g, active) {
+          if (!g) return;
+          const c = g.querySelector('circle');
+          const txt = g.querySelectorAll('text');
+          if (active) {
+            c.setAttribute('stroke','#C8382A');
+            c.setAttribute('stroke-width','2.5');
+            c.setAttribute('opacity','1');
+            txt.forEach(t => t.setAttribute('opacity','1'));
+          } else {
+            c.setAttribute('stroke','#1A1612');
+            c.setAttribute('stroke-width','1.5');
+            c.setAttribute('opacity','0.35');
+            txt.forEach(t => t.setAttribute('opacity','0.35'));
+          }
+        }
+        setNodeActive(naka, state.q3 === 'nakasendo');
+        setNodeActive(alpes, state.q3 === 'alpes');
+        if (state.q5 === 'hakone') { setNodeActive(hakone,true); setNodeActive(kinosaki,false); }
+        else if (state.q5 === 'kinosaki') { setNodeActive(hakone,false); setNodeActive(kinosaki,true); }
+        else if (state.q5 === 'surprise') { setNodeActive(hakone,true); setNodeActive(kinosaki,true); }
+        else { setNodeActive(hakone,false); setNodeActive(kinosaki,false); }
+
+        // Scrapbook — 4 polaroids elegidas según respuestas
+        const scrap = document.getElementById('scrapbook');
+        scrap.innerHTML = '';
+        const items = [];
+        items.push({img: IMG.sensoji, cap: 'Tokio · el primer amanecer', rot: -3});
+        items.push({img: IMG.sushi, cap: 'Shinjuku · sushi a las once', rot: 2});
+        if (state.q3 === 'nakasendo') items.push({img: IMG.nakasendo, cap: 'Magome → Tsumago · 8 km', rot: -1.5});
+        else if (state.q3 === 'alpes') items.push({img: IMG.shirakawa, cap: 'Takayama + Shirakawa-go', rot: -1.5});
+        else if (state.q3 === 'direct') items.push({img: IMG.inari, cap: 'Tokio → Kioto · shinkansen', rot: -1.5});
+        else items.push({img: IMG.nakasendo, cap: 'El intermedio · por decidir', rot: -1.5});
+        items.push({img: IMG.ryokan, cap: state.q5 === 'hakone' ? 'Hakone · onsen privado' : (state.q5 === 'kinosaki' ? 'Kinosaki · 6 sotoyu' : 'El último baño'), rot: 3});
+
+        items.forEach((it, i) => {
+          const fig = document.createElement('figure');
+          fig.className = 'mapa__polaroid';
+          fig.style.setProperty('--rot', it.rot + 'deg');
+          fig.style.animationDelay = (i * 120) + 'ms';
+          fig.innerHTML = `<img src="${it.img}" alt="" loading="lazy" data-lightbox data-lightbox-caption="${it.cap}" data-lightbox-place="" tabindex="0"><figcaption>${it.cap}</figcaption>`;
+          scrap.appendChild(fig);
+        });
+
+        // Resumen
+        const sm = document.getElementById('mapaSummary');
+        const intLabel = state.q3 === 'nakasendo' ? 'Nakasendō (2–3 noches)'
+                       : state.q3 === 'alpes' ? 'Alpes japoneses (2–3 noches)'
+                       : state.q3 === 'direct' ? 'Tokio → Kioto directo'
+                       : 'El intermedio, por decidir';
+        const onsenLabel = state.q5 === 'hakone' ? 'Hakone'
+                         : state.q5 === 'kinosaki' ? 'Kinosaki'
+                         : state.q5 === 'surprise' ? 'Hakone o Kinosaki'
+                         : 'onsen, por decidir';
+        sm.innerHTML = '4–5 noches en Tokio · ' + intLabel + ' · 3–4 noches en Kioto · ' + onsenLabel + '.';
+      }
+
+      // ===================================================================
+      // INIT
+      // ===================================================================
+      buildQuestions();
+      clearActs();
+    })();
+  </script>
+</body>
+</html>
