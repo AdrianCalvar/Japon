@@ -897,25 +897,21 @@
         lost:    './images/unsplash/lost.jpg',  
         
         nezu:       './images/unsplash/nezu.jpg',  // santuario torii
-        gatos:      './images/unsplash/gatos.jpg',  // gato interior
         sumida:     './images/unsplash/sumida.webp',  // río Tokio
         harajuku:   './images/unsplash/hara.jpeg',  // calle Takeshita
         mandarake:  './images/unsplash/mandarake.jpg',  // tienda coleccionables
         mugiwara:   './images/unsplash/mugiwara.jpeg',  // tienda pop
-        sunshine:   './images/unsplash/sunshine.jpg',  // centro comercial (ya no se usa, en desuso)
         shibuya:    './images/unsplash/sibuya.jpg',  // cruce de Shibuya de noche
         nakamise:   './images/unsplash/nakamise.jpg',  // calle tradicional
         shodo:      './images/unsplash/shodo.jpg',  // pincel tinta
         nagoya: './images/unsplash/nagoya.jpg',  // ciudad Nagoya
-        nakaPath:   './images/unsplash/nakaPath.jpg',  // empedrado pueblo
-        nakaBosque: './images/unsplash/nakaBosque.jpg', // paisaje bosque
-        miyagawa:   './images/unsplash/miyagawa.jpg',  // mercado al aire libre (ya no se usa, en desuso)
         sanmachi:   './images/unsplash/sanmachi.webp',  // calles históricas
         shirakawa:  './images/unsplash/shirakawa.jpg',  // gassho-zukuri (villa rural)
         shira:  './images/unsplash/shira.jpg',  // gassho-zukuri (villa rural)
         wagyu:      './images/unsplash/wagyu.jpg',  // carne wagyu A5
         fuji:       './images/unsplash/fuji.jpg',  // monte Fuji nevado
         kioto:      './images/unsplash/kioto.jpg',  // templos Kioto
+        kioto2:      './images/unsplash/kioto.webp',  // templos Kioto
         inari:      './images/unsplash/inari.jpg',  // torii naranjas
         kiyomizu:   './images/unsplash/kiyomizu2.webp',  // terraza Kiyomizu
         kinkaku:    './images/unsplash/kinkaku.jpg',  // pabellón dorado
@@ -929,18 +925,9 @@
         kama:      './images/unsplash/kama.jpg',  
         kibune:     './images/unsplash/kibune.jpg',  // santuario bosque
         kurama:     './images/unsplash/kurama.webp',  // onsen al aire libre
-        romancecar: './images/unsplash/romancecar.jpg',  // tren turístico
-        kaiseki:    './images/unsplash/kaiseki.jpg',  // kaiseki presentado
-        limited:    './images/unsplash/limited.jpg',  // tren express
         nishimuraya:'./images/unsplash/nishimuraya.jpg',  // ryokan histórico madera
         sotoyu:     './images/unsplash/sotoyu.jpg',  // onsen público madera bambú
-        matsuba:    './images/unsplash/matsuba.jpg',  // paisaje rural
-        // 6 extras para romper repeticiones (inari/nara/harajuku/shinkansen/honen/sensoji/sushi/ryokan)
-        inari3:     './images/unsplash/inari3.jpg',   // torii atardecer
         shinkansen2:'./images/unsplash/shinkansen2.jpg',   // tren bala
-        wagyu2:     './images/unsplash/wagyu2.jpg',  // carne/plancha japonesa
-        // 3 extras extra para romper sunshine/kiyomizu/inari
-        sunshine2:  './images/unsplash/sunshine2.jpg',  // vitrina / moda
         inari4:     './images/unsplash/inari4.jpg'   // torii lateral
       };
       // SVG decorativo cuando un acto no tiene imagen (sin letra suelta)
@@ -1026,7 +1013,7 @@
                   text: 'Mugiwara Store en Shibuya, donde Gold D. Roger perdió el sombrero. Diez mil artículos en seis plantas. Entras queriendo una cosa, sales con una caja.',
                   tag: '10.000' },
                 { place: 'Nakano Broadway', image: IMG.mandarake, caption: 'Nakano · cuatro plantas',
-                  text: 'Nakano Broadway, cuatro plantas de Mandarake. Figuras de edición limitada, vinilos. Tú te quedas ahí dentro hasta que me echen.',
+                  text: 'Nakano Broadway, cuatro plantas de Mandarake. Figuras de edición limitada, vinilos. Nos quedamos hasta que nos echen.',
                   tag: 'manga' },
                 { place: 'Sensoji al atardecer', image: IMG.sensoji, caption: 'Asakusa · con la caja bajo el brazo',
                   text: 'Sensoji al atardecer, camino de vuelta a casa con la caja bajo el brazo. La linterna roja encendida ya, las farolas de papel meciéndose. Tú caminas más despacio para que no se nos acabe el día.',
@@ -1131,7 +1118,7 @@
               micro: 'Vas a probar el mejor miso de tu vida. Y la croqueta de Hida Beef te va a volar la cabeza.',
               acts: [
                 { place: 'Sanmachi Suji', image: IMG.sanmachi, caption: 'Takayama · sake breweries',
-                  text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake, no podía faltar',
+                  text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake, nos emborrachamos en japonés',
                   tag: 'sake' },
                 { place: 'Shirakawa-go', image: IMG.shira, caption: 'Gassho-zukuri · entre nieblas',
                   text: 'Bus a Shirakawa-go. Las casas gassho-zukuri entre los arrozales. Cruzamos el Deai-bashi, buscamos el San-goya —tres cabañas perdidas en los campos—. Un momento único.',
@@ -1182,7 +1169,7 @@
             {
               value: 'ninja',
               label: 'El camino ninja: Honen-in, Kibune, Kurama y Nara',
-              micro: 'Iremos a un sitio que no sale en las guías. Tú y yo. Y los ciervos de Nara.',
+              micro: 'Iremos a un sitio que no sale en las guías. Tú, yo y los ciervos de Nara.',
               acts: [
                 { place: 'Honen-in', image: IMG.honen, caption: 'Sakyō · templo casi secreto',
                   text: 'Honen-in, gratis, junto a Philosopher\'s Path. Una puerta de paja, musgo, una arena rastrillada. Casi nadie. Si queremos una mañana callada, aquí.',
@@ -1244,7 +1231,7 @@
                 { place: 'Volver al que nos flipó', image: IMG.kinkaku, caption: 'El templo que más nos gustó',
                   text: 'Volver al templo que más nos gustó. Sentarnos otra vez. Los mejores sitios se ven dos veces —la primera vez no te enteras de todo.',
                   tag: 'volver' },
-                { place: 'Lo que dejamos pendiente', image: IMG.kioto, caption: 'La calle o el café pendiente',
+                { place: 'Lo que dejamos pendiente', image: IMG.kioto2, caption: 'La calle o el café pendiente',
                   text: 'Algo que dejamos pendiente el primer día. Una calle, un café, un cruce. Volver para encontrarlo es parte del viaje.',
                   tag: 'pendiente' },
                 { place: 'Higashiyama al anochecer', image: IMG.higi, caption: 'Higashiyama · al anochecer',
