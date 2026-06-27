@@ -223,15 +223,22 @@
     .btn:hover .btn__hover-text{opacity:.85;transform:translateY(0)}
 
     /* === Hero CTA — el botón principal de la postal ===
+       Tipografía japonesa coherente con el resto del postal: serif italic
+       (Cormorant Garamond, mismo family que el título "Se la requiere…") +
+       kanji 旅 (viaje) en Shippori Mincho B1, ancla la identidad tipográfica
+       japonesa del conjunto (mismo display font que 郵便, 美, 道, 約束).
        Más presencia que un .btn base: gradiente, gloss superior, sombra profunda,
        flecha SVG que se desplaza al hover/focus/active. Tacto tipo "sello". */
     .postal__cta-wrap .btn{
       flex-direction:row;
+      align-items:center;
       gap:.55rem;
-      font-size:.95rem;
-      font-weight:600;
-      letter-spacing:.05em;
-      padding:1rem 1.65rem 1rem 1.85rem;
+      font-family:var(--serif);
+      font-style:italic;
+      font-weight:500;
+      font-size:1.02rem;
+      letter-spacing:.015em;
+      padding:1rem 1.7rem 1rem 1.5rem;
       background:linear-gradient(180deg,var(--vermilion) 0%,var(--vermilion-deep) 100%);
       box-shadow:
         0 8px 20px -6px rgba(200,56,42,.55),
@@ -241,6 +248,25 @@
         background 220ms ease,
         transform 220ms var(--ease-out),
         box-shadow 220ms ease;
+    }
+    /* Kanji 旅 (viaje) — ancla japonesa antes del label español.
+       Display font (Shippori Mincho B1) para diferenciarlo visualmente
+       del italic serif latino, pero del mismo sistema tipográfico del sitio. */
+    .postal__cta-wrap .btn__kanji{
+      font-family:var(--kanji-display);
+      font-style:normal;
+      font-weight:600;
+      font-size:1.18rem;
+      letter-spacing:0;
+      opacity:.92;
+      margin-right:.18rem;
+      transform:translateY(-1px);
+      display:inline-block;
+      transition:opacity 220ms ease;
+    }
+    .postal__cta-wrap .btn:hover .btn__kanji,
+    .postal__cta-wrap .btn:focus-visible .btn__kanji{
+      opacity:1;
     }
     .postal__cta-wrap .btn .btn__icon{
       display:inline-flex;align-items:center;
@@ -1278,7 +1304,8 @@
       <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
         <button class="btn" data-action="q1" aria-label="Abrir la postal — comenzar el viaje">
-          <span>Comienza el viaje</span>
+          <span class="btn__kanji" aria-hidden="true">旅</span>
+          <span class="btn__label">Comienza el viaje</span>
           <svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
             <path d="M2 7 H11 M7.5 3.5 L11 7 L7.5 10.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
