@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Crónica de un viaje anunciado · De Adrián, para Noelia</title>
-  <meta name="description" content="Una carta con cinco preguntas para Noelia. Japón nos espera.">
+  <meta name="description" content="Una carta con siete preguntas para Noelia. Japón nos espera.">
   <meta name="theme-color" content="#F4ECE0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,10 +12,9 @@
   <style>
     /* ---------- TOKENS ---------- */
     :root{
-      --paper:#F4ECE0;--paper-deep:#E8DCC4;--paper-shadow:#D4C5A6;
+      --paper:#F4ECE0;--paper-deep:#E8DCC4;
       --ink:#1A1612;--ink-soft:#4A3F33;--ink-mute:#7A6A5A;
       --vermilion:#C8382A;--vermilion-deep:#9B2820;--gold:#B8893E;
-      --sakura:#F2C7C7;--moss:#5C6E4A;
       --serif:'Cormorant Garamond','Cormorant Infant',Georgia,serif;
       --body:'Cormorant Infant',Georgia,serif;
       --script:'Great Vibes',cursive;
@@ -423,8 +422,9 @@
     .transition__step--from{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(-100%) translateX(-1rem);animation-delay:1300ms}
     .transition__step--to{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(1rem);animation-delay:1900ms}
 
-    /* En transición, ocultamos el fondo normal para que el mapa de transición sea el fondo */
-    .state--transition ~ * .q__map{display:none}
+    /* (El selector hermano general .state--transition ~ * .q__map{display:none} se eliminó:
+   era código muerto — .state--transition está después de los .state--question en el DOM,
+   por lo que el selector nunca matcheaba.) */
 
     @keyframes drawLine{to{stroke-dashoffset:0}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
@@ -632,7 +632,7 @@
       </div>
       <div class="postal__to">Noelia,</div>
       <h1 class="postal__title">Crónica de un viaje<br>anunciado</h1>
-      <p class="postal__body">Llevamos años queriendo ir a Japón.<br>esta vez, no se nos escapa</p>
+      <p class="postal__body">Llevamos años queriendo ir a Japón.<br>Esta vez, no se nos escapa</p>
       <div class="postal__cta-wrap">
         <button class="btn" data-action="q1" aria-label="Abrir la postal">
           Comienza el viaje
@@ -1298,18 +1298,18 @@
       // ===================================================================
       const state = { q1:null, q2:null, q3:null, q4:null, q5:null, q6:null, q7:null };
       const topbar = document.getElementById('topbar');
+      // Timer pendiente del auto-navegado tras una transición (se cancela en go())
+      let transitionTimer = null;
+      // Hash del state la última vez que se construyó el mapa final — evita re-render si no cambiaron las respuestas
+      let mapaBuiltHash = null;
+      // Cache de los SVG de fondo de cada pregunta/acto (clave = node + idx + respuestas que afectan al encuadre)
+      const bgSvgCache = new Map();
 
       // ===================================================================
       // BUILD QUESTIONS (inyecta en #qHost al inicio)
       // ===================================================================
       function buildQuestions() {
         const host = document.getElementById('qHost');
-        const qBg = {
-          tokio: 'q__map--tokio',
-          intermedio: 'q__map--intermedio',
-          kioto: 'q__map--kioto',
-          onsen: 'q__map--onsen'
-        };
         const html = QUESTIONS.map((q, idx) => {
           const dots = Array.from({length: 7}, (_, i) =>
             `<span class="${i < idx ? 'is-done' : (i === idx ? 'is-current' : '')}"></span>`
@@ -1321,7 +1321,7 @@
           ).join('');
           return `
             <section class="state state--question" id="s-q${q.id}" aria-label="Pregunta ${q.id} de 7">
-              <div class="q__map ${qBg[q.node]}" aria-hidden="true">
+              <div class="q__map" aria-hidden="true">
                 ${mapBgSvg(q.node, idx)}
               </div>
               <div class="q">
@@ -1342,6 +1342,12 @@
 
       // SVG del fondo de cada pregunta — reutiliza el mapaSvg con zoom al área del nodo activo
       function mapBgSvg(node, idx) {
+        // idx 3 depende de state.q4, idx 6 depende de state.q7 — incluirlos en la cache
+        const key = idx === 3 ? `${node}-${idx}-${state.q4 || ''}`
+                  : idx === 6 ? `${node}-${idx}-${state.q7 || ''}`
+                  : `${node}-${idx}`;
+        if (bgSvgCache.has(key)) return bgSvgCache.get(key);
+
         // Resaltar el nodo activo según la pregunta (mismo criterio que en showTransition)
         let activeId = null;
         if (idx === 0 || idx === 1 || idx === 2) activeId = 'tokio';
@@ -1368,7 +1374,9 @@
         const mapaEl = document.getElementById('mapaSvg');
         if (!mapaEl) {
           // Antes de que mapaSvg exista en DOM, devolvemos un placeholder SVG silencioso
-          return `<svg viewBox="0 0 ${focus.vbW} ${focus.vbH}" xmlns="http://www.w3.org/2000/svg" style="opacity:.7"></svg>`;
+          const placeholder = `<svg viewBox="0 0 ${focus.vbW} ${focus.vbH}" xmlns="http://www.w3.org/2000/svg" style="opacity:.7"></svg>`;
+          bgSvgCache.set(key, placeholder);
+          return placeholder;
         }
         const finalSvg = mapaEl.cloneNode(true);
         finalSvg.removeAttribute('id');
@@ -1377,7 +1385,9 @@
         finalSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
         // Quitar textos del clon (atmósfera, no compite con el contenido del acto)
         finalSvg.querySelectorAll('text').forEach(t => t.remove());
-        return finalSvg.outerHTML;
+        const html = finalSvg.outerHTML;
+        bgSvgCache.set(key, html);
+        return html;
       }
 
       // ===================================================================
@@ -1391,23 +1401,18 @@
         const act = opt.acts[actIdx];
         const total = opt.acts.length;
         const isLast = actIdx === total - 1;
-        const qBg = {
-          tokio: 'q__map--tokio',
-          intermedio: 'q__map--intermedio',
-          kioto: './images/unsplash/kioto.jpg',
-          onsen: 'q__map--onsen'
-        }[q.node];
         const ctaAction = isLast ? `q${qId + 1}` : `act-${qId}-${actIdx + 1}`;
-        const ctaLabel = isLast ? 'Siguiente →' : 'Siguiente →';
+        // q8 es el alias que handleQuestionTransition mapea a s-mapa
+        const ctaLabel = ctaAction === 'q8' ? 'Ver el plan →' : 'Siguiente →';
         const photoHtml = act.image
           ? (act.image.startsWith('data:image/svg')
               ? `<div class="act__photo act__photo--svg" style="background-image:url('${act.image}')" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" tabindex="0" role="img" aria-label="${act.place}"></div>`
-              : `<img class="act__photo" src="${act.image}" alt="${act.place}" loading="lazy" decoding="async" tabindex="0" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">`)
+              : `<img class="act__photo" src="${act.image}" alt="${act.place}" width="300" height="375" loading="lazy" decoding="async" tabindex="0" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}">`)
           : `<div class="act__photo act__photo--none" data-lightbox data-lightbox-caption="${act.place}" data-lightbox-place="${act.caption}" tabindex="0" role="img" aria-label="${act.place}">${act.place.charAt(0)}</div>`;
 
         const html = `
           <section class="state state--act" id="s-act-${qId}-${actIdx}" aria-label="Acto ${actIdx + 1} de ${total}: ${act.place}">
-            <div class="q__map ${qBg}" aria-hidden="true">${mapBgSvg(q.node, qId - 1)}</div>
+            <div class="q__map" aria-hidden="true">${mapBgSvg(q.node, qId - 1)}</div>
             <article class="act">
               <div class="act__head">
                 <span class="act__node">${q.nodeLabel}</span>
@@ -1592,6 +1597,8 @@
       }
 
       function go(id, opts = {}) {
+        // Cancelar cualquier auto-navegado pendiente de una transición
+        if (transitionTimer) { clearTimeout(transitionTimer); transitionTimer = null; }
         // Si llegamos a una pregunta por primera vez tras postal, generar actos vacíos
         // (los actos se generan al elegir opción, así que aquí solo activamos).
         if (id === 's-mapa') buildMapa();
@@ -1600,7 +1607,9 @@
           // reset
           state.q1=state.q2=state.q3=state.q4=state.q5=state.q6=state.q7=null;
           document.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
-          document.querySelectorAll('.q__card,.q').forEach(c => c.classList.remove('is-revealed'));
+          // Invalidar la cache del mapa final y de los fondos para la próxima partida
+          mapaBuiltHash = null;
+          bgSvgCache.clear();
           clearActs();
           thoughtQId = null;
         } else {
@@ -1612,8 +1621,27 @@
 
       // ===================================================================
       // ACCIONES: q1, q2, ..., q5, mapa, despedida, back, next-act, q{i+1} desde último acto
+      // Selección de opción (q__option) + acciones explícitas (data-action)
       // ===================================================================
       document.addEventListener('click', e => {
+        // 1) Selección de opción dentro de una pregunta
+        const opt = e.target.closest('.q__option');
+        if (opt) {
+          const qId = +opt.getAttribute('data-q');
+          const value = opt.getAttribute('data-value');
+          // Si ya hay una opción elegida con actos generados, limpiarlos antes
+          removeActsFor(qId);
+          state['q' + qId] = value;
+          // Limpiar selección previa dentro de la misma pregunta (los botones son hermanos)
+          opt.parentElement.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
+          opt.classList.add('is-selected');
+          // construir TODOS los actos de la opción elegida
+          buildActsFor(qId);
+          showThought(qId);
+          return;
+        }
+
+        // 2) Acciones explícitas (back, siguiente acto, siguiente pregunta, mapa, despedida)
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
         const a = btn.getAttribute('data-action');
@@ -1629,8 +1657,7 @@
         // q{i+1} → siguiente pregunta (con posible transición)
         const m = a && a.match(/^q([1-8])$/);
         if (m) {
-          const next = +m[1];
-          handleQuestionTransition(next);
+          handleQuestionTransition(+m[1]);
           return;
         }
 
@@ -1638,27 +1665,15 @@
         if (a === 'despedida') { go('s-despedida'); return; }
       });
 
-      // Selección de opción: marcar + construir TODOS los actos + ir a la primera diapositiva
-      document.addEventListener('click', e => {
-        const opt = e.target.closest('.q__option');
-        if (!opt) return;
-        const qId = +opt.getAttribute('data-q');
-        const value = opt.getAttribute('data-value');
-        // Si ya hay una opción elegida con actos generados, limpiarlos antes
-        removeActsFor(qId);
-        state['q' + qId] = value;
-        const card = opt.closest('.q__card') || opt.closest('.q');
-        if (card) {
-          card.querySelectorAll('.q__option').forEach(o => o.classList.remove('is-selected'));
-          opt.classList.add('is-selected');
-          card.classList.add('is-revealed');
-        } else {
-          opt.classList.add('is-selected');
+      // Fallback de imagen: si falla al cargar, sustituir por el placeholder SVG.
+      // Usamos capture phase porque los eventos 'error' de <img> no burbujean por defecto.
+      document.addEventListener('error', e => {
+        const t = e.target;
+        if (t && t.tagName === 'IMG' && t.hasAttribute('data-lightbox') && t.src !== FALLBACK_IMG) {
+          t.onerror = null;
+          t.src = FALLBACK_IMG;
         }
-        // construir TODOS los actos de la opción elegida
-        buildActsFor(qId);
-        showThought(qId);
-      });
+      }, true);
 
       // ===================================================================
       // TRANSICIÓN DE MAPA ENTRE PREGUNTAS
@@ -1683,9 +1698,16 @@
           labelText = 'Tokio → el intermedio';
           toNode = 'intermedio'; fromNode = 'tokio';
         } else if (nextQId === 5) {
-          connKey = state.q4 === 'nakasendo' ? 'naka-kioto' : 'alpes-kioto';
-          labelText = state.q4 === 'nakasendo' ? 'Nakasendō → Kioto' : 'Alpes → Kioto';
-          toNode='kioto'; fromNode='intermedio';
+          if (state.q4 === 'direct') {
+            connKey = 'tok-kioto'; labelText = 'Tokio → Kioto';
+            toNode='kioto'; fromNode='tokio';
+          } else if (state.q4 === 'nakasendo') {
+            connKey = 'naka-kioto'; labelText = 'Nakasendō → Kioto';
+            toNode='kioto'; fromNode='intermedio';
+          } else {
+            connKey = 'alpes-kioto'; labelText = 'Alpes → Kioto';
+            toNode='kioto'; fromNode='intermedio';
+          }
         } else if (nextQId === 7) {
           if (state.q7 === 'kinosaki') {
             connKey='kioto-onsen'; labelText='Kioto → Kinosaki'; toNode='onsen'; fromNode='kioto';
@@ -1699,7 +1721,10 @@
         showTransition(fromNode, toNode, connKey, labelText);
         go('s-transition');
         // Tras 2400ms ir a la siguiente pregunta (línea 1500ms + label 700ms + sub 500ms + margen)
-        setTimeout(() => go('s-q' + nextQId), 2400);
+        transitionTimer = setTimeout(() => {
+          transitionTimer = null;
+          go('s-q' + nextQId);
+        }, 2400);
       }
 
       // ===================================================================
@@ -1717,10 +1742,27 @@
         lbReturn = returnEl || null;
         lb.hidden = false;
         lb.querySelector('.lightbox__close').focus();
+        document.addEventListener('keydown', lbFocusTrap);
       }
       function closeLb() {
         lb.hidden = true;
+        document.removeEventListener('keydown', lbFocusTrap);
         if (lbReturn && typeof lbReturn.focus === 'function') lbReturn.focus();
+      }
+      // Atrapa Tab/Shift+Tab dentro del lightbox (WCAG 2.4.3)
+      function lbFocusTrap(e) {
+        if (e.key !== 'Tab') return;
+        const focusables = lb.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
 
       document.addEventListener('click', e => {
@@ -1765,6 +1807,11 @@
       // MAPA FINAL
       // ===================================================================
       function buildMapa() {
+        // Si ya construimos el mapa con este mismo state, no rehacer el trabajo
+        const stateHash = JSON.stringify(state);
+        if (stateHash === mapaBuiltHash) return;
+        mapaBuiltHash = stateHash;
+
         const svg = document.getElementById('mapaSvg');
         const conns = {
           'tok-naka':{solid:false}, 'tok-alpes':{solid:false}, 'tok-kioto':{solid:false},
@@ -1850,7 +1897,7 @@
           fig.className = 'mapa__polaroid';
           fig.style.setProperty('--rot', it.rot + 'deg');
           fig.style.animationDelay = (i * 120) + 'ms';
-          fig.innerHTML = `<img src="${it.img}" alt="" loading="lazy" data-lightbox data-lightbox-caption="${it.cap}" data-lightbox-place="" tabindex="0"><figcaption>${it.cap}</figcaption>`;
+          fig.innerHTML = `<img src="${it.img}" alt="" width="280" height="140" loading="lazy" data-lightbox data-lightbox-caption="${it.cap}" data-lightbox-place="" tabindex="0"><figcaption>${it.cap}</figcaption>`;
           scrap.appendChild(fig);
         });
 
