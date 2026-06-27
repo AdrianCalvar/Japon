@@ -587,6 +587,20 @@
       }
       .postal__hint{animation:none;opacity:.7}
     }
+
+    /* ---------- COMPACT MOBILE — encaja actos con foto en viewports cortos ---------- */
+    @media (max-width:520px){
+      /* Foto más pequeña y menos padding polaroid → ahorra ~100px de alto */
+      .act__photo,.act__photo--none,.act__photo--svg{max-width:240px;padding:4px 4px 18px}
+      .act__photo--none{min-height:240px}
+      /* Menos aire vertical en el stack del acto */
+      .state--act{padding-top:calc(var(--topbar-h) + .25rem);padding-bottom:.5rem}
+      .act{padding:.5rem 0 .75rem;gap:.55rem}
+      /* Tipografías un punto más comedidas */
+      .act__place{font-size:clamp(1.35rem,1.1rem + 1vw,1.6rem)}
+      .act__micro{font-size:1.05rem}
+      .act__text{font-size:.96rem;line-height:1.55}
+    }
   </style>
 </head>
 <body>
@@ -867,17 +881,23 @@
         // ryokan.png → solo en Q5 acto Gora Setsugetsuka
         sensoji:    './images/Sensō-ji · Asakusa.png',
         sushi:      './images/comiendo sushi.png',
+        sushi2:      './images/sushiplus.png',
+        kimono:      './images/kimono.png',
+        omoide:      './images/unsplash/omoide.jpeg',
         nakasendo:  './images/NAKASENDO .png',
         ryokan:     './images/ryokan.png',
+        sushiriokan:     './images/sushiriokan.png',
 
         // Unsplash (37 URLs validadas con curl HTTP 200)
         yanesen:    './images/unsplash/yanesen.webp',  // barrio viejo Tokio
         akiba:    './images/unsplash/akiba.jpg',  
+        koenji:    './images/unsplash/koenji.jpg',  
+        lost:    './images/unsplash/lost.jpg',  
         
         nezu:       './images/unsplash/nezu.jpg',  // santuario torii
         gatos:      './images/unsplash/gatos.jpg',  // gato interior
-        sumida:     './images/unsplash/sumida.jpg',  // río Tokio
-        harajuku:   './images/unsplash/harajuku.jpg',  // calle Takeshita
+        sumida:     './images/unsplash/sumida.webp',  // río Tokio
+        harajuku:   './images/unsplash/hara.jpeg',  // calle Takeshita
         mandarake:  './images/unsplash/mandarake.jpg',  // tienda coleccionables
         mugiwara:   './images/unsplash/mugiwara.jpeg',  // tienda pop
         sunshine:   './images/unsplash/sunshine.jpg',  // centro comercial (ya no se usa, en desuso)
@@ -898,8 +918,13 @@
         kinkaku:    './images/unsplash/kinkaku.jpg',  // pabellón dorado
         nara:       './images/unsplash/nara.jpg',  // ciervos Nara
         honen:      './images/unsplash/honen.jpg',  // templo zen pequeño
+        tsuru:      './images/unsplash/tsuru.webp',  
+        shuku:      './images/unsplash/shuku.webp',  
+        higi:      './images/unsplash/Higashiyama.webp',  
+        hase:      './images/unsplash/hase.webp',  
+        kama:      './images/unsplash/kama.jpg',  
         kibune:     './images/unsplash/kibune.jpg',  // santuario bosque
-        kurama:     './images/unsplash/kurama.jpg',  // onsen al aire libre
+        kurama:     './images/unsplash/kurama.webp',  // onsen al aire libre
         romancecar: './images/unsplash/romancecar.jpg',  // tren turístico
         kaiseki:    './images/unsplash/kaiseki.jpg',  // kaiseki presentado
         limited:    './images/unsplash/limited.jpg',  // tren express
@@ -908,7 +933,6 @@
         matsuba:    './images/unsplash/matsuba.jpg',  // paisaje rural
         // 6 extras para romper repeticiones (inari/nara/harajuku/shinkansen/honen/sensoji/sushi/ryokan)
         inari3:     './images/unsplash/inari3.jpg',   // torii atardecer
-        nara3:      './images/unsplash/nara3.jpg',   // ciervos / templo
         shinkansen2:'./images/unsplash/shinkansen2.jpg',   // tren bala
         wagyu2:     './images/unsplash/wagyu2.jpg',  // carne/plancha japonesa
         // 3 extras extra para romper sunshine/kiyomizu/inari
@@ -937,46 +961,46 @@
               label: 'El cruce de Shibuya, el neón y los pasos de mil personas',
               micro: 'Te imagino cruzando Shibuya con los ojos enormes. Yo a tu lado, fingiendo que controlo.',
               acts: [
-                { place: 'Akihabara', image: IMG.akiba, caption: 'Tokio · antes que nadie',
-                  text: 'Akihabara a las diez de la mañana. Radio Kaikan en silencio. Las figuras que te flipan están dentro, en algún piso, en alguna vitrina. Tú las encuentras. Yo cargo con las bolsas.',
-                  tag: 'figuras' },
                 { place: 'Shibuya Crossing', image: IMG.shibuya, caption: 'Shibuya · desde arriba',
-                  text: 'Subimos al Starbucks de la esquina, segunda planta. Abajo, mil personas cruzando en todas direcciones. Tú dices "parecen salmones". Yo me río, pero es verdad. Bajamos, cruzamos, nos mezclamos. Tu mano en la mía. El neón.',
+                  text: 'Subimos al Starbucks de la esquina, segunda planta. Abajo, mil personas cruzando en todas direcciones. No saben que Gojo los salvó',
                   tag: 'cruce' },
+                { place: 'Akihabara', image: IMG.akiba, caption: 'Tokio · antes que nadie',
+                  text: 'Akihabara es el "Barrio electrico", tecnología, manga, excesos. Tú las encuentras. Yo cargo con las bolsas.',
+                  tag: 'figuras' },
                 { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku · 20 pases',
-                  text: 'Cena en Sushi Tokyo Ten, Shinjuku. Omakase de veinte piezas, una detrás de otra. El chef te mira a los ojos antes de cada una. Tú le devuelves la mirada. Yo cuento los bocados.',
+                  text: 'Cena en Sushi Tokyo Ten, Shinjuku. porque si hay algo que no debe faltar en Japón, es el sushi.',
                   tag: 'sushi' },
-                { place: 'Omoide Yokocho', image: PLACEHOLDER_SVGS.brush, caption: 'Shinjuku · humo y yakitori',
-                  text: 'Si un día no te apetece sushi: Omoide Yokocho. Callejones de madera, humo, yakitori, cerveza. Nos sentamos en la barra, pedimos lo que apunta el dedo y hablamos con el de al lado.',
+                { place: 'Omoide Yokocho', image: IMG.omoide, caption: 'Shinjuku · humo y yakitori',
+                  text: 'Si un día pierdes la cabeza y no te apetece sushi: Omoide Yokocho. Callejones de madera, humo, yakitori, cerveza. Nos sentamos en la barra, pedimos lo que apunta el dedo',
                   tag: 'callejón' }
               ]
             },
             {
               value: 'calm',
-              label: 'Tokio que sobrevive: callejones, gatos y musgo',
-              micro: 'Te imagino en Yanaka, con un gato en el regazo y sin saber qué hora es.',
+              label: 'El Tokio tradicional: callejones, talleres y musgo',
+              micro: 'Te imagino en Yanaka, sentada en una casa de té centenaria, con una taza entre las manos y sin saber qué hora es.',
               acts: [
                 { place: 'Yanesen', image: IMG.yanesen, caption: 'Yanaka · el Tokio viejo',
-                  text: 'Yanaka, Nezu, Sendagi. El Tokio que sobrevivió a 1945. Calles estrechas, talleres abiertos, galerías, gatos en cada esquina. Sin prisa, sin listas, sin fotos con el móvil por delante.',
+                  text: 'Yanaka, Nezu, Sendagi. El Tokio que sobrevivió a la guerra. Calles estrechas, talleres abiertos, galerías, gatos en cada esquina. Sin prisa, sin listas, sin fotos con el móvil por delante.',
                   tag: 'barrio' },
                 { place: 'Nezu-jinja', image: IMG.nezu, caption: 'Bunkyo · torii sin gente',
-                  text: 'Nezu-jinja abre a las nueve. Un pasillo de torii bermellón escondido entre casas bajas. Si vas a Fushimi Inari más tarde, aquí ya te has quedado con la mejor foto del día.',
+                  text: 'Nezu-jinja, nuestro primer santuario. Un pasillo de torii bermellón escondido entre casas bajas.',
                   tag: 'torii' },
-                { place: 'Café de gatos', image: IMG.gatos, caption: 'Yanaka · una hora de michis',
-                  text: 'Café de gatos en Yanaka antes de la cena. Una hora en una sala pequeña, con michis en el regazo. Porque Tokio nos lo permite. Porque nos lo merecemos.',
-                  tag: 'michis' }
+                { place: 'Comida en Yanaka', image: IMG.sushi, caption: 'Yanaka · casa de té centenaria',
+                  text: 'Es famoso por los gatos, pero nosotros tenemos prioridades',
+                  tag: 'matcha' }
               ]
             },
             {
               value: 'market',
-              label: 'Tsukiji a las 6 de la mañana, con niebla',
+              label: 'Tsukiji, el mercado, olores nipones',
               micro: 'Vas a probar el mejor atún de tu vida. No te voy a decir de qué puesto.',
               acts: [
                 { place: 'Tsukiji outer', image: IMG.sushi, caption: 'Tsukiji · 6h, sin turistas',
-                  text: 'Tsukiji outer market a las seis. Tamagoyaki, uni, atún rojo. Los locales ya están desayunando. Tú pruebas el primer bocado del viaje. Yo grabo tu cara.',
+                  text: 'Tamagoyaki, uni, atún rojo. En cristiano: sushi. Porque, en fin, estamos en Japón',
                   tag: 'primer bocado' },
                 { place: 'Sumida', image: IMG.sumida, caption: 'Sumida · Sensoji al fondo',
-                  text: 'Caminata por el río Sumida hasta Asakusa. Sensoji abriendo al fondo, las barcas pasando. La postal que todo el mundo busca —solo que a esta hora es nuestra.',
+                  text: 'Caminata por el río Sumida hasta Asakusa. Sensoji abriendo al fondo, las barcas pasando. La postal que todo el mundo busca.',
                   tag: 'río' },
                 { place: 'Harajuku Takeshita', image: IMG.harajuku, caption: 'Harajuku · el ruido vuelve',
                   text: 'Harajuku Takeshita-dori por la tarde. Crêpes, tiendas de colores, gente disfrazada sin que nadie mire. Después del silencio de la mañana, Tokio nos devuelve el ruido.',
@@ -991,15 +1015,15 @@
           options: [
             {
               value: 'onepiece',
-              label: 'Una figura de One Piece, firmada, de Nakano Broadway',
+              label: 'Una figura de One Piece como mi cabeza ',
               micro: 'Te veo eligiendo un Luffy edición limitada. Yo pago y finjo no entender.',
               acts: [
-                { place: 'Nakano Broadway', image: IMG.mandarake, caption: 'Nakano · cuatro plantas',
-                  text: 'Nakano Broadway, cuatro plantas de Mandarake. Figuras de hace veinte años, ediciones limitadas, vinilos. Tú te quedas ahí dentro hasta que me echen.',
-                  tag: 'manga' },
                 { place: 'Mugiwara Store', image: IMG.mugiwara, caption: 'Shibuya · flagship One Piece',
-                  text: 'Mugiwara Store en Shibuya, flagship de One Piece. Diez mil artículos en seis plantas. Entras queriendo una cosa, sales con una caja.',
+                  text: 'Mugiwara Store en Shibuya, donde Gold D. Roger perdió el sombrero. Diez mil artículos en seis plantas. Entras queriendo una cosa, sales con una caja.',
                   tag: '10.000' },
+                { place: 'Nakano Broadway', image: IMG.mandarake, caption: 'Nakano · cuatro plantas',
+                  text: 'Nakano Broadway, cuatro plantas de Mandarake. Figuras de edición limitada, vinilos. Tú te quedas ahí dentro hasta que me echen.',
+                  tag: 'manga' },
                 { place: 'Sensoji al atardecer', image: IMG.sensoji, caption: 'Asakusa · con la caja bajo el brazo',
                   text: 'Sensoji al atardecer, camino de vuelta a casa con la caja bajo el brazo. La linterna roja encendida ya, las farolas de papel meciéndose. Tú caminas más despacio para que no se nos acabe el día.',
                   tag: 'atardecer' }
@@ -1011,29 +1035,29 @@
               micro: 'Tu nombre, en rojo, en un papel. Te lo voy a regalar el último día, cuando ya no te lo esperas.',
               acts: [
                 { place: 'Nakamise', image: IMG.nakamise, caption: 'Asakusa · tienda de sellos',
-                  text: 'Nakamise en Asakusa. Hay una tienda donde llevan siglos grabando nombres en katakana. Tú eliges, ellos tallan. Te vas con un sello que va a firmar todo lo que escribas en japonés en tu vida.',
+                  text: 'Nakamise en Asakusa. Hay una tienda donde llevan siglos grabando nombres en katakana. Tú eliges, ellos tallan.',
                   tag: 'sello' },
-                { place: 'Taller de shodō', image: IMG.shodo, caption: 'Kioto · caligrafía',
-                  text: 'Una hora de shodō en Kioto. Pincel, tinta, papel washi. La maestra te corrige la postura. Tú escribes tu nombre y te lo quedas mirando como si fuera un retrato.',
+                { place: 'Kioto', image: IMG.shodo, caption: 'Kioto · caligrafía',
+                  text: 'Una hora de shodō en Kioto. Pincel, tinta, papel washi. O ir a la búsqueda geishas. O ver joyas. Todo vale.',
                   tag: 'caligrafía' },
                 { place: 'Sensoji al atardecer', image: IMG.sensoji, caption: 'Asakusa · luz dorada',
-                  text: 'Sensoji al atardecer. El sello en el bolsillo, el sol cayendo sobre la pagoda. La luz dorada hace que todo parezca una postal —solo que esta vez es nuestra.',
+                  text: 'Sensoji al atardecer. El sello en el bolsillo, el sol cayendo sobre la pagoda. La luz dorada hace que todo parezca una postal',
                   tag: 'atardecer' }
               ]
             },
             {
               value: 'yukata',
               label: 'Una foto contigo en yukata frente a Sensoji',
-              micro: 'Esa foto la vamos a hacer al amanecer, antes de que abran las tiendas. Como en Koh Samui, pero con kimono.',
+              micro: 'Esa foto la vamos a hacer al amanecer, antes de que abran las tiendas. Cuando estemos solos.',
               acts: [
-                { place: 'Tienda de yukata', image: IMG.nakamise, caption: 'Asakusa · a las ocho',
-                  text: 'Tienda de yukata en Asakusa. Tú eliges el color. Yo te espero fuera con un café. En diez minutos sales con la yukata puesta, geta, pelo recogido. Te van a mirar. Vas a brillar.',
-                  tag: 'yukata' },
                 { place: 'Sensoji al amanecer', image: IMG.sensoji, caption: 'Asakusa · antes que nadie',
-                  text: 'Sensoji a las siete. Las tiendas todavía cerradas, la luz entrando de lado. Te tomo la mano y no te la suelto hasta que el sol termina de salir.',
+                  text: 'Sensoji a las siete. Las tiendas todavía cerradas, la luz entrando de lado. Japón para nosotros.',
                   tag: 'amanecer' },
-                { place: 'Sushi Tokyo Ten', image: IMG.sushi, caption: 'Shinjuku · después de la foto',
-                  text: 'Después de la foto, sushi. Sushi Tokyo Ten en Shinjuku, omakase de veinte pases. La yukata y el sushi juntos en la misma noche. Eso no se nos va a olvidar.',
+                { place: 'Tienda de yukata', image: IMG.kimono, caption: 'Asakusa · a las ocho',
+                  text: 'Tienda de yukata en Asakusa. Tú eliges el color.',
+                  tag: 'yukata' },
+                { place: 'Sushi Tokyo Ten', image: IMG.sushi2, caption: 'Shinjuku · después de la foto',
+                  text: 'Después de la foto, sushi. Sushi Tokyo Ten en Shinjuku, Omakase de veinte piezas, una detrás de otra. Duelo entre nosotros y el chef, a ver quien puede más.',
                   tag: 'cena' }
               ]
             }
@@ -1041,25 +1065,22 @@
         },
         {
           id: 3, node: 'tokio', nodeLabel: 'Tokio · un día fuera',
-          title: 'Cuatro días en Tokio dan para mucho. Pero a una hora hay mar, cedros viejos y un Daibutsu de bronce al aire libre. ¿Salimos un día?',
+          title: 'Cuatro días en Tokio dan para mucho. Pero a una hora hay mar, cedros viejos y budas gigantes al aire libre. ¿Una escapadita?',
           options: [
             {
               value: 'kamakura',
               label: 'Kamakura: mar, Daibutsu y templos zen del siglo XIII',
               micro: 'Un día de mar, de cedros viejos, de caminar sin metro. Una hora de Tokio.',
               acts: [
-                { place: 'Kita-Kamakura', image: IMG.honen, caption: 'Kita-Kamakura · zen del XIII',
+                { place: 'Kita-Kamakura', image: IMG.kama, caption: 'Kita-Kamakura · zen del XIII',
                   text: 'Bajamos en Kita-Kamakura, una parada antes. Engaku-ji y Kencho-ji, dos templos zen del siglo XIII. Cedros de ochocientos años, casi nadie. Es el tipo de sitio donde te callas sin darte cuenta.',
                   tag: 'zen' },
-                { place: 'Tsurugaoka', image: IMG.sensoji, caption: 'Kamakura · santuario principal',
+                { place: 'Tsurugaoka', image: IMG.tsuru, caption: 'Kamakura · santuario principal',
                   text: 'Tsurugaoka Hachimangu, el santuario principal. Escalinata larga, ambiente de pueblo costero, perros, escuelas. Bajamos andando veinte minutos hasta el centro.',
                   tag: 'santuario' },
-                { place: 'Hasedera', image: IMG.fuji, caption: 'Hasedera · vistas al Pacífico',
-                  text: 'Hasedera, los jardines escalonados con vistas al Pacífico. Mil estatuas Jizō custodian a los niños muertos. Es el momento más sereno del día, el que se te queda cuando llegas a casa.',
-                  tag: 'pacífico' },
-                { place: 'Daibutsu', image: IMG.kinkaku, caption: 'Kotoku-in · once metros al aire libre',
-                  text: 'Kotoku-in. El Daibutsu de bronce al aire libre, once metros. Podemos entrar dentro de la estatua por veinte yenes. Es la foto que ya te has hecho mil veces en la cabeza.',
-                  tag: 'bronce' }
+                { place: 'Hasedera', image: IMG.hase, caption: 'Hasedera · vistas al Pacífico',
+                  text: 'Hasedera, los jardines escalonados con vistas al Pacífico. Mil estatuas Jizō. La misma paz que cuando llegas a casa después de un día largo.',
+                  tag: 'pacífico' }
               ]
             },
             {
@@ -1067,14 +1088,14 @@
               label: 'Tokio entero. Sin excursiones.',
               micro: 'Cuatro o cinco días en la ciudad dan para más de lo que parece. Nos quedamos.',
               acts: [
-                { place: 'Volver a Yanaka', image: IMG.yanesen, caption: 'Yanaka · al atardecer',
-                  text: 'Volver a Yanaka al atardecer, cuando los gatos salen y las farolas se encienden. Es el Tokio que se vive sin guía, el que se descubre volviendo.',
+                { place: 'Perderse', image: IMG.lost, caption: 'Yanaka · al atardecer',
+                  text: 'Vivir Tokio sin rumbo, volver a sitios que nos gustaron. Sin prisa, sin guía.',
                   tag: 'atardecer' },
-                { place: 'Shimokitazawa', image: PLACEHOLDER_SVGS.brush, caption: 'Shimokitazawa · vinilos y cafés',
+                { place: 'Shimokitazawa', image: IMG.koenji, caption: 'Shimokitazawa · vinilos y cafés',
                   text: 'Shimokitazawa o Koenji, lo que pida el cuerpo. Tiendas de vinilos, cafés pequeños, gente con prisa por nada. Para perdernos a propósito.',
                   tag: 'perdernos' },
-                { place: 'Un día perdido', image: PLACEHOLDER_SVGS.kanji, caption: 'El día que no hicimos nada',
-                  text: 'Un día para no hacer nada. Para volver al café que nos gustó, para sentarnos en un parque, para mirar cómo vive la gente. Lo que recordaremos al final.',
+                { place: 'Coger fuerzas', image: IMG.sushi2, caption: 'El día que no hicimos nada',
+                  text: 'No hacer nada más que descansar y comer sushi. Suena bien ¿verdad?',
                   tag: 'nada' }
               ]
             }
@@ -1086,14 +1107,14 @@
           options: [
             {
               value: 'nakasendo',
-              label: 'Caminar 8 km por el Nakasendō, de Magome a Tsumago',
-              micro: 'La mochila la llevo yo. Tú solo tienes que mirar alrededor y decir "adiós" muy bajito cuando lleguemos.',
+              label: 'Caminar por la famosa senda de Nakasendō, de Magome a Tsumago',
+              micro: 'La mochila la llevo yo. Tú solo tienes que mirar alrededor.',
               acts: [
                 { place: 'Shinkansen → Nagoya', image: IMG.nagoya, caption: 'Tokio → Nagoya · ventanilla',
-                  text: 'Shinkansen Tokio → Nagoya. Una hora cuarenta de ventanilla. El Fuji aparece a la izquierda. No te aviso —cuando lo veas, lo ves.',
+                  text: 'Shinkansen Tokio → Nagoya. Una hora del famoso tren. El Fuji a la izquierda.',
                   tag: 'ventanilla' },
                 { place: 'Magome → Tsumago', image: IMG.nakasendo, caption: 'Kiso · 8 km por bosque',
-                  text: 'Magome → Tsumago. Ocho kilómetros por bosque, sin coches. Las posadas son las mismas del 1600. La gente que te cruza te saluda. Tú vas en silencio. Yo detrás.',
+                  text: 'Magome → Tsumago. Ocho kilómetros por bosque, sin coches. Posadas de hace siglos. Tú vas en silencio. Yo detrás.',
                   tag: '8 km' },
                 { place: 'Ryokan en Tsumago', image: IMG.ryokan, caption: 'Tsumago · descalzos',
                   text: 'El ryokan de Tsumago al final del día. Cena descalzos sobre el tatami, futón preparado, el pueblo en silencio afuera. No hay wifi. No lo necesitamos.',
@@ -1103,7 +1124,7 @@
             {
               value: 'alpes',
               label: 'Takayama al amanecer y Shirakawa-go entre nieblas',
-              micro: 'Vas a probar el mejor miso de tu vida. Y la croqueta de Hida Beef te la comes, quieras o no.',
+              micro: 'Vas a probar el mejor miso de tu vida. Y la croqueta de Hida Beef te va a volar la cabeza.',
               acts: [
                 { place: 'Sanmachi Suji', image: IMG.sanmachi, caption: 'Takayama · sake breweries',
                   text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake por vasos, el dueño nos explica qué estamos bebiendo. No te digo cuál —te lo descubres tú.',
@@ -1111,8 +1132,8 @@
                 { place: 'Shirakawa-go', image: IMG.shirakawa, caption: 'Gassho-zukuri · entre nieblas',
                   text: 'Bus a Shirakawa-go. Las casas gassho-zukuri entre los arrozales. Cruzamos el Deai-bashi, buscamos el San-goya —tres cabañas perdidas en los campos—. La niebla va y viene. No hace falta nada más.',
                   tag: 'niebla' },
-                { place: 'Croqueta de Hida Beef', image: IMG.wagyu, caption: 'Shirakawa-go · la croqueta',
-                  text: 'La croqueta de Hida Beef, en la calle, con las manos frías. Crujiente, caliente, con un sabor que no se va a ir en mucho tiempo.',
+                { place: 'Croqueta de Hida Beef y wagyu', image: IMG.wagyu, caption: 'Shirakawa-go · la croqueta',
+                  text: 'La croqueta de Hida Beef, en la calle, con las manos frías. Carne jugosa y sabrosa que se deshace en la boca.',
                   tag: 'croqueta' }
               ]
             },
@@ -1138,7 +1159,7 @@
             {
               value: 'impres',
               label: 'Imprescindibles al amanecer: Fushimi Inari, Kiyomizu, Kinkaku-ji',
-              micro: 'Los torii a las 6 de la mañana. Solo se oye el viento y tus pasos. Te voy a tomar la mano y no te voy a soltar en dos horas.',
+              micro: 'Los torii a las 6 de la mañana. Solo se oye el viento y tus pasos.',
               acts: [
                 { place: 'Fushimi Inari', image: IMG.inari, caption: 'Kioto · 10.000 torii al amanecer',
                   text: 'Fushimi Inari al amanecer. Diez mil torii naranjas hasta la cima del monte. El 90% se queda abajo. Nosotros subimos. Arriba no hay nadie.',
@@ -1168,7 +1189,7 @@
                 { place: 'Kurama onsen', image: IMG.kurama, caption: 'Kioto norte · onsen en la montaña',
                   text: 'Kurama onsen, en la montaña, junto al santuario. Funicular desde Kibune. Agua caliente, vapor, un bosque rojo. Medio día. Sin hablar.',
                   tag: 'vapor' },
-                { place: 'Nara', image: IMG.nara3, caption: 'Nara · ciervos sagrados',
+                { place: 'Nara', image: IMG.nara, caption: 'Nara · ciervos sagrados',
                   text: 'Vuelta vía Nara para los ciervos sagrados. Las galletas que venden en la entrada son la trampa. Si solo quieres una, una.',
                   tag: 'galletas' }
               ]
@@ -1182,9 +1203,9 @@
                   text: 'Si amanece claro: Fushimi Inari a las seis, los torii solos. Si está nublado: nos quedamos en la cama media hora más. Las dos opciones me valen.',
                   tag: 'si amanece' },
                 { place: 'Honen-in', image: IMG.honen, caption: 'Cuando pida calma',
-                  text: 'Cuando el cuerpo pida calma: Honen-in, el templo gratis de Philosopher\'s Path. Siestas morales en el jardín permitidas.',
+                  text: 'Cuando el cuerpo pida calma: Honen-in, el templo de Philosopher\'s Path. Siestas morales en el jardín permitidas.',
                   tag: 'siesta' },
-                { place: 'Nara', image: IMG.nara3, caption: 'Si hay ganas de ciervos',
+                { place: 'Nara', image: IMG.nara, caption: 'Si hay ganas de ciervos',
                   text: 'Si hay ganas de ciervos: Nara en tren, cuarenta y cinco minutos. Si no, café en un kissaten de Shijō mirando llover.',
                   tag: 'café' }
               ]
@@ -1193,25 +1214,22 @@
         },
         {
           id: 6, node: 'kioto', nodeLabel: 'Kōya-san',
-          title: 'Kioto da para dos noches. Pero en la montaña, a dos horas, hay un monasterio budista donde los monjes te enseñan a comer en silencio y a caminar entre doscientas mil tumbas bajo cedros de ochocientos años. ¿Una noche fuera?',
+          title: 'Kioto da para dos noches. Pero en la montaña, a dos horas, hay un monasterio budista donde los monjes viven bajo cedros de ochocientos años. ¿Una noche fuera?',
           options: [
             {
               value: 'koyasan',
               label: 'Sí, Kōya-san: una noche en monasterio budista',
               micro: 'Cenamos shōjin-ryori con los monjes. Dormimos en el shukubo. Antes del amanecer, la ceremonia del fuego. Y Okunoin de noche es algo que no se olvida.',
               acts: [
-                { place: 'Nankai → Kōya-san', image: IMG.nagoya, caption: 'Osaka → Kōya-san · monte arriba',
+                { place: 'Nankai → Kōya-san', image: IMG.shinkansen2, caption: 'Osaka → Kōya-san · monte arriba',
                   text: 'Tren desde Osaka-Namba hasta Gokurakubashi, funicular hasta la cima. Dos horas con el monte engrandeciendo a cada curva. La civilización se queda abajo.',
                   tag: 'monte' },
                 { place: 'Okunoin al atardecer', image: IMG.shirakawa, caption: 'Okunoin · doscientas mil tumbas',
                   text: 'Okunoin al caer la noche. Doscientas mil tumbas bajo cedros de ochocientos años, iluminadas con faroles. Es el cementerio más grande de Japón. De noche es otra cosa —perturbador en el buen sentido—.',
                   tag: 'faroles' },
-                { place: 'Shōjin-ryori', image: IMG.kaiseki, caption: 'Shukubo · cena de monjes',
+                { place: 'Shōjin-ryori', image: IMG.shuku, caption: 'Shukubo · cena de monjes',
                   text: 'Cena shōjin-ryori en el shukubo. Cocina vegetariana de monjes: tofu, sésamo, verduras de montaña, nada de carne ni pescado. Se come en silencio. Se saborea.',
-                  tag: 'silencio' },
-                { place: 'Fuego y Kongōbu-ji', image: IMG.kioto, caption: 'Antes del amanecer · fuego goma',
-                  text: 'Antes del amanecer, ceremonia del fuego goma con los monjes. Después, Kongōbu-ji y sus jardines de arena. Luego bajamos.',
-                  tag: 'fuego' }
+                  tag: 'silencio' }
               ]
             },
             {
@@ -1225,7 +1243,7 @@
                 { place: 'Lo que dejamos pendiente', image: IMG.kioto, caption: 'La calle o el café pendiente',
                   text: 'Algo que dejamos pendiente el primer día. Una calle, un café, un cruce. Volver para encontrarlo es parte del viaje.',
                   tag: 'pendiente' },
-                { place: 'Higashiyama al anochecer', image: IMG.honen, caption: 'Higashiyama · al anochecer',
+                { place: 'Higashiyama al anochecer', image: IMG.higi, caption: 'Higashiyama · al anochecer',
                   text: 'Higashiyama al anochecer, o el barrio de Gion si nos cruzamos con una geisha. Lo que nos dé el cuerpo. Kioto de noche es otra ciudad.',
                   tag: 'anochecer' }
               ]
@@ -1241,13 +1259,10 @@
               label: 'Hakone, onsen privado en la habitación, monte Fuji al fondo',
               micro: 'Nos vamos a quedar en una habitación donde se oye el agua. Tú entras primero, yo te espero fuera con un café.',
               acts: [
-                { place: 'Romancecar', image: IMG.romancecar, caption: 'Shinjuku → Hakone · última línea',
-                  text: 'Romancecar desde Shinjuku. Una hora y media. La ciudad se acaba, empieza el monte. Última línea del viaje en tren. Ventanilla.',
-                  tag: 'ventanilla' },
                 { place: 'Ryokan en Gora', image: IMG.ryokan, caption: 'Gora · onsen privado',
                   text: 'Ryokan en Gora. Madera, tatami, onsen privado en la habitación. Toda la noche para no hacer nada. No tenemos que hacer nada.',
                   tag: 'madera' },
-                { place: 'Kaiseki en yukata', image: IMG.kaiseki, caption: 'Habitación · cena servida',
+                { place: 'Kaiseki en yukata', image: IMG.sushiriokan, caption: 'Habitación · cena servida',
                   text: 'Cena kaiseki en yukata. Once platos servidos en la habitación. Descalzos sobre el tatami. Sin hablar de horarios, sin mirar el móvil.',
                   tag: 'once platos' },
                 { place: 'Monte Fuji', image: IMG.fuji, caption: 'Si hay suerte · amanecer',
@@ -1257,19 +1272,19 @@
             },
             {
               value: 'kinosaki',
-              label: 'Kinosaki, 6 baños públicos, yukata por el pueblo',
+              label: 'Kinosaki, rituales, lujo y descanso',
               micro: 'Vas a recorrer el pueblo en yukata, con el gotō en la mano. Y vas a estar adorable.',
               acts: [
-                { place: 'Limited Express', image: IMG.limited, caption: 'Kioto → Kinosaki · por la costa',
-                  text: 'Limited Express desde Kioto. Dos horas y media. La costa, el mar, los pueblos. Vamos leyendo, mirando por la ventana, sin hablar.',
+                { place: 'Nishimuraya', image: IMG.nishimuraya, caption: 'Nishimuraya',
+                  text: 'Un remanso de paz. Tradición japonesa de lujo. Lo que nos merecemos',
                   tag: 'ventanilla' },
-                { place: 'Ryokan en Kinosaki', image: IMG.nishimuraya, caption: 'Kinosaki · pueblo de onsen',
-                  text: 'Ryokan en Kinosaki. Madera vieja, kaiseki en la habitación, onsen en el pueblo. Tattoo-friendly, sin códigos, sin etiquetas.',
+                { place: 'Ryokan en Kinosaki', image: IMG.ryokan, caption: 'Kinosaki · pueblo de onsen',
+                  text: 'Ryokan en Kinosaki. Madera vieja, kaiseki en la habitación, onsen en el pueblo.',
                   tag: 'pueblo' },
                 { place: 'Ritual de los 6 sotoyu', image: IMG.sotoyu, caption: 'Seis baños · con el yumepa',
                   text: 'Los seis sotoyu con el yumepa del ryokan. Mandara-yu al atardecer, Ichino-yu después de las nueve. Sales del baño con el yukata puesto y vuelves andando por el río.',
                   tag: 'ritual' },
-                { place: 'Cena en el pueblo', image: IMG.matsuba, caption: 'Kinosaki · wagyu y cangrejo',
+                { place: 'Cena en el pueblo', image: IMG.sushiriokan, caption: 'Kinosaki · wagyu y cangrejo',
                   text: 'Cena en un restaurante del pueblo: wagyu, cangrejo, sake local. Si el ryokan ya tiene kaiseki, mejor. Si no, aquí.',
                   tag: 'cena' }
               ]
