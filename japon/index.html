@@ -222,19 +222,84 @@
     }
     .btn:hover .btn__hover-text{opacity:.85;transform:translateY(0)}
 
+    /* === Hero CTA — el botón principal de la postal ===
+       Más presencia que un .btn base: gradiente, gloss superior, sombra profunda,
+       flecha SVG que se desplaza al hover/focus/active. Tacto tipo "sello". */
+    .postal__cta-wrap .btn{
+      flex-direction:row;
+      gap:.55rem;
+      font-size:.95rem;
+      font-weight:600;
+      letter-spacing:.05em;
+      padding:1rem 1.65rem 1rem 1.85rem;
+      background:linear-gradient(180deg,var(--vermilion) 0%,var(--vermilion-deep) 100%);
+      box-shadow:
+        0 8px 20px -6px rgba(200,56,42,.55),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -2px 0 rgba(0,0,0,.12);
+      transition:
+        background 220ms ease,
+        transform 220ms var(--ease-out),
+        box-shadow 220ms ease;
+    }
+    .postal__cta-wrap .btn .btn__icon{
+      display:inline-flex;align-items:center;
+      transition:transform 280ms var(--ease-out);
+    }
+    .postal__cta-wrap .btn:hover,
+    .postal__cta-wrap .btn:focus-visible{
+      background:linear-gradient(180deg,var(--vermilion) 0%,#8a1f18 100%);
+      transform:translateY(-2px);
+      box-shadow:
+        0 12px 26px -6px rgba(200,56,42,.65),
+        inset 0 1px 0 rgba(255,255,255,.26),
+        inset 0 -2px 0 rgba(0,0,0,.14);
+    }
+    .postal__cta-wrap .btn:hover .btn__icon,
+    .postal__cta-wrap .btn:focus-visible .btn__icon{
+      transform:translateX(4px);
+    }
+    .postal__cta-wrap .btn:active{
+      transform:translateY(1px) scale(.98);
+      background:linear-gradient(180deg,#a82a22 0%,#7a1c16 100%);
+      box-shadow:
+        0 4px 10px -4px rgba(200,56,42,.5),
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -1px 0 rgba(0,0,0,.18);
+      transition-duration:80ms;
+    }
+    .postal__cta-wrap .btn:active .btn__icon{
+      transform:translateX(5px) scale(1.06);
+    }
+
     /* GLOW UP v3 — Breathing CTA: el botón principal respira sutilmente cuando
-       el postal está listo y revelado, invitando a tocar. Pausa en hover/focus. */
+       el postal está listo y revelado, invitando a tocar. Rango mayor + halo
+       sutil exterior en el pico para que el "respiro" sea más perceptible. */
     @keyframes btnBreathe{
-      0%,100%{transform:translateY(0);box-shadow:0 6px 16px -4px rgba(200,56,42,.5)}
-      50%    {transform:translateY(-2px);box-shadow:0 12px 28px -4px rgba(200,56,42,.65)}
+      0%,100%{
+        transform:translateY(0);
+        box-shadow:
+          0 8px 20px -6px rgba(200,56,42,.55),
+          inset 0 1px 0 rgba(255,255,255,.22),
+          inset 0 -2px 0 rgba(0,0,0,.12);
+      }
+      50%{
+        transform:translateY(-4px);
+        box-shadow:
+          0 18px 34px -6px rgba(200,56,42,.75),
+          inset 0 1px 0 rgba(255,255,255,.32),
+          inset 0 -2px 0 rgba(0,0,0,.08),
+          0 0 0 6px rgba(200,56,42,.10);
+      }
     }
     .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn{
-      animation:btnBreathe 2.6s var(--ease-soft) 900ms infinite;
+      animation:btnBreathe 2.8s var(--ease-soft) infinite;
     }
     .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:hover,
-    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:focus-visible{
+    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:focus-visible,
+    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:active{
       animation:none;
-      transform:translateY(-1px);
+      transform:translateY(-2px);
     }
     @media (prefers-reduced-motion:reduce){
       .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn{animation:none}
@@ -1212,8 +1277,11 @@
       <h1 class="postal__title">Se la requiere para una <br>AVENTURA</h1>
       <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
-        <button class="btn" data-action="q1" aria-label="Abrir la postal">
-          Comienza el viaje
+        <button class="btn" data-action="q1" aria-label="Abrir la postal — comenzar el viaje">
+          <span>Comienza el viaje</span>
+          <svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M2 7 H11 M7.5 3.5 L11 7 L7.5 10.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
       </div>
     </article>
@@ -1780,7 +1848,9 @@
         if (window.SakuraField) window.SakuraField.stop();
       }
 
-      // === SECUENCIA v4 — cinemática calibrada (UX-UI Pro Max) ===
+      // === SECUENCIA v5 — cinemática calibrada (UX-UI Pro Max) ===
+      // Cada texto revela con 700ms de "respiro" tras terminar el anterior:
+      // el usuario puede LEER cada pieza antes de la siguiente.
       // t=0      : sobre aparece + respiración sutil (1 ciclo, 2600ms)
       // t=900    : flap empieza a abrirse (transition 1400ms, ease paper)
       // t=2200   : flap abierto; postal empieza a emerger (overlap con flap)
@@ -1788,11 +1858,13 @@
       // t=3700   : sello se estampa (900ms ceremonial) + BURST sakura (28-40 pétalos)
       // t=4400   : "Noelia," empieza a escribirse (1700ms handWrite + pluma sweep)
       // t=6100   : handWrite terminado
-      // t=6400   : título revela (wipe 800ms) — gap de 300ms para leer
-      // t=7400   : cuerpo revela (wipe 800ms)
-      // t=8200   : CTA revela (wipe 800ms)
-      // t=9000   : stream sakura termina + finish intro
-      // Total: 9s en desktop, ~7.4s en móvil (T=0.82)
+      // t=6800   : título revela (wipe 800ms) — gap de 700ms para leer
+      // t=7600   : título completo
+      // t=8300   : cuerpo revela (wipe 800ms)
+      // t=9100   : cuerpo completo
+      // t=9800   : CTA revela (wipe 800ms) — fade con flecha que se desplaza
+      // t=10600  : CTA completo + stream sakura termina + finish intro
+      // Total: 10.6s en desktop, ~8.7s en móvil (T=0.82)
 
       function scheduleSequence(){
         at(900 * T,  () => { env.classList.add('is-open'); });
@@ -1819,9 +1891,9 @@
           }
         });
 
-        at(6400 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
-        at(7400 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
-        at(8200 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
+        at(6800 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
+        at(8300 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
+        at(9800 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
 
         at(4800 * T, () => {
           // Stream sutil de sakura mientras los textos aparecen
@@ -1830,11 +1902,11 @@
           }
         });
 
-        at(9000 * T, () => {
+        at(10600 * T, () => {
           if (window.SakuraField) window.SakuraField.stop();
         });
 
-        at(9000 * T, () => {
+        at(10600 * T, () => {
           finish();
         });
       }
