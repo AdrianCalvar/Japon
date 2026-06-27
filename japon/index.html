@@ -165,18 +165,6 @@
       /* Compresión inicial leve: se "abre" mientras se escribe (handWrite). */
       letter-spacing:-.02em;
     }
-    /* Pluma SVG que aparece durante el handWrite — barrido sincronizado con clip-path */
-    .postal__to .pen-cursor{
-      position:absolute;
-      width:34px;height:34px;
-      pointer-events:none;
-      top:50%;left:0;
-      transform:translate(-12px,-50%) rotate(-12deg);
-      opacity:0;
-      z-index:2;
-      filter:drop-shadow(0 2px 4px rgba(200,56,42,.35));
-    }
-    .postal__to .pen-cursor.is-visible{opacity:.9}
     /* Highlight de "tinta fresca" en la zona escribiéndose */
     .postal__to::after{
       content:'';position:absolute;
@@ -1052,7 +1040,9 @@
     /* === NOELIA — escritura real con un trazo (1700ms, clip-path + letter-spacing)
          Animamos solo 2 propiedades (compositor-friendly, sin "salto"):
          - clip-path: la letra emerge de izquierda a derecha
-         - letter-spacing: -.04em → 0 (las letras se "abren" mientras se escriben)
+         - letter-spacing: -.04em → -.02em (las letras se "abren" mientras se escriben
+           y terminan en el MISMO valor que el CSS estático, así al quitar la animación
+           vía .intro-done no hay salto de letter-spacing).
          Sin filter:blur ni transform:translateY simultáneos → sin salto. === */
     .postal__to.is-revealing{
       animation:handWrite 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
@@ -1061,17 +1051,7 @@
     @keyframes handWrite{
       0%  {clip-path:inset(0 100% 0 0); letter-spacing:-.04em; opacity:.6}
       20% {opacity:1}
-      100%{clip-path:inset(0 0 0 0); letter-spacing:0; opacity:1}
-    }
-    /* Pluma — barrido sincronizado con handWrite (misma duración y curva) */
-    .postal__to.is-revealing .pen-cursor{
-      animation:penSweep 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
-    }
-    @keyframes penSweep{
-      0%  {opacity:0; transform:translate(-12px,-50%) rotate(-12deg)}
-      8%  {opacity:.9}
-      90% {opacity:.9}
-      100%{opacity:0; transform:translate(180px,-50%) rotate(-8deg)}
+      100%{clip-path:inset(0 0 0 0); letter-spacing:-.02em; opacity:1}
     }
     /* === Resto de textos: wipe corto (700ms) === */
     .postal__title.is-revealing,
@@ -1293,13 +1273,7 @@
           <text x="50" y="62" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="38" font-weight="600" font-style="italic">旅</text>
         </svg>
       </div>
-      <div class="postal__to">Noelia
-        <svg class="pen-cursor" viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M6 28 L26 6 L29 9 L9 31 Z" fill="#C8382A" opacity=".85"/>
-          <path d="M3 30 L8 27 L11 30 L6 33 Z" fill="#9B2820"/>
-          <line x1="22" y1="10" x2="30" y2="2" stroke="#9B2820" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
+      <div class="postal__to">Noelia</div>
       <h1 class="postal__title">Se la requiere para una <br>AVENTURA</h1>
       <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
@@ -1636,16 +1610,20 @@
       function spawn(opts) {
         const o = Object.assign({
           x: Math.random() * w,
-          y: -20 - Math.random() * 80,
-          size: 6 + Math.random() * 10,
+          // Spawn cerca del borde superior (no muy lejos): entran al viewport en <1s
+          y: -10 - Math.random() * 50,
+          // Pétalos más grandes para que se vean contra el fondo crema
+          size: 12 + Math.random() * 12,
           rot: Math.random() * Math.PI * 2,
           rotSpeed: (Math.random() - 0.5) * 0.014,
           vx: 0.15 + Math.random() * 0.45,
-          vy: 0.35 + Math.random() * 0.55,
+          // Caída un poco más rápida (entran antes al viewport, son más perceptibles)
+          vy: 0.5 + Math.random() * 0.7,
           wobblePhase: Math.random() * Math.PI * 2,
           wobbleAmp: 0.8 + Math.random() * 1.3,
           wobbleFreq: 0.005 + Math.random() * 0.012,
-          opacity: 0.55 + Math.random() * 0.4,
+          // Opacidad alta: claramente visibles desde el primer frame en viewport
+          opacity: 0.78 + Math.random() * 0.22,
           hueIdx: Math.floor(Math.random() * PETAL_COLORS.length),
           speedMul: opts && opts.speed ? opts.speed : 1
         }, opts || {});
@@ -1731,12 +1709,19 @@
 
       // === API PÚBLICA ===
       const SakuraField = {
-        /** Ráfaga: añade N partículas de golpe. Se desvanecen solas al salir de pantalla. */
+        /** Ráfaga: añade N partículas de golpe. Se desvanecen solas al salir de pantalla.
+         *  ~40% se siembran dentro del viewport (sobre todo tercio superior) para que el
+         *  espectador perciba impacto inmediato; el resto cae desde el borde superior. */
         burst: function(opts) {
           opts = opts || {};
           const n = Math.min(opts.count || burstCap(), burstCap());
           for (let i = 0; i < n; i++) {
-            particles.push(spawn({ speedMul: opts.speed || 1 }));
+            const o = { speedMul: opts.speed || 1 };
+            if (Math.random() < 0.4) {
+              // Pétalo ya dentro del viewport (impacto visual inmediato)
+              o.y = Math.random() * h * 0.6;
+            }
+            particles.push(spawn(o));
           }
           // Cap duro por seguridad
           const cap = adaptiveCap() * 3; // burst puede superar el stream
@@ -1834,7 +1819,6 @@
       const elTitle= sec.querySelector('.postal__title');
       const elBody = sec.querySelector('.postal__body');
       const elCta  = sec.querySelector('.postal__cta-wrap');
-      const penCursor = elTo ? elTo.querySelector('.pen-cursor') : null;
 
       // Esperar a que las fuentes estén listas antes de iniciar la intro.
       // Sin esto, en conexiones lentas los timers arrancan antes de que la
@@ -1871,7 +1855,6 @@
         sec.classList.remove('is-playing');
         sec.classList.add('intro-done');
         if (env) env.remove();
-        if (penCursor) penCursor.classList.remove('is-visible');
         if (window.SakuraField) window.SakuraField.stop();
       }
 
