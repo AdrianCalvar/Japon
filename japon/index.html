@@ -153,13 +153,30 @@
     .postal__seal svg{width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(200,56,42,.3))}
     .postal__to{
       font-family:var(--script);
-      font-size:clamp(1.6rem,1.2rem + 1.5vw,2.1rem);
+      /* Restaurada la presencia del glow up: ~3rem en móvil, hasta ~3.8rem en desktop.
+         3.8rem (vs 5rem original) evita romper jerarquía con el título de 2.4rem. */
+      font-size:clamp(2.6rem,1.5rem + 4.5vw,3.8rem);
+      font-weight:600;
       color:var(--vermilion);
       margin-bottom:.5rem;
-      line-height:1.2;
+      line-height:1.1;
       position:relative;
       display:inline-block;
+      /* Compresión inicial leve: se "abre" mientras se escribe (handWrite). */
+      letter-spacing:-.02em;
     }
+    /* Pluma SVG que aparece durante el handWrite — barrido sincronizado con clip-path */
+    .postal__to .pen-cursor{
+      position:absolute;
+      width:34px;height:34px;
+      pointer-events:none;
+      top:50%;left:0;
+      transform:translate(-12px,-50%) rotate(-12deg);
+      opacity:0;
+      z-index:2;
+      filter:drop-shadow(0 2px 4px rgba(200,56,42,.35));
+    }
+    .postal__to .pen-cursor.is-visible{opacity:.9}
     /* Highlight de "tinta fresca" en la zona escribiéndose */
     .postal__to::after{
       content:'';position:absolute;
@@ -904,21 +921,34 @@
       opacity:0;transform:scale(.6);
     }
     .postal__seal.is-stamping svg{
-      animation:sealStamp 700ms var(--ease-seal) forwards;
+      /* Glow-up: 900ms ceremonial (antes 700ms), con leve rotación que da el "thud". */
+      animation:sealStamp 900ms var(--ease-seal) forwards;
       transform-origin:center;transform-box:fill-box;
     }
     .postal__seal.is-stamping .postal__seal-halo{
       animation:sealHalo 900ms var(--ease-paper) forwards;
     }
+    /* Glow-up: el contenedor también recibe una pequeña vibración (drop-shadow pulse)
+       que sincroniza con el golpe del SVG interior — sensación física de "thud". */
+    .postal__seal.is-stamping{
+      animation:sealShadow 900ms var(--ease-paper) forwards;
+    }
     @keyframes sealStamp{
-      0%{transform:scale(1.6);filter:brightness(1.4)}
-      50%{transform:scale(.94);filter:brightness(1.05)}
-      100%{transform:scale(1);filter:brightness(1)}
+      /* Glow-up: 900ms ceremonial, con leve rotación que da el "thud".
+         Solo transform + filter (compositor-friendly) → sin salto. */
+      0%  {transform:scale(1.6) rotate(-2deg); filter:brightness(1.4)}
+      35% {transform:scale(.94) rotate(1.5deg); filter:brightness(1.05)}
+      55% {transform:scale(1.03) rotate(-1deg); filter:brightness(1.05)}
+      100%{transform:scale(1) rotate(0); filter:brightness(1)}
     }
     @keyframes sealHalo{
       0%{opacity:0;transform:scale(.5)}
       40%{opacity:1;transform:scale(1.15)}
       100%{opacity:0;transform:scale(1.6)}
+    }
+    @keyframes sealShadow{
+      0%,100%{filter:drop-shadow(0 4px 8px rgba(200,56,42,.3))}
+      50%    {filter:drop-shadow(0 1px 2px rgba(200,56,42,.5))}
     }
 
     /* Textos del postal: ocultos durante intro; cuando JS añade .is-revealing, animación toma control */
@@ -928,13 +958,29 @@
     .state--no-topbar:not(.intro-done) .postal__cta-wrap:not(.is-revealing){
       opacity:0;
     }
-    /* === NOELIA — revelado suave sin salto (700ms, fade + lift sutil) === */
+    /* === NOELIA — escritura real con un trazo (1700ms, clip-path + letter-spacing)
+         Animamos solo 2 propiedades (compositor-friendly, sin "salto"):
+         - clip-path: la letra emerge de izquierda a derecha
+         - letter-spacing: -.04em → 0 (las letras se "abren" mientras se escriben)
+         Sin filter:blur ni transform:translateY simultáneos → sin salto. === */
     .postal__to.is-revealing{
-      animation:handWrite 700ms var(--ease-out) both;
+      animation:handWrite 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+      transform-origin:left center;
     }
     @keyframes handWrite{
-      0%  {opacity:0;transform:translateY(6px)}
-      100%{opacity:1;transform:translateY(0)}
+      0%  {clip-path:inset(0 100% 0 0); letter-spacing:-.04em; opacity:.6}
+      20% {opacity:1}
+      100%{clip-path:inset(0 0 0 0); letter-spacing:0; opacity:1}
+    }
+    /* Pluma — barrido sincronizado con handWrite (misma duración y curva) */
+    .postal__to.is-revealing .pen-cursor{
+      animation:penSweep 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+    }
+    @keyframes penSweep{
+      0%  {opacity:0; transform:translate(-12px,-50%) rotate(-12deg)}
+      8%  {opacity:.9}
+      90% {opacity:.9}
+      100%{opacity:0; transform:translate(180px,-50%) rotate(-8deg)}
     }
     /* === Resto de textos: wipe corto (700ms) === */
     .postal__title.is-revealing,
@@ -1156,7 +1202,13 @@
           <text x="50" y="62" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="38" font-weight="600" font-style="italic">旅</text>
         </svg>
       </div>
-      <div class="postal__to">Noelia,</div>
+      <div class="postal__to">Noelia,
+        <svg class="pen-cursor" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M6 28 L26 6 L29 9 L9 31 Z" fill="#C8382A" opacity=".85"/>
+          <path d="M3 30 L8 27 L11 30 L6 33 Z" fill="#9B2820"/>
+          <line x1="22" y1="10" x2="30" y2="2" stroke="#9B2820" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
       <h1 class="postal__title">Se la requiere para una <br>AVENTURA</h1>
       <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
@@ -1728,19 +1780,19 @@
         if (window.SakuraField) window.SakuraField.stop();
       }
 
-      // === SECUENCIA v3 — más física y narrativa ===
-      // Los timers se programan DESPUÉS de que startIntro arranca, para que
-      // t=0 coincida con el momento en que el sobre aparece en pantalla.
+      // === SECUENCIA v4 — cinemática calibrada (UX-UI Pro Max) ===
       // t=0      : sobre aparece + respiración sutil (1 ciclo, 2600ms)
       // t=900    : flap empieza a abrirse (transition 1400ms, ease paper)
       // t=2200   : flap abierto; postal empieza a emerger (overlap con flap)
       // t=3100   : sobre se va hacia abajo + fade (900ms)
-      // t=3700   : sello se estampa + BURST sakura (28-40 pétalos)
-      // t=4400   : "Noelia," empieza a escribirse (1800ms handWrite) — la pluma aparece
-      // t=5500   : título revela (wipe 800ms)
-      // t=6100   : cuerpo revela
-      // t=6700   : CTA revela
-      // t=7300   : stream sakura termina
+      // t=3700   : sello se estampa (900ms ceremonial) + BURST sakura (28-40 pétalos)
+      // t=4400   : "Noelia," empieza a escribirse (1700ms handWrite + pluma sweep)
+      // t=6100   : handWrite terminado
+      // t=6400   : título revela (wipe 800ms) — gap de 300ms para leer
+      // t=7400   : cuerpo revela (wipe 800ms)
+      // t=8200   : CTA revela (wipe 800ms)
+      // t=9000   : stream sakura termina + finish intro
+      // Total: 9s en desktop, ~7.4s en móvil (T=0.82)
 
       function scheduleSequence(){
         at(900 * T,  () => { env.classList.add('is-open'); });
@@ -1767,9 +1819,9 @@
           }
         });
 
-        at(5200 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
-        at(5800 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
-        at(6400 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
+        at(6400 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
+        at(7400 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
+        at(8200 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
 
         at(4800 * T, () => {
           // Stream sutil de sakura mientras los textos aparecen
@@ -1778,11 +1830,11 @@
           }
         });
 
-        at(8200 * T, () => {
+        at(9000 * T, () => {
           if (window.SakuraField) window.SakuraField.stop();
         });
 
-        at(7000 * T, () => {
+        at(9000 * T, () => {
           finish();
         });
       }
