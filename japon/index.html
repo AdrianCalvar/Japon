@@ -882,10 +882,12 @@
         sensoji:    './images/Sensō-ji · Asakusa.png',
         sushi:      './images/comiendo sushi.png',
         sushi2:      './images/sushiplus.png',
+        sushigordos:      './images/sushigordos.png',
         kimono:      './images/kimono.png',
         omoide:      './images/unsplash/omoide.jpeg',
         nakasendo:  './images/NAKASENDO .png',
         ryokan:     './images/ryokan.png',
+        ryokan2:     './images/ryokan2.png',
         sushiriokan:     './images/sushiriokan.png',
 
         // Unsplash (37 URLs validadas con curl HTTP 200)
@@ -910,6 +912,7 @@
         miyagawa:   './images/unsplash/miyagawa.jpg',  // mercado al aire libre (ya no se usa, en desuso)
         sanmachi:   './images/unsplash/sanmachi.webp',  // calles históricas
         shirakawa:  './images/unsplash/shirakawa.jpg',  // gassho-zukuri (villa rural)
+        shira:  './images/unsplash/shira.jpg',  // gassho-zukuri (villa rural)
         wagyu:      './images/unsplash/wagyu.jpg',  // carne wagyu A5
         fuji:       './images/unsplash/fuji.jpg',  // monte Fuji nevado
         kioto:      './images/unsplash/kioto.jpg',  // templos Kioto
@@ -919,6 +922,7 @@
         nara:       './images/unsplash/nara.jpg',  // ciervos Nara
         honen:      './images/unsplash/honen.jpg',  // templo zen pequeño
         tsuru:      './images/unsplash/tsuru.webp',  
+        ryo:      './images/unsplash/ryo.webp',  
         shuku:      './images/unsplash/shuku.webp',  
         higi:      './images/unsplash/Higashiyama.webp',  
         hase:      './images/unsplash/hase.webp',  
@@ -1076,7 +1080,7 @@
                   text: 'Bajamos en Kita-Kamakura, una parada antes. Engaku-ji y Kencho-ji, dos templos zen del siglo XIII. Cedros de ochocientos años, casi nadie. Es el tipo de sitio donde te callas sin darte cuenta.',
                   tag: 'zen' },
                 { place: 'Tsurugaoka', image: IMG.tsuru, caption: 'Kamakura · santuario principal',
-                  text: 'Tsurugaoka Hachimangu, el santuario principal. Escalinata larga, ambiente de pueblo costero, perros, escuelas. Bajamos andando veinte minutos hasta el centro.',
+                  text: 'Tsurugaoka Hachimangu, el santuario principal. Escalinata larga. Dedicado a la emperatriz, yo te la dedico a ti',
                   tag: 'santuario' },
                 { place: 'Hasedera', image: IMG.hase, caption: 'Hasedera · vistas al Pacífico',
                   text: 'Hasedera, los jardines escalonados con vistas al Pacífico. Mil estatuas Jizō. La misma paz que cuando llegas a casa después de un día largo.',
@@ -1094,7 +1098,7 @@
                 { place: 'Shimokitazawa', image: IMG.koenji, caption: 'Shimokitazawa · vinilos y cafés',
                   text: 'Shimokitazawa o Koenji, lo que pida el cuerpo. Tiendas de vinilos, cafés pequeños, gente con prisa por nada. Para perdernos a propósito.',
                   tag: 'perdernos' },
-                { place: 'Coger fuerzas', image: IMG.sushi2, caption: 'El día que no hicimos nada',
+                { place: 'Coger fuerzas', image: IMG.sushigordos, caption: 'El día que no hicimos nada',
                   text: 'No hacer nada más que descansar y comer sushi. Suena bien ¿verdad?',
                   tag: 'nada' }
               ]
@@ -1116,8 +1120,8 @@
                 { place: 'Magome → Tsumago', image: IMG.nakasendo, caption: 'Kiso · 8 km por bosque',
                   text: 'Magome → Tsumago. Ocho kilómetros por bosque, sin coches. Posadas de hace siglos. Tú vas en silencio. Yo detrás.',
                   tag: '8 km' },
-                { place: 'Ryokan en Tsumago', image: IMG.ryokan, caption: 'Tsumago · descalzos',
-                  text: 'El ryokan de Tsumago al final del día. Cena descalzos sobre el tatami, futón preparado, el pueblo en silencio afuera. No hay wifi. No lo necesitamos.',
+                { place: 'Ryokan en Tsumago', image: IMG.ryokan2, caption: 'Tsumago · descalzos',
+                  text: 'El ryokan de Tsumago al final del día. Cena descalzos sobre el tatami, futón preparado, el pueblo en silencio afuera. No hay wifi. No hace falta.',
                   tag: 'tatami' }
               ]
             },
@@ -1127,10 +1131,10 @@
               micro: 'Vas a probar el mejor miso de tu vida. Y la croqueta de Hida Beef te va a volar la cabeza.',
               acts: [
                 { place: 'Sanmachi Suji', image: IMG.sanmachi, caption: 'Takayama · sake breweries',
-                  text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake por vasos, el dueño nos explica qué estamos bebiendo. No te digo cuál —te lo descubres tú.',
+                  text: 'Sanmachi Suji, las calles de las bodegas. Entramos en una que está abierta, pedimos sake, no podía faltar',
                   tag: 'sake' },
-                { place: 'Shirakawa-go', image: IMG.shirakawa, caption: 'Gassho-zukuri · entre nieblas',
-                  text: 'Bus a Shirakawa-go. Las casas gassho-zukuri entre los arrozales. Cruzamos el Deai-bashi, buscamos el San-goya —tres cabañas perdidas en los campos—. La niebla va y viene. No hace falta nada más.',
+                { place: 'Shirakawa-go', image: IMG.shira, caption: 'Gassho-zukuri · entre nieblas',
+                  text: 'Bus a Shirakawa-go. Las casas gassho-zukuri entre los arrozales. Cruzamos el Deai-bashi, buscamos el San-goya —tres cabañas perdidas en los campos—. Un momento único.',
                   tag: 'niebla' },
                 { place: 'Croqueta de Hida Beef y wagyu', image: IMG.wagyu, caption: 'Shirakawa-go · la croqueta',
                   text: 'La croqueta de Hida Beef, en la calle, con las manos frías. Carne jugosa y sabrosa que se deshace en la boca.',
@@ -1140,10 +1144,10 @@
             {
               value: 'direct',
               label: 'Sin intermedio. Directos a Kioto.',
-              micro: 'Vale. Sin intermedio. Pero el shinkansen lo elijo yo —el asiento de la ventana es mío—.',
+              micro: 'Vale. Sin intermedio. Pero el shinkansen lo elijo yo —me pido la ventanilla—.',
               acts: [
                 { place: 'Tokaido Shinkansen', image: IMG.shinkansen2, caption: 'Tokio → Kioto · ventanilla',
-                  text: 'Tokaido Shinkansen Tokio → Kioto. Dos horas y cuarto. Ventanilla. El Fuji a la izquierda, si quiere aparecer. Tú leyendo, yo mirando el mapa.',
+                  text: 'Tokaido Shinkansen Tokio → Kioto. Un viaje largo. El Fuji a la izquierda, nosotros aprovechamos y leemos',
                   tag: 'ventanilla' },
                 { place: 'Kioto aparece', image: IMG.kioto, caption: 'Kioto · llegada',
                   text: 'Kioto aparece después de un túnel. Templos, callejones, silencio. Lo que viene después, lo decides tú.',
@@ -1162,12 +1166,12 @@
               micro: 'Los torii a las 6 de la mañana. Solo se oye el viento y tus pasos.',
               acts: [
                 { place: 'Fushimi Inari', image: IMG.inari, caption: 'Kioto · 10.000 torii al amanecer',
-                  text: 'Fushimi Inari al amanecer. Diez mil torii naranjas hasta la cima del monte. El 90% se queda abajo. Nosotros subimos. Arriba no hay nadie.',
+                  text: 'Fushimi Inari al amanecer. Diez mil torii naranjas hasta la cima del monte. Casi todos se quedan abajo. Nosotros subimos. Piensa en el sushi de después.',
                   tag: 'cima' },
                 { place: 'Kiyomizu-dera', image: IMG.kiyomizu, caption: 'Kioto · terraza sobre el vacío',
-                  text: 'Kiyomizu-dera abriendo a las seis. La terraza de madera sobre el vacío, la ciudad abajo. Sitio UNESCO —pero también el lugar donde te vas a quedar callada un rato.',
+                  text: 'Kiyomizu-dera, la terraza de madera sobre el vacío, la ciudad abajo. Patrimonio de la Humanidad',
                   tag: 'terraza' },
-                { place: 'Kinkaku-ji + Ryoan-ji', image: IMG.kinkaku, caption: 'Kioto · oro y 15 piedras',
+                { place: 'Kinkaku-ji + Ryoan-ji', image: IMG.ryo, caption: 'Kioto · oro y 15 piedras',
                   text: 'Kinkaku-ji y Ryoan-ji están a diez minutos andando. El Pabellón Dorado, el jardín zen de las quince piedras. Combo perfecto de mañana —y excusa para ir en silencio juntos.',
                   tag: 'oro' },
                 { place: 'Nara', image: IMG.nara, caption: 'Nara · Gran Buda + ciervos',
