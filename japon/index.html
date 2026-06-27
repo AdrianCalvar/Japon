@@ -152,9 +152,38 @@
     }
     .postal__seal svg{width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(200,56,42,.3))}
     .postal__to{
-      font-family:var(--script);font-size:clamp(1.6rem,1.2rem+1.5vw,2.1rem);
-      color:var(--vermilion);margin-bottom:.5rem;line-height:1.2;
+      font-family:var(--script);
+      /* v3: tamano impactante, ~3rem en movil, hasta ~5rem en desktop */
+      font-size:clamp(3rem,1.8rem + 6vw,5rem);
+      font-weight:600;
+      color:var(--vermilion);
+      margin-bottom:.5rem;
+      line-height:1.1;
+      position:relative;
+      display:inline-block;
+      /* letter-spacing inicial comprimido: se "abre" mientras se escribe */
+      letter-spacing:-.04em;
     }
+    /* Cursor SVG de pluma que sigue al frente de escritura — JS lo posiciona */
+    .postal__to .pen-cursor{
+      position:absolute;
+      width:36px;height:36px;
+      pointer-events:none;
+      top:50%;left:0;
+      transform:translate(-12px,-50%) rotate(-12deg);
+      opacity:0;
+      z-index:2;
+      filter:drop-shadow(0 2px 4px rgba(200,56,42,.35));
+    }
+    .postal__to .pen-cursor.is-visible{opacity:.9}
+    /* Highlight de "tinta fresca" en la zona escribiéndose */
+    .postal__to::after{
+      content:'';position:absolute;
+      inset:-4% -2% -4% -2%;
+      background:radial-gradient(ellipse at 0% 50%,rgba(200,56,42,.18) 0%,transparent 35%);
+      opacity:0;pointer-events:none;
+    }
+    .postal__to.is-inking::after{opacity:1}
     .postal__title{
       font-family:var(--serif);font-style:italic;font-weight:500;
       font-size:clamp(1.7rem,1.2rem+2.5vw,2.4rem);
@@ -191,6 +220,40 @@
       font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;
     }
     .btn:hover .btn__hover-text{opacity:.85;transform:translateY(0)}
+
+    /* GLOW UP v3 — Breathing CTA: el botón principal respira sutilmente cuando
+       el postal está listo y revelado, invitando a tocar. Pausa en hover/focus. */
+    @keyframes btnBreathe{
+      0%,100%{transform:translateY(0);box-shadow:0 6px 16px -4px rgba(200,56,42,.5)}
+      50%    {transform:translateY(-2px);box-shadow:0 12px 28px -4px rgba(200,56,42,.65)}
+    }
+    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn{
+      animation:btnBreathe 2.6s var(--ease-soft) 900ms infinite;
+    }
+    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:hover,
+    .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn:focus-visible{
+      animation:none;
+      transform:translateY(-1px);
+    }
+    @media (prefers-reduced-motion:reduce){
+      .state--no-topbar.intro-done .postal__cta-wrap.is-revealing .btn{animation:none}
+    }
+
+    /* GLOW UP v3 — Question options: entrada sutil escalonada al activarse la pregunta */
+    @keyframes optIn{
+      from{opacity:0;transform:translateY(10px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
+    .state[data-active="true"] .q__option{
+      animation:optIn 600ms var(--ease-out) backwards;
+    }
+    .state[data-active="true"] .q__option:nth-child(1){animation-delay:200ms}
+    .state[data-active="true"] .q__option:nth-child(2){animation-delay:300ms}
+    .state[data-active="true"] .q__option:nth-child(3){animation-delay:400ms}
+    .state[data-active="true"] .q__option:nth-child(4){animation-delay:500ms}
+    @media (prefers-reduced-motion:reduce){
+      .state[data-active="true"] .q__option{animation:none;opacity:1;transform:none}
+    }
 
     /* ---------- Q MAP BACKGROUND — mapa siempre visible detrás del contenido ---------- */
     .q__map{
@@ -294,6 +357,9 @@
       box-shadow:0 14px 30px -10px rgba(26,22,18,.45);
       cursor:zoom-in;transform:rotate(-2deg);
       transition:transform 400ms var(--ease-out);
+      /* GLOW UP v3 — clip-path reveal: la foto emerge de izquierda a derecha */
+      clip-path:inset(0 100% 0 0);
+      animation:photoReveal 1100ms var(--ease-photo) 250ms forwards;
     }
     .act__photo--svg{background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#fff}
     @media (min-width:480px){.act__photo,.act__photo--none,.act__photo--svg{max-width:300px}}
@@ -304,6 +370,10 @@
       font-family:var(--script);color:var(--vermilion);font-size:2.2rem;
       min-height:280px;
     }
+    @keyframes photoReveal{
+      from{clip-path:inset(0 100% 0 0)}
+      to  {clip-path:inset(0 0 0 0)}
+    }
     .act__place{
       font-family:var(--serif);
       font-weight:500;
@@ -311,6 +381,13 @@
       color:var(--vermilion-deep);
       line-height:1.15;margin-top:.5rem;
       letter-spacing:-.01em;
+    }
+    /* GLOW UP v3 — entrada sutil al activarse el acto */
+    .state--act[data-active="true"] .act__place{animation:actPlaceIn 700ms var(--ease-out) 150ms backwards}
+    .state--act[data-active="true"] .act__micro{animation:optIn 700ms var(--ease-out) 300ms backwards}
+    @keyframes actPlaceIn{
+      from{opacity:0;transform:translateY(8px);filter:blur(2px)}
+      to  {opacity:1;transform:translateY(0);filter:blur(0)}
     }
     .act__caption{
       font-family:var(--ui);font-size:.78rem;letter-spacing:.14em;
@@ -412,19 +489,14 @@
         repeating-linear-gradient(25deg, transparent 0, transparent 64px, rgba(184,137,62,.07) 64px, rgba(184,137,62,.07) 65px);
       opacity:1;
     }
-    /* Marco decorativo interior (inspirado en pergamino) + kanji grande de fondo */
+    /* Marco decorativo interior (inspirado en pergamino) — el kanji grande
+       ahora es 美 animado, así que aquí sólo queda el marco perimetral. */
     .state--transition::after{
-      content:'行';position:absolute;inset:0;pointer-events:none;
+      content:'';position:absolute;inset:0;pointer-events:none;
       z-index:0;
       border:1px solid rgba(184,137,62,.2);
       margin:clamp(1rem, 4vh, 2rem);
       border-radius:4px;
-      font-family:var(--script);
-      font-size:clamp(10rem, 50vh, 24rem);
-      color:rgba(184,137,62,.1);
-      display:flex;align-items:center;justify-content:center;
-      line-height:1;
-      letter-spacing:0;
     }
     .state--transition[data-active="true"]{opacity:1;pointer-events:auto}
     .transition{
@@ -470,6 +542,52 @@
     }
     .transition__step--from{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(-100%) translateX(-1rem);animation-delay:1300ms}
     .transition__step--to{left:50%;top:clamp(1.5rem, 6vh, 4rem);transform:translateX(1rem);animation-delay:1900ms}
+
+    /* GLOW UP v3 — byōbu (biombo): dos hojas de papel que se abren al activarse la transición */
+    .transition__curtain{
+      position:absolute;top:0;bottom:0;width:50%;
+      background:
+        linear-gradient(180deg,var(--paper) 0%,var(--paper-deep) 100%);
+      z-index:6;pointer-events:none;
+      border:1px solid rgba(184,137,62,.22);
+      box-shadow:0 0 40px rgba(26,22,18,.12),inset 0 0 80px rgba(184,137,62,.10);
+      will-change:transform;
+    }
+    .transition__curtain--left{
+      left:0;transform-origin:left center;
+      transform:scaleX(1); /* cerrado inicialmente */
+    }
+    .transition__curtain--right{
+      right:0;transform-origin:right center;
+      transform:scaleX(1);
+    }
+    /* Trigger: la sección recibe .is-brushing vía activate() → las hojas se abren */
+    .state.is-brushing .transition__curtain--left{
+      animation:curtainOpenLeft 1500ms var(--ease-paper) 200ms forwards;
+    }
+    .state.is-brushing .transition__curtain--right{
+      animation:curtainOpenRight 1500ms var(--ease-paper) 200ms forwards;
+    }
+    @keyframes curtainOpenLeft{
+      0%  {transform:scaleX(1)}
+      100%{transform:scaleX(0)}
+    }
+    @keyframes curtainOpenRight{
+      0%  {transform:scaleX(1)}
+      100%{transform:scaleX(0)}
+    }
+    /* Detalle: una "línea central" donde se encuentran las dos hojas — visible un instante */
+    .transition__curtain::after{
+      content:'';position:absolute;top:0;bottom:0;width:1px;
+      background:linear-gradient(180deg,transparent 0%,rgba(184,137,62,.4) 30%,rgba(184,137,62,.4) 70%,transparent 100%);
+    }
+    .transition__curtain--left::after{right:0}
+    .transition__curtain--right::after{left:0}
+
+    /* Reduced motion: hojas abiertas, sin animación */
+    @media (prefers-reduced-motion:reduce){
+      .transition__curtain{transform:scaleX(0)!important;animation:none!important}
+    }
 
     /* (El selector hermano general .state--transition ~ * .q__map{display:none} se eliminó:
    era código muerto — .state--transition está después de los .state--question en el DOM,
@@ -562,7 +680,12 @@
     }
     .mapa__polaroid:hover{transform:scale(1.04) rotate(0deg);box-shadow:0 16px 32px -8px rgba(26,22,18,.5)}
     .mapa__polaroid:focus-visible{outline:3px solid var(--vermilion);outline-offset:4px}
-    .mapa__polaroid img{width:100%;height:120px;object-fit:cover;display:block}
+    .mapa__polaroid img{
+      width:100%;height:120px;object-fit:cover;display:block;
+      /* GLOW UP v3 — clip-path reveal con stagger via --photo-delay (set por JS) */
+      clip-path:inset(0 100% 0 0);
+      animation:photoReveal 1100ms var(--ease-photo) var(--photo-delay,300ms) forwards;
+    }
     @media (min-width:640px){.mapa__polaroid img{height:140px}}
     .mapa__polaroid figcaption{
       font-family:var(--script);font-size:.95rem;color:var(--vermilion);
@@ -634,7 +757,278 @@
       .conn-draw,.node-pulse,.act__photo,.transition__label,.mapa__polaroid{
         transition:none!important;animation:none!important;transform:none!important;
       }
+      /* GLOW UP v3 — sin clip-path reveal en reduced motion */
+      .act__photo,.act__photo--svg,.act__photo--none,.mapa__polaroid img{
+        clip-path:none!important;animation:none!important;
+      }
+      /* GLOW UP v3 — placeholders visibles sin animación de entrada */
+      .state[data-active="true"] .q__option,
+      .state--act[data-active="true"] .act__place,
+      .state--act[data-active="true"] .act__micro{
+        animation:none!important;opacity:1;transform:none;filter:none;
+      }
       .postal__hint{animation:none;opacity:.7}
+    }
+
+    /* ---------- GLOW UP v2 — Intro postal: sobre abriéndose + sello + reveal ---------- */
+    .intro-skip{
+      position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));right:1rem;
+      z-index:300;font-family:var(--ui);font-size:.7rem;letter-spacing:.14em;
+      text-transform:lowercase;color:var(--ink-mute);
+      background:rgba(244,236,224,.85);backdrop-filter:blur(8px);
+      border:1px solid rgba(184,137,62,.25);border-radius:999px;
+      padding:.5rem .85rem;cursor:pointer;
+      opacity:0;pointer-events:none;
+      transition:opacity 300ms ease,color 200ms ease,border-color 200ms ease;
+    }
+    .intro-skip.is-visible{opacity:.7;pointer-events:auto}
+    .intro-skip:hover{opacity:1;color:var(--vermilion);border-color:var(--vermilion)}
+    .intro-skip:focus-visible{outline:2px solid var(--vermilion);outline-offset:3px}
+    @media (prefers-reduced-motion:reduce){.intro-skip{display:none}}
+
+    /* Sobre — contenedor relativo al state, centrado como la postal */
+    .envelope{
+      position:absolute;
+      top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:min(440px,94vw);
+      aspect-ratio:440/310;
+      /* GLOW UP v3 — perspective + transform-style para flap 3D real */
+      perspective:1400px;
+      perspective-origin:50% 30%;
+      transform-style:preserve-3d;
+      z-index:5;pointer-events:none;
+      opacity:0;
+      will-change:opacity,transform;
+    }
+    .envelope.is-revealed{
+      opacity:1;
+      /* Sutil respiración inicial — como si lo estuvieran sujetando antes de abrir */
+      animation:envelopeBreath 2600ms ease-in-out 200ms 1 both;
+    }
+    @keyframes envelopeBreath{
+      0%   {transform:translate(-50%,-50%) translateY(0)    rotate(0deg)}
+      35%  {transform:translate(-50%,-50%) translateY(-3px) rotate(-.6deg)}
+      65%  {transform:translate(-50%,-50%) translateY(2px)  rotate(.5deg)}
+      100% {transform:translate(-50%,-50%) translateY(0)    rotate(0deg)}
+    }
+    /* Cuerpo del sobre (rectángulo de papel) */
+    .envelope__back{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,var(--paper) 0%,var(--paper-deep) 100%);
+      border-radius:4px;
+      border:1px solid rgba(184,137,62,.30);
+      box-shadow:
+        0 1px 2px rgba(26,22,18,.06),
+        0 12px 24px -6px rgba(26,22,18,.18),
+        inset 0 0 60px rgba(184,137,62,.10);
+      transform-style:preserve-3d;
+    }
+    /* Textura sutil de papel (grano) — cubre TODO el sobre */
+    .envelope__paper-grain{
+      position:absolute;inset:0;border-radius:4px;pointer-events:none;z-index:1;
+      background-image:
+        repeating-linear-gradient(115deg,transparent 0,transparent 38px,rgba(184,137,62,.07) 38px,rgba(184,137,62,.07) 39px),
+        repeating-linear-gradient(25deg,transparent 0,transparent 64px,rgba(184,137,62,.05) 64px,rgba(184,137,62,.05) 65px),
+        radial-gradient(circle at 22% 38%,rgba(184,137,62,.06) 0,transparent 6%),
+        radial-gradient(circle at 71% 65%,rgba(184,137,62,.05) 0,transparent 5%);
+      opacity:.75;
+      mix-blend-mode:multiply;
+    }
+    /* Sombra interior bajo el flap — invisible cuando cerrado, crece al abrirse */
+    .envelope__shadow{
+      position:absolute;top:34%;left:8%;right:8%;height:20px;
+      background:linear-gradient(180deg,rgba(26,22,18,.18),transparent);
+      border-radius:0 0 50% 50%/0 0 100% 100%;
+      filter:blur(5px);z-index:2;pointer-events:none;
+      transition:opacity 1400ms var(--ease-paper),transform 1400ms var(--ease-paper);
+      opacity:0;transform:translateY(0);
+    }
+    /* Kanji 郵便 (postal/correo) escrito muy tenue en el centro inferior del sobre */
+    .envelope__kanji{
+      position:absolute;top:62%;left:50%;
+      transform:translate(-50%,-50%);
+      font-family:var(--kanji-display);
+      font-weight:400;
+      font-size:clamp(2rem,8vw,3rem);
+      color:rgba(184,137,62,.22);
+      letter-spacing:.5em;
+      padding-left:.5em;
+      pointer-events:none;z-index:3;
+      transition:opacity 800ms var(--ease-paper) 200ms;
+    }
+    .envelope.is-open .envelope__kanji{opacity:.08}
+
+    /* === FLAP — cubre el top del cuerpo, hinge en borde superior, dos caras === */
+    .envelope__flap{
+      position:absolute;top:0;left:0;right:0;
+      height:35%;
+      transform-style:preserve-3d;
+      /* HINGE EN BORDE SUPERIOR — clave para apertura natural */
+      transform-origin:top center;
+      transform:rotateX(0deg);
+      transition:transform 1400ms var(--ease-paper),filter 1400ms var(--ease-paper);
+      z-index:4;
+      pointer-events:none;
+      will-change:transform;
+    }
+    /* Cara exterior (visible cuando cerrado) — mismo papel crema, sin sombra para integrarse al cuerpo */
+    .envelope__flap-face{
+      position:absolute;inset:0;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      background:linear-gradient(180deg,var(--paper) 0%,var(--paper-deep) 100%);
+      clip-path:polygon(0 0,100% 0,50% 100%);
+      box-shadow:inset 0 -1px 0 rgba(184,137,62,.35);
+    }
+    /* Cara interior (visible cuando el flap rota y queda detrás) — tono más cálido */
+    .envelope__flap-inner{
+      position:absolute;inset:0;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      transform:rotateX(180deg);
+      background:linear-gradient(180deg,#E8DCC2 0%,#D9C8A4 100%);
+      clip-path:polygon(0 0,100% 0,50% 100%);
+      box-shadow:inset 0 -1px 0 rgba(184,137,62,.20);
+    }
+    /* Apertura: flap rota 178° (ligeramente pasado de -180 para asentar la cara interior) */
+    .envelope.is-open .envelope__flap{
+      transform:rotateX(-178deg);
+      filter:drop-shadow(0 6px 8px rgba(26,22,18,.20));
+    }
+    /* Sombra interior crece con la apertura — sensación de hueco físico */
+    .envelope.is-open .envelope__shadow{
+      opacity:1;transform:translateY(2px) scaleX(1.06);
+    }
+    /* Sello de lacre — fijo en el flap; cae con la apertura */
+    .envelope__seal{
+      position:absolute;top:13.5%;left:50%;
+      transform:translateX(-50%);
+      width:36px;height:36px;
+      background:radial-gradient(circle,var(--vermilion) 0%,var(--vermilion-deep) 100%);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(200,56,42,.45),inset 0 0 6px rgba(0,0,0,.15);
+      z-index:5;pointer-events:none;
+      transition:transform 1400ms var(--ease-paper),opacity 800ms var(--ease-paper);
+    }
+    .envelope__seal span{
+      font-family:var(--kanji-display);
+      font-size:1rem;color:rgba(244,236,224,.85);font-weight:600;
+    }
+    .envelope.is-open .envelope__seal{
+      opacity:0;transform:translateX(-50%) translateY(40px);
+    }
+    /* Cuando el sobre se va — controlado por JS para evitar conflictos con perspective */
+    .envelope.is-leaving{
+      transition:opacity 900ms var(--ease-paper),transform 900ms var(--ease-paper);
+      opacity:0;
+      transform:translate(-50%,-50%) translateY(60px) scale(.94);
+      pointer-events:none;
+    }
+
+    /* Postal: oculto durante intro hasta que JS lo libera */
+    .postal{
+      transition:transform 900ms var(--ease-paper),opacity 800ms ease;
+    }
+    .state--no-topbar:not(.intro-done):not(.is-playing) .postal{
+      opacity:0;transform:translateY(40px) scale(.97);
+      pointer-events:none;
+    }
+    /* Cuando JS activa is-playing (sobre está animándose),
+       la postal sigue oculta, esperando al momento del reveal */
+    .state--no-topbar.is-playing:not(.postal-emerging) .postal{
+      opacity:0;transform:translateY(40px) scale(.97);
+      pointer-events:none;
+    }
+    /* Cuando postal-emerging se activa (sobre ya abierto), postal aparece */
+    .state--no-topbar.postal-emerging .postal{
+      opacity:1;transform:none;pointer-events:none; /* sigue sin ser interactivo hasta terminar */
+    }
+    .state--no-topbar.intro-done .postal{
+      opacity:1;transform:none;pointer-events:auto;
+    }
+
+    /* Sello postal: halo expansivo + escala de golpe cuando se estampa */
+    .postal__seal{position:relative}
+    .postal__seal-halo{
+      position:absolute;inset:-25%;border-radius:50%;pointer-events:none;
+      background:radial-gradient(circle,rgba(200,56,42,.45) 0%,rgba(200,56,42,.15) 40%,transparent 70%);
+      opacity:0;transform:scale(.6);
+    }
+    .postal__seal.is-stamping svg{
+      animation:sealStamp 700ms var(--ease-seal) forwards;
+      transform-origin:center;transform-box:fill-box;
+    }
+    .postal__seal.is-stamping .postal__seal-halo{
+      animation:sealHalo 900ms var(--ease-paper) forwards;
+    }
+    @keyframes sealStamp{
+      0%{transform:scale(1.6);filter:brightness(1.4)}
+      50%{transform:scale(.94);filter:brightness(1.05)}
+      100%{transform:scale(1);filter:brightness(1)}
+    }
+    @keyframes sealHalo{
+      0%{opacity:0;transform:scale(.5)}
+      40%{opacity:1;transform:scale(1.15)}
+      100%{opacity:0;transform:scale(1.6)}
+    }
+
+    /* Textos del postal: ocultos durante intro; cuando JS añade .is-revealing, animación toma control */
+    .state--no-topbar:not(.intro-done) .postal__to:not(.is-revealing),
+    .state--no-topbar:not(.intro-done) .postal__title:not(.is-revealing),
+    .state--no-topbar:not(.intro-done) .postal__body:not(.is-revealing),
+    .state--no-topbar:not(.intro-done) .postal__cta-wrap:not(.is-revealing){
+      opacity:0;
+    }
+    /* === NOELIA — escritura manuscrita (1800ms, pluma avanza) === */
+    .postal__to.is-revealing{
+      animation:handWrite 1800ms cubic-bezier(.45,.05,.55,.95) both;
+    }
+    @keyframes handWrite{
+      0%{
+        opacity:0;
+        clip-path:inset(0 100% 0 0);
+        letter-spacing:-.04em;
+        filter:blur(.6px);
+      }
+      8%{opacity:1}
+      60%{filter:blur(0)}
+      100%{
+        opacity:1;
+        clip-path:inset(0 0 0 0);
+        letter-spacing:0;
+        filter:blur(0);
+      }
+    }
+    /* === Resto de textos: wipe corto (700ms) === */
+    .postal__title.is-revealing,
+    .postal__body.is-revealing,
+    .postal__cta-wrap.is-revealing{
+      animation:textWipe 800ms var(--ease-paper) both;
+    }
+    @keyframes textWipe{
+      0%{opacity:0;clip-path:inset(0 100% 0 0);transform:translateY(8px)}
+      100%{opacity:1;clip-path:inset(0 0 0 0);transform:translateY(0)}
+    }
+
+    /* Cuando intro-done (visita repetida por back), postal visible directo */
+    .state--no-topbar.intro-done .postal{
+      opacity:1;transform:none;pointer-events:auto;
+    }
+    .state--no-topbar.intro-done .postal__to,
+    .state--no-topbar.intro-done .postal__title,
+    .state--no-topbar.intro-done .postal__body,
+    .state--no-topbar.intro-done .postal__cta-wrap{
+      opacity:1;animation:none;
+    }
+
+    /* prefers-reduced-motion: todo instantáneo, sin sobre, sin sakura */
+    @media (prefers-reduced-motion:reduce){
+      .envelope{display:none!important}
+      .state--no-topbar .postal{opacity:1;transform:none;pointer-events:auto}
+      .postal__to,.postal__title,.postal__body,.postal__cta-wrap{opacity:1;animation:none}
+      .intro-skip{display:none}
     }
 
     /* ---------- GLOW UP v2 — Sakura field (canvas fijo detrás del contenido) ---------- */
@@ -663,6 +1057,116 @@
       .act__micro{font-size:1.05rem}
       .act__text{font-size:.96rem;line-height:1.55}
     }
+
+    /* ---------- GLOW UP v3 — Kanji pincelada system ----------
+       Render: SVG <text> con Shippori Mincho B1 (peso 600) — los glifos se trazan como
+       silueta con stroke-dasharray (efecto pincelada) y luego se rellenan con tinta.
+       Trigger: cada .state recibe .is-brushing cuando se activa (vía activate() en JS).
+       Sin librería: misma técnica que .conn-draw ya usada en el mapa.
+    */
+    .kanji-svg{
+      position:absolute;pointer-events:none;user-select:none;
+      opacity:0; /* fade in al activarse */
+      z-index:0;
+    }
+    .kanji-svg--center{z-index:2}
+    .kanji-svg svg{display:block}
+
+    .kanji-brush{
+      fill:transparent;
+      stroke:var(--sumi);
+      stroke-width:1.6;
+      stroke-linejoin:round;
+      stroke-linecap:round;
+      stroke-dasharray:900;
+      stroke-dashoffset:900;
+      vector-effect:non-scaling-stroke;
+    }
+
+    /* Activación: aparece el contenedor + se traza el glifo + se rellena */
+    .state.is-brushing .kanji-svg{
+      animation:kanjiAppear 500ms ease forwards;
+    }
+    .state.is-brushing .kanji-brush{
+      animation:kanjiDraw 2200ms var(--ease-brush) 250ms forwards,
+                 kanjiFill  700ms ease 1900ms forwards;
+    }
+    .state.is-brushing .kanji-brush--delayed{
+      animation:kanjiDraw 2200ms var(--ease-brush) 900ms forwards,
+                 kanjiFill  700ms ease 2550ms forwards;
+    }
+
+    @keyframes kanjiAppear{to{opacity:1}}
+    @keyframes kanjiDraw{to{stroke-dashoffset:0}}
+    @keyframes kanjiFill{to{fill:var(--sumi)}}
+
+    /* —— 道 — watermark sutil detrás del mapa (s-mapa) —— */
+    .kanji-svg--do{
+      inset:0;display:flex;align-items:center;justify-content:center;
+      opacity:0;
+    }
+    .state.is-brushing .kanji-svg--do{
+      animation:kanjiAppearDo 800ms ease forwards;
+    }
+    @keyframes kanjiAppearDo{
+      0%{opacity:0}
+      100%{opacity:.07}
+    }
+    .kanji-svg--do svg{width:min(86vw,520px);height:auto}
+
+    /* —— 美 — kanji atmosférico para transiciones (s-transition) —— */
+    .kanji-svg--bi{
+      inset:0;display:flex;align-items:center;justify-content:center;
+      opacity:0;
+    }
+    .state.is-brushing .kanji-svg--bi{
+      animation:kanjiAppearBi 900ms ease forwards;
+    }
+    @keyframes kanjiAppearBi{
+      0%{opacity:0}
+      100%{opacity:.09}
+    }
+    .kanji-svg--bi svg{width:min(60vw,360px);height:auto}
+
+    /* —— 約束 — pieza central de la despedida (s-despedida) —— */
+    .kanji-promise{
+      position:relative;
+      width:min(86vw,420px);
+      height:auto;
+      margin:0 auto .75rem;
+      display:block;
+      opacity:0;
+    }
+    .state.is-brushing .kanji-promise{
+      animation:kanjiAppear 600ms ease forwards;
+    }
+    .kanji-promise .kanji-brush{
+      stroke-width:1.4;
+      stroke-dasharray:700;
+      stroke-dashoffset:700;
+    }
+    /* En la despedida el kanji termina en negro tinta, opacity plena */
+    .state.is-brushing .kanji-promise .kanji-brush{
+      animation:kanjiDraw 2000ms var(--ease-brush) 300ms forwards,
+                 kanjiFill  700ms ease 1700ms forwards;
+    }
+    .state.is-brushing .kanji-promise .kanji-brush--delayed{
+      animation:kanjiDraw 2000ms var(--ease-brush) 900ms forwards,
+                 kanjiFill  700ms ease 2300ms forwards;
+    }
+
+    /* Reduced motion: kanji ya rellenado, sin animación */
+    @media (prefers-reduced-motion:reduce){
+      .kanji-svg,.kanji-promise{opacity:1;animation:none!important}
+      .kanji-svg--do{opacity:.07}
+      .kanji-svg--bi{opacity:.09}
+      .kanji-brush{
+        fill:var(--sumi);
+        stroke:none;
+        stroke-dashoffset:0;
+        animation:none!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -686,8 +1190,30 @@
 
   <!-- STATE 0: POSTAL -->
   <section class="state state--no-topbar" id="s-postal" data-active="true" aria-label="Postal">
+
+    <!-- GLOW UP v2 — botón saltar intro (solo visible durante la cinemática inicial) -->
+    <button class="intro-skip" id="introSkip" type="button" aria-label="Saltar la animación de apertura">
+      saltar intro →
+    </button>
+
+    <!-- GLOW UP v3 — sobre cerrado, flap con hinge superior real -->
+    <div class="envelope" id="envelope" aria-hidden="true">
+      <div class="envelope__back"></div>
+      <div class="envelope__paper-grain" aria-hidden="true"></div>
+      <div class="envelope__shadow" aria-hidden="true"></div>
+      <div class="envelope__kanji">郵便</div>
+      <div class="envelope__flap" aria-hidden="true">
+        <div class="envelope__flap-face"></div>
+        <div class="envelope__flap-inner" aria-hidden="true"></div>
+      </div>
+      <div class="envelope__seal">
+        <span>旅</span>
+      </div>
+    </div>
+
     <article class="postal" role="region" aria-label="Postal de Adrián para Noelia">
-      <div class="postal__seal" aria-hidden="true">
+      <div class="postal__seal" id="postalSeal" aria-hidden="true">
+        <div class="postal__seal-halo"></div>
         <svg viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="46" fill="none" stroke="#C8382A" stroke-width="1.5" opacity="0.4"/>
           <circle cx="50" cy="50" r="42" fill="#C8382A" opacity="0.06"/>
@@ -695,9 +1221,31 @@
           <text x="50" y="62" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="38" font-weight="600" font-style="italic">旅</text>
         </svg>
       </div>
-      <div class="postal__to">Noelia,</div>
-      <h1 class="postal__title">Crónica de un viaje<br>anunciado</h1>
-      <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará REALIDAD</p>
+      <div class="postal__to">
+        <svg class="pen-cursor" viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="penBody" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1a1612"/>
+              <stop offset=".6" stop-color="#3a2418"/>
+              <stop offset="1" stop-color="#5a3a28"/>
+            </linearGradient>
+            <linearGradient id="penTip" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#d8a0a8"/>
+              <stop offset="1" stop-color="#8c4a52"/>
+            </linearGradient>
+          </defs>
+          <!-- Cuerpo de la pluma (rotada -45deg ya desde CSS) -->
+          <g transform="translate(32 32) rotate(135)">
+            <rect x="-3" y="-28" width="6" height="22" rx="1" fill="url(#penBody)"/>
+            <polygon points="-3,-6 3,-6 0,4" fill="url(#penTip)"/>
+            <circle cx="0" cy="4" r="1.5" fill="#1a1612"/>
+            <rect x="-3" y="-30" width="6" height="3" rx="1" fill="#c8382a"/>
+          </g>
+        </svg>
+        Noelia,
+      </div>
+      <h1 class="postal__title">Se la requiere para una <br>AVENTURA</h1>
+      <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
         <button class="btn" data-action="q1" aria-label="Abrir la postal">
           Comienza el viaje
@@ -723,6 +1271,14 @@
 
   <!-- STATE: TRANSICIÓN MAPA (entre actos → siguiente pregunta) — mapa a pantalla completa -->
   <section class="state state--transition" id="s-transition" aria-hidden="true" aria-label="Viajando al siguiente nodo">
+    <!-- GLOW UP v3 — kanji 美 (belleza) atmosférico detrás del mapa de transición -->
+    <div class="kanji-svg kanji-svg--bi" aria-hidden="true">
+      <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+        <text x="100" y="160" text-anchor="middle"
+              font-family="var(--kanji-display)" font-size="180" font-weight="600"
+              class="kanji-brush">美</text>
+      </svg>
+    </div>
     <div class="transition">
       <div class="transition__map" aria-hidden="true">
         <svg id="transitionSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet">
@@ -735,11 +1291,22 @@
         <p class="transition__label" id="transitionLabel">Esto es nuestro viaje</p>
         <span class="transition__sub" id="transitionSub">siguiente parada</span>
       </div>
+      <!-- GLOW UP v3 — byōbu (biombo japonés): dos hojas de papel que se abren para revelar el mapa -->
+      <div class="transition__curtain transition__curtain--left"  aria-hidden="true"></div>
+      <div class="transition__curtain transition__curtain--right" aria-hidden="true"></div>
     </div>
   </section>
 
   <!-- STATE 6: MAPA -->
   <section class="state" id="s-mapa" aria-label="El plan">
+    <!-- GLOW UP v3 — kanji 道 (camino) como watermark detrás del mapa -->
+    <div class="kanji-svg kanji-svg--do" aria-hidden="true">
+      <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+        <text x="100" y="160" text-anchor="middle"
+              font-family="var(--kanji-display)" font-size="180" font-weight="600"
+              class="kanji-brush">道</text>
+      </svg>
+    </div>
     <div class="mapa">
       <h2 class="mapa__title">El plan es nuestro.</h2>
       <p class="mapa__sub">Mira. Ya está. Esto es lo que vamos a hacer.</p>
@@ -892,6 +1459,15 @@
   <!-- STATE 7: DESPEDIDA -->
   <section class="state" id="s-despedida" aria-label="Despedida">
     <div class="despedida">
+      <!-- GLOW UP v3 — kanji 約束 (promesa) pieza central del cierre emocional -->
+      <svg class="kanji-promise" viewBox="0 0 320 200" aria-hidden="true">
+        <text x="80" y="158" text-anchor="middle"
+              font-family="var(--kanji-display)" font-size="170" font-weight="600"
+              class="kanji-brush">約</text>
+        <text x="240" y="158" text-anchor="middle"
+              font-family="var(--kanji-display)" font-size="170" font-weight="600"
+              class="kanji-brush kanji-brush--delayed">束</text>
+      </svg>
       <div class="despedida__name">Noelia,</div>
 
       <div class="despedida__block">
@@ -1148,6 +1724,193 @@
       // Re-ajustar al rotar / cambiar tamaño
       window.addEventListener('resize', resize, { passive: true });
       window.addEventListener('orientationchange', () => setTimeout(resize, 100), { passive: true });
+    })();
+
+    // ===================================================================
+    // GLOW UP v2 — Intro postal: sobre abriéndose, sello estampándose, texto letra a letra
+    // Se reproduce SIEMPRE al cargar la página (no usa sessionStorage).
+    // Si el usuario navega atrás desde otra pantalla (back), la postal
+    // aparece ya revelada vía la clase intro-done.
+    // ===================================================================
+    (function(){
+      'use strict';
+      const sec   = document.getElementById('s-postal');
+      if (!sec) return;
+      const env   = document.getElementById('envelope');
+      const seal  = document.getElementById('postalSeal');
+      const skip  = document.getElementById('introSkip');
+
+      const reduced = window.matchMedia &&
+                      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Detección de móvil para compactar tiempos
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 520px)').matches;
+      const T = isMobile ? 0.82 : 1.0;
+
+      // Si el usuario navega desde otra pantalla (vuelve al inicio),
+      // #s-postal tendrá data-active puesto por go() — pero queremos
+      // detectar específicamente "ya se vio la intro en esta carga" sin
+      // usar sessionStorage. Si el sobre ya no existe en el DOM, es que
+      // ya se reprodujo.
+      if (!env) {
+        sec.classList.add('intro-done');
+        return;
+      }
+
+      // Accesibilidad: si reduce-motion, saltar todo
+      if (reduced) {
+        sec.classList.add('intro-done');
+        env.remove();
+        if (skip) skip.remove();
+        return;
+      }
+
+      let timers = [];
+      function clearAllTimers() {
+        timers.forEach(t => clearTimeout(t));
+        timers = [];
+      }
+      function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+      // Textos del postal (referencias para revelado secuencial)
+      const elTo   = sec.querySelector('.postal__to');
+      const elTitle= sec.querySelector('.postal__title');
+      const elBody = sec.querySelector('.postal__body');
+      const elCta  = sec.querySelector('.postal__cta-wrap');
+      const penCursor = elTo ? elTo.querySelector('.pen-cursor') : null;
+
+      // Esperar a que las fuentes estén listas antes de iniciar la intro.
+      // Sin esto, en conexiones lentas los timers arrancan antes de que la
+      // webfont Great Vibes / Shippori esté renderizada, y los textos se ven
+      // un instante con la fallback antes de saltar a la definitiva (flicker).
+      // Ademas, garantizamos que el primer RAF arranca con todo listo.
+      const bootIntro = () => {
+        requestAnimationFrame(() => {
+          env.classList.add('is-revealed');
+          sec.classList.add('is-playing');
+        });
+        scheduleSequence();
+        attachSkipButton();
+      };
+      if (document.fonts && document.fonts.ready) {
+        // Esperar fonts, con timeout de seguridad 1.5s por si el navegador no las entrega
+        Promise.race([
+          document.fonts.ready,
+          new Promise(res => setTimeout(res, 1500))
+        ]).then(bootIntro);
+      } else {
+        bootIntro();
+      }
+
+      // Botón saltar intro — aparece pronto, click omite todo
+      if (skip) {
+        at(500 * T, () => skip.classList.add('is-visible'));
+        skip.addEventListener('click', () => finish(true));
+      }
+
+      function finish() {
+        clearAllTimers();
+        if (skip) { skip.classList.remove('is-visible'); setTimeout(() => skip.remove(), 300); }
+        sec.classList.remove('is-playing');
+        sec.classList.add('intro-done');
+        if (env) env.remove();
+        if (penCursor) penCursor.classList.remove('is-visible');
+        if (window.SakuraField) window.SakuraField.stop();
+      }
+
+      // === SECUENCIA v3 — más física y narrativa ===
+      // Los timers se programan DESPUÉS de que startIntro arranca, para que
+      // t=0 coincida con el momento en que el sobre aparece en pantalla.
+      // t=0      : sobre aparece + respiración sutil (1 ciclo, 2600ms)
+      // t=900    : flap empieza a abrirse (transition 1400ms, ease paper)
+      // t=2200   : flap abierto; postal empieza a emerger (overlap con flap)
+      // t=3100   : sobre se va hacia abajo + fade (900ms)
+      // t=3700   : sello se estampa + BURST sakura (28-40 pétalos)
+      // t=4400   : "Noelia," empieza a escribirse (1800ms handWrite) — la pluma aparece
+      // t=5500   : título revela (wipe 800ms)
+      // t=6100   : cuerpo revela
+      // t=6700   : CTA revela
+      // t=7300   : stream sakura termina
+
+      function scheduleSequence(){
+        at(900 * T,  () => { env.classList.add('is-open'); });
+
+        at(2200 * T, () => {
+          sec.classList.add('postal-emerging');
+        });
+
+        at(3100 * T, () => { env.classList.add('is-leaving'); });
+
+        at(3700 * T, () => {
+          if (seal) seal.classList.add('is-stamping');
+          if (window.SakuraField) {
+            window.SakuraField.burst({ count: isMobile ? 28 : 40, speed: 1.3 });
+          }
+        });
+
+        at(4400 * T, () => {
+          if (elTo) {
+            elTo.classList.add('is-revealing');
+            // Pluma aparece y sigue el frente de revelado durante 1800ms
+            if (penCursor) {
+              penCursor.classList.add('is-visible');
+              const startLeft = -12; // px offset inicial
+              const duration = 1800 * T;
+              const totalWidth = elTo.offsetWidth + 24; // ancho del texto + un poco más
+              penCursor.animate(
+                [
+                  { left: startLeft + 'px', opacity: .9 },
+                  { left: (startLeft + totalWidth * 0.55) + 'px', opacity: .9, offset: .55 },
+                  { left: (startLeft + totalWidth) + 'px', opacity: .9, offset: .92 },
+                  { left: (startLeft + totalWidth + 8) + 'px', opacity: 0 }
+                ],
+                { duration: duration, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' }
+              );
+            }
+            // Highlight de tinta activa durante la escritura
+            elTo.classList.add('is-inking');
+            setTimeout(() => elTo.classList.remove('is-inking'), 1900 * T);
+          }
+        });
+
+        // Pluma se desvanece al terminar la escritura
+        at((4400 + 1900) * T, () => {
+          if (penCursor) penCursor.classList.remove('is-visible');
+        });
+
+        at(6200 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
+        at(6800 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
+        at(7400 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
+
+        at(4800 * T, () => {
+          // Stream sutil de sakura mientras los textos aparecen
+          if (window.SakuraField) {
+            window.SakuraField.stream({ rate: 300, cap: isMobile ? 8 : 12, speed: 1 });
+          }
+        });
+
+        at(8200 * T, () => {
+          if (window.SakuraField) window.SakuraField.stop();
+        });
+
+        at(6200 * T, () => {
+          finish();
+        });
+      }
+
+      // Saltar intro — botón
+      if (skip) {
+        skip.addEventListener('click', () => finish(true));
+      }
+
+      // El botón "saltar intro" aparece en cuanto se inicia la intro
+      // Lo programamos también desde scheduleSequence
+      function attachSkipButton(){
+        if (!skip) return;
+        at(500 * T, () => skip.classList.add('is-visible'));
+      }
+
+      // bootIntro (definido arriba) ya se encarga de invocar scheduleSequence y attachSkipButton
     })();
 
     (function(){
@@ -1446,7 +2209,7 @@
                   text: 'Kinkaku-ji y Ryoan-ji están a diez minutos andando. El Pabellón Dorado, el jardín zen de las quince piedras. Combo perfecto de mañana —y excusa para ir en silencio juntos.',
                   tag: 'oro' },
                 { place: 'Nara', image: IMG.nara, caption: 'Nara · Gran Buda + ciervos',
-                  text: 'Nara en tren, cuarenta y cinco minutos. El Gran Buda de Tōdai-ji, los ciervos que te van a comer la chaqueta si te descuidas. Las galletas: no compres más de un paquete.',
+                  text: 'Nara en tren, de una. El Gran Buda de Tōdai-ji, los ciervos que te van a comer la chaqueta si te descuidas. Las galletas: no compres más de un paquete.',
                   tag: 'ciervos' }
               ]
             },
@@ -1465,7 +2228,7 @@
                   text: 'Kurama onsen, en la montaña, junto al santuario. Funicular desde Kibune. Agua caliente, vapor, un bosque rojo. Medio día. Sin hablar.',
                   tag: 'vapor' },
                 { place: 'Nara', image: IMG.nara, caption: 'Nara · ciervos sagrados',
-                  text: 'Vuelta vía Nara para los ciervos sagrados. Las galletas que venden en la entrada son la trampa. Si solo quieres una, una.',
+                  text: 'Vuelta vía Nara para los ciervos sagrados. Si compras galletas, cuidado, parecen buenos, pero son... traviesos.',
                   tag: 'galletas' }
               ]
             },
@@ -1481,7 +2244,7 @@
                   text: 'Cuando el cuerpo pida calma: Honen-in, el templo de Philosopher\'s Path. Siestas morales en el jardín permitidas.',
                   tag: 'siesta' },
                 { place: 'Nara', image: IMG.nara, caption: 'Si hay ganas de ciervos',
-                  text: 'Si hay ganas de ciervos: Nara en tren, cuarenta y cinco minutos. Si no, café en un kissaten de Shijō mirando llover.',
+                  text: 'Si hay ganas de ciervos: Nara en tren. Si no, café en un kissaten de Shijō mirando llover.',
                   tag: 'café' }
               ]
             }
@@ -1548,7 +2311,7 @@
             {
               value: 'kinosaki',
               label: 'Kinosaki, rituales, lujo y descanso',
-              micro: 'Vas a recorrer el pueblo en yukata, con el gotō en la mano. Y vas a estar adorable.',
+              micro: 'Vas a recorrer el pueblo en yukata, con el gotō en la mano. Y vas a estar kawaii.',
               acts: [
                 { place: 'Nishimuraya', image: IMG.nishimuraya, caption: 'Nishimuraya',
                   text: 'Un remanso de paz. Tradición japonesa de lujo. Lo que nos merecemos',
@@ -1875,9 +2638,20 @@
       const order = ['s-postal','s-q1','s-q2','s-q3','s-q4','s-q5','s-q6','s-q7','s-mapa','s-despedida'];
 
       function activate(id) {
-        document.querySelectorAll('.state').forEach(el => el.removeAttribute('data-active'));
+        document.querySelectorAll('.state').forEach(el => {
+          el.removeAttribute('data-active');
+          el.classList.remove('is-brushing');
+        });
         const next = document.getElementById(id);
-        if (next) next.setAttribute('data-active','true');
+        if (!next) return;
+        next.setAttribute('data-active','true');
+        // GLOW UP v3 — disparar pincelada kanji tras 2 frames para que la animación
+        // arranque desde cero (importante al re-navegar a una sección ya visitada).
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            next.classList.add('is-brushing');
+          });
+        });
       }
 
       function go(id, opts = {}) {
@@ -2181,6 +2955,9 @@
           fig.className = 'mapa__polaroid';
           fig.style.setProperty('--rot', it.rot + 'deg');
           fig.style.animationDelay = (i * 120) + 'ms';
+          // GLOW UP v3 — stagger del clip-path reveal de la foto interior.
+          // Pequeño lag detrás de la animación del figure (que ya tiene 120ms*i).
+          fig.style.setProperty('--photo-delay', (260 + i * 130) + 'ms');
           fig.innerHTML = `<img src="${it.img}" alt="" width="280" height="140" loading="lazy" data-lightbox data-lightbox-caption="${it.cap}" data-lightbox-place="" tabindex="0"><figcaption>${it.cap}</figcaption>`;
           scrap.appendChild(fig);
         });
