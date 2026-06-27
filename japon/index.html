@@ -1083,17 +1083,51 @@
       .intro-skip{display:none}
     }
 
-    /* ---------- GLOW UP v2 — Sakura field (canvas fijo detrás del contenido) ---------- */
-    #sakuraField{
-      position:fixed;inset:0;
-      width:100%;height:100%;
+    /* ---------- GLOW UP v2 — Sakura field (DOM-based petals, garantizado visible) ----------
+   Sistema basado en DOM real (no canvas) — cada pétalo es un <div> con animación CSS.
+   Si esto no se ve, el problema está fuera del sistema (prefers-reduced-motion, JS error,
+   etc.) — no en el renderer. */
+    #sakuraField{display:none}
+    .sakura-petal{
+      position:fixed;top:-40px;
+      width:18px;height:13px;
+      border-radius:50% 30% 50% 30%;
       pointer-events:none;
       z-index:var(--z-particles);
-      /* no bloquea nada ni visualmente distrae en reposo: el canvas queda transparente
-         mientras no haya partículas activas (SakuraField no redibuja cuando está idle) */
+      transform:translate3d(0,0,0);
+      will-change:transform,opacity;
+      box-shadow:inset -2px -2px 3px rgba(155,40,32,.35), 0 1px 2px rgba(155,40,32,.18);
+      animation-timing-function:linear;
+      animation-fill-mode:forwards;
+    }
+    @keyframes sakuraFallA{
+      0%  {transform:translate3d(0,0,0) rotate(0deg);opacity:0}
+      8%  {opacity:.95}
+      25% {transform:translate3d(45px,25vh,0) rotate(180deg)}
+      50% {transform:translate3d(-30px,52vh,0) rotate(360deg)}
+      75% {transform:translate3d(50px,78vh,0) rotate(540deg)}
+      92% {opacity:.95}
+      100%{transform:translate3d(20px,112vh,0) rotate(720deg);opacity:0}
+    }
+    @keyframes sakuraFallB{
+      0%  {transform:translate3d(0,0,0) rotate(0deg);opacity:0}
+      8%  {opacity:.95}
+      30% {transform:translate3d(-50px,30vh,0) rotate(-200deg)}
+      55% {transform:translate3d(35px,55vh,0) rotate(-400deg)}
+      80% {transform:translate3d(-40px,82vh,0) rotate(-620deg)}
+      92% {opacity:.95}
+      100%{transform:translate3d(-25px,112vh,0) rotate(-820deg);opacity:0}
+    }
+    @keyframes sakuraFallC{
+      0%  {transform:translate3d(0,0,0) rotate(0deg);opacity:0}
+      10% {opacity:.95}
+      40% {transform:translate3d(60px,40vh,0) rotate(260deg)}
+      70% {transform:translate3d(-25px,70vh,0) rotate(540deg)}
+      92% {opacity:.95}
+      100%{transform:translate3d(40px,112vh,0) rotate(900deg);opacity:0}
     }
     @media (prefers-reduced-motion:reduce){
-      #sakuraField{display:none}
+      .sakura-petal{display:none!important}
     }
 
     /* ---------- COMPACT MOBILE — encaja actos con foto en viewports cortos ---------- */
@@ -1224,8 +1258,8 @@
 <body>
   <a class="skip-link" href="#main">Saltar al contenido</a>
 
-  <!-- GLOW UP v2 — Sakura field canvas (fixed, detrás del contenido, pointer-events:none) -->
-  <canvas id="sakuraField" aria-hidden="true"></canvas>
+  <!-- GLOW UP v2 — Sakura field ahora es DOM-based: los pétalos se montan
+       como hijos directos de <body> con position:fixed (no necesitan host). -->
 
   <!-- TOPBAR -->
   <header class="topbar" id="topbar" role="banner">
@@ -1539,233 +1573,103 @@
 
   <script>
     // ===================================================================
-    // GLOW UP v2 — SakuraField
-    // Canvas fijo con sistema de partículas de pétalos de cerezo.
+    // GLOW UP v2 — SakuraField (DOM-based petals)
+    // Cada pétalo es un <div class="sakura-petal"> con animación CSS.
+    // Se montan en <body> como hijos directos → visibilidad garantizada
+    // (si esto no se ve, el problema es prefers-reduced-motion u otro).
     // API:
-    //   SakuraField.burst({ count?, speed?, duration? })  →  ráfaga única (N partículas durante Ms)
-    //   SakuraField.stream({ rate?, speed? })            →  flujo continuo (1 partícula cada RATE ms)
-    //   SakuraField.stop()                               →  detiene cualquier stream activo
-    // Mobile-first: count y velocidad se adaptan al viewport y a FPS.
-    // Respeta prefers-reduced-motion (no-op si está activo).
+    //   SakuraField.burst({ count?, speed? }) → ráfaga de N pétalos
+    //   SakuraField.stream({ rate?, cap? })   → flujo continuo
+    //   SakuraField.stop()                    → detiene stream activo
     // ===================================================================
     (function(){
       'use strict';
-      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        // No hacer nada — accesibilidad ante todo
-        window.SakuraField = { burst: function(){}, stream: function(){}, stop: function(){} };
-        return;
-      }
-
-      const canvas = document.getElementById('sakuraField');
-      if (!canvas || !canvas.getContext) {
-        window.SakuraField = { burst: function(){}, stream: function(){}, stop: function(){} };
-        return;
-      }
-      const ctx = canvas.getContext('2d', { alpha: true });
-
-      // DPR limitado a 2 para no quemar móviles
-      let dpr = Math.min(window.devicePixelRatio || 1, 2);
-      let w = 0, h = 0;
-
-      // Count adaptativo: max(8, min(innerWidth/50, 18)). En 375px → 8, en 1440px → 18.
-      function adaptiveCap() {
-        return Math.max(8, Math.min(Math.floor(window.innerWidth / 50), 18));
-      }
-      // Cap burst: máximo absoluto, escalado por viewport (no por cap adaptativo)
-      function burstCap() {
-        return Math.max(20, Math.min(Math.floor(window.innerWidth / 30), 60));
-      }
-
-      // Estado
-      let particles = [];      // partículas activas
-      let rafId = null;
-      let lastFrame = 0;
-      let lastFpsCheck = 0;
-      let frameCount = 0;
-      let currentFps = 60;
-      let paused = false;
-      let streamTimer = null;
-      let resizeObs = null;
-
-      // Paleta leída de los tokens (sin hardcodear)
-      const rootStyle = getComputedStyle(document.documentElement);
+      const reduced = window.matchMedia &&
+                      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const PETAL_COLORS = [
-        rootStyle.getPropertyValue('--sakura').trim() || '#F2C7C7',
-        rootStyle.getPropertyValue('--sakura-bright').trim() || '#FFB7C5',
-        rootStyle.getPropertyValue('--sakura-pale').trim() || '#FFE4E8'
+        '#FF6B9D', '#FF8FA3', '#FFA8C0', '#E91E63'
       ];
+      const ANIMS = ['sakuraFallA', 'sakuraFallB', 'sakuraFallC'];
 
-      function resize() {
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        w = window.innerWidth;
-        h = window.innerHeight;
-        canvas.width  = Math.floor(w * dpr);
-        canvas.height = Math.floor(h * dpr);
-        canvas.style.width  = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      resize();
+      let active = [];             // DOM nodes vivos
+      let streamId = null;          // setInterval handle
+      let streamCap = 22;
 
-      function spawn(opts) {
-        const o = Object.assign({
-          x: Math.random() * w,
-          // Spawn cerca del borde superior (no muy lejos): entran al viewport en <1s
-          y: -10 - Math.random() * 50,
-          // Pétalos más grandes para que se vean contra el fondo crema
-          size: 12 + Math.random() * 12,
-          rot: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.014,
-          vx: 0.15 + Math.random() * 0.45,
-          // Caída un poco más rápida (entran antes al viewport, son más perceptibles)
-          vy: 0.5 + Math.random() * 0.7,
-          wobblePhase: Math.random() * Math.PI * 2,
-          wobbleAmp: 0.8 + Math.random() * 1.3,
-          wobbleFreq: 0.005 + Math.random() * 0.012,
-          // Opacidad alta: claramente visibles desde el primer frame en viewport
-          opacity: 0.78 + Math.random() * 0.22,
-          hueIdx: Math.floor(Math.random() * PETAL_COLORS.length),
-          speedMul: opts && opts.speed ? opts.speed : 1
-        }, opts || {});
-        return o;
-      }
+      function spawnPetal(opts) {
+        opts = opts || {};
+        const el = document.createElement('div');
+        el.className = 'sakura-petal';
+        const size = 14 + Math.random() * 12; // 14-26 px
+        const startX = Math.random() * window.innerWidth;
+        const speedMul = opts.speed || 1;
+        const duration = (6000 + Math.random() * 5000) / speedMul;
+        const delay = opts.delay != null ? opts.delay : Math.random() * 80;
+        const color = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)];
+        const anim = ANIMS[Math.floor(Math.random() * ANIMS.length)];
 
-      function draw(p) {
-        ctx.save();
-        ctx.globalAlpha = p.opacity;
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        // Cuerpo del pétalo (elipse suave)
-        ctx.fillStyle = PETAL_COLORS[p.hueIdx];
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Pequeño sombreado en el lado derecho (luz desde arriba-izquierda)
-        ctx.fillStyle = 'rgba(216,160,168,0.35)';
-        ctx.beginPath();
-        ctx.ellipse(p.size * 0.25, 0, p.size * 0.35, p.size * 0.25, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Centro oscuro (sello del pétalo)
-        ctx.fillStyle = 'rgba(200,56,42,0.18)';
-        ctx.beginPath();
-        ctx.arc(0, 0, Math.max(0.8, p.size * 0.14), 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
+        el.style.left = startX + 'px';
+        el.style.width = size + 'px';
+        el.style.height = (size * 0.7) + 'px';
+        el.style.background = color;
+        el.style.animationName = anim;
+        el.style.animationDuration = duration + 'ms';
+        el.style.animationDelay = delay + 'ms';
 
-      function tick(now) {
-        rafId = requestAnimationFrame(tick);
-        if (paused) return;
-        if (!lastFrame) lastFrame = now;
-        const dt = Math.min(40, now - lastFrame); // clamp para evitar saltos al volver de background
-        lastFrame = now;
-        // FPS sampler (cada 1s)
-        frameCount++;
-        if (now - lastFpsCheck > 1000) {
-          currentFps = frameCount / ((now - lastFpsCheck) / 1000);
-          frameCount = 0;
-          lastFpsCheck = now;
-          // Auto-throttle: si FPS < 45, eliminar la mitad de las partículas
-          if (currentFps < 45 && particles.length > 6) {
-            particles.length = Math.max(6, Math.floor(particles.length / 2));
-          }
-        }
+        document.body.appendChild(el);
+        active.push(el);
 
-        ctx.clearRect(0, 0, w, h);
+        // Limpieza: cuando termine la animación, eliminar el DOM node.
+        const cleanup = duration + delay + 200;
+        setTimeout(() => {
+          el.remove();
+          const i = active.indexOf(el);
+          if (i > -1) active.splice(i, 1);
+        }, cleanup);
 
-        // Si no hay partículas, dejamos de pintar (ahorra batería en móvil)
-        if (particles.length === 0) {
-          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-          lastFrame = 0;
-          return;
-        }
-
-        for (let i = particles.length - 1; i >= 0; i--) {
-          const p = particles[i];
-          const speed = p.speedMul || 1;
-          // Movimiento con wobble senoidal
-          p.x += (p.vx + Math.sin(p.life * p.wobbleFreq + p.wobblePhase) * p.wobbleAmp * 0.5) * (dt / 16) * speed;
-          p.y += p.vy * (dt / 16) * speed;
-          p.rot += p.rotSpeed * (dt / 16);
-          p.life = (p.life || 0) + 1;
-          // Viento global muy sutil (deriva hacia la derecha)
-          p.x += 0.05 * (dt / 16);
-
-          // Si sale por abajo o lateral muy fuera → eliminar
-          if (p.y > h + 30 || p.x > w + 40 || p.x < -40) {
-            particles.splice(i, 1);
-            continue;
-          }
-          draw(p);
+        // Si superamos el cap efectivo, eliminar el más viejo.
+        const effectiveCap = opts.cap || streamCap;
+        if (active.length > effectiveCap) {
+          const old = active.shift();
+          if (old && old.parentNode) old.remove();
         }
       }
 
-      function ensureLoop() {
-        if (rafId == null) {
-          lastFrame = 0;
-          rafId = requestAnimationFrame(tick);
-        }
-      }
-
-      // === API PÚBLICA ===
       const SakuraField = {
-        /** Ráfaga: añade N partículas de golpe. Se desvanecen solas al salir de pantalla.
-         *  ~40% se siembran dentro del viewport (sobre todo tercio superior) para que el
-         *  espectador perciba impacto inmediato; el resto cae desde el borde superior. */
+        /** Ráfaga de N pétalos, escalonados en el tiempo para que caigan progresivamente.
+         *  El cap del burst es independiente del cap del stream → permite ráfagas densas
+         *  sin que el stream quite pétalos. */
         burst: function(opts) {
+          if (reduced) return;
           opts = opts || {};
-          const n = Math.min(opts.count || burstCap(), burstCap());
+          const n = opts.count || 30;
+          const burstCap = opts.cap || 60;
           for (let i = 0; i < n; i++) {
-            const o = { speedMul: opts.speed || 1 };
-            if (Math.random() < 0.4) {
-              // Pétalo ya dentro del viewport (impacto visual inmediato)
-              o.y = Math.random() * h * 0.6;
-            }
-            particles.push(spawn(o));
+            // Escalonado: cada pétalo empieza 25-60ms después del anterior
+            spawnPetal({ speed: opts.speed, delay: i * (opts.stagger || 35), cap: burstCap });
           }
-          // Cap duro por seguridad
-          const cap = adaptiveCap() * 3; // burst puede superar el stream
-          if (particles.length > cap) particles.splice(0, particles.length - cap);
-          ensureLoop();
         },
-        /** Stream: añade partículas continuamente. Devuelve un id para parar. */
+        /** Stream continuo (1 pétalo cada `rate` ms), respeta el `cap`. */
         stream: function(opts) {
-          SakuraField.stop(); // un stream a la vez
-          opts = opts || {};
-          const rate = Math.max(120, opts.rate || 320);
-          const speed = opts.speed || 1;
-          const cap = Math.min(opts.cap || adaptiveCap(), burstCap());
-          streamTimer = setInterval(() => {
-            if (particles.length < cap) {
-              particles.push(spawn({ speedMul: speed }));
-              ensureLoop();
-            }
-          }, rate);
-        },
-        /** Detiene cualquier stream activo. Las partículas en vuelo terminan su caída. */
-        stop: function() {
-          if (streamTimer) { clearInterval(streamTimer); streamTimer = null; }
-        },
-        /** Limpia todo inmediatamente (sin esperar a que salgan). */
-        clear: function() {
-          particles = [];
+          if (reduced) return;
           SakuraField.stop();
-          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-          ctx.clearRect(0, 0, w, h);
+          opts = opts || {};
+          const rate = opts.rate || 280;
+          streamCap = opts.cap || 22;
+          streamId = setInterval(() => spawnPetal(), rate);
+        },
+        /** Detiene el stream; los pétalos en vuelo terminan su animación. */
+        stop: function() {
+          if (streamId) { clearInterval(streamId); streamId = null; }
+        },
+        /** Limpieza total. */
+        clear: function() {
+          SakuraField.stop();
+          active.forEach(p => p.remove());
+          active = [];
         }
       };
 
       window.SakuraField = SakuraField;
-
-      // Pausar cuando la pestaña no está visible (ahorra CPU/batería)
-      document.addEventListener('visibilitychange', () => {
-        paused = document.hidden;
-        if (!paused) lastFrame = 0;
-      });
-
-      // Re-ajustar al rotar / cambiar tamaño
-      window.addEventListener('resize', resize, { passive: true });
-      window.addEventListener('orientationchange', () => setTimeout(resize, 100), { passive: true });
     })();
 
     // ===================================================================
@@ -1877,7 +1781,23 @@
       // Total: 10.6s en desktop, ~8.7s en móvil (T=0.82)
 
       function scheduleSequence(){
+        // Pre-burst inmediato (200ms tras cargar): el usuario percibe movimiento desde
+        // el primer instante aunque no haya interactuado. Bajo el sobre cerrado aún, pero
+        // visible en los márgenes. No rompe la cinemática — son sólo 6-10 partículas.
+        at(200 * T, () => {
+          if (window.SakuraField) {
+            window.SakuraField.burst({ count: isMobile ? 6 : 10, speed: 1.0 });
+          }
+        });
+
         at(900 * T,  () => { env.classList.add('is-open'); });
+
+        // Burst principal cuando el sobre se abre — momento cinemático clave
+        at(1000 * T, () => {
+          if (window.SakuraField) {
+            window.SakuraField.burst({ count: isMobile ? 32 : 45, speed: 1.3 });
+          }
+        });
 
         at(2200 * T, () => {
           sec.classList.add('postal-emerging');
@@ -1906,9 +1826,9 @@
         at(9800 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
 
         at(4800 * T, () => {
-          // Stream sutil de sakura mientras los textos aparecen
+          // Stream continuo de sakura mientras los textos aparecen
           if (window.SakuraField) {
-            window.SakuraField.stream({ rate: 300, cap: isMobile ? 8 : 12, speed: 1 });
+            window.SakuraField.stream({ rate: 240, cap: isMobile ? 14 : 22, speed: 1 });
           }
         });
 
