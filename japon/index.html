@@ -152,24 +152,40 @@
     }
     .postal__seal svg{width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(200,56,42,.3))}
     .postal__to{
-      font-family:var(--script);
-      /* Restaurada la presencia del glow up: ~3rem en móvil, hasta ~3.8rem en desktop.
-         3.8rem (vs 5rem original) evita romper jerarquía con el título de 2.4rem. */
-      font-size:clamp(2.6rem,1.5rem + 4.5vw,3.8rem);
-      font-weight:600;
-      color:var(--vermilion);
-      margin-bottom:.5rem;
-      /* line-height generoso para que los ascenders de Great Vibes no queden
-         pegados al borde superior de la caja. */
-      line-height:1.35;
-      position:relative;
+      /* Contenedor del SVG "Noelia" — el SVG dentro define su tamaño real.
+         Mantenemos las proporciones de la viewBox (500x130 ≈ 3.85:1). */
       display:inline-block;
-      /* Compresión inicial leve: se "abre" mientras se escribe (handWrite). */
-      letter-spacing:-.02em;
+      position:relative;
+      width:clamp(220px, 18rem + 16vw, 360px);
+      height:auto;
+      margin-bottom:.5rem;
+      line-height:0; /* el alto lo gobierna el SVG; sin espacio extra bajo la línea */
     }
-    /* (Highlight de tinta fresca eliminado — el glow que extendía 4% por encima de la
-       caja se percibía como un "corte" en la parte superior del texto durante el
-       reveal con clip-path. La animación handWrite ya da suficiente presencia.) */
+    .noelia-svg{
+      display:block;
+      width:100%;
+      height:auto;
+      overflow:visible; /* deja respirar los ascenders fuera del viewBox si hace falta */
+    }
+    /* === Animación de trazado ===
+       El rect de la máscara TIENE ancho 500 completo; lo que animamos es su
+       transform: scaleX() de 0 → 1. Esto es 100% fiable cross-browser sobre
+       SVG (animar el atributo `width` desde CSS da problemas en algunos
+       navegadores porque el atributo HTML pisa la animación).
+       transform-box:fill-box ancla el escalado a la propia caja del rect,
+       transform-origin:0 0 lo ancla al borde izquierdo → "escritura" izq→der. */
+    .noelia-mask__wipe{
+      transform-box:fill-box;
+      transform-origin:0 0;
+      transform:scaleX(0);
+    }
+    .postal__to.is-revealing .noelia-mask__wipe{
+      animation:noeliaWrite 1900ms cubic-bezier(0.65, 0, 0.35, 1) both;
+    }
+    @keyframes noeliaWrite{
+      0%  {transform:scaleX(0)}
+      100%{transform:scaleX(1)}
+    }
     .postal__title{
       font-family:var(--serif);font-style:italic;font-weight:500;
       font-size:clamp(1.7rem,1.2rem+2.5vw,2.4rem);
@@ -197,8 +213,24 @@
     }
     .btn:hover{background:var(--vermilion-deep);transform:translateY(-1px);box-shadow:0 8px 20px -4px rgba(200,56,42,.6)}
     .btn:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
-    .btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);box-shadow:none;padding:.65rem 1.2rem;font-size:.82rem}
-    .btn--ghost:hover{background:var(--ink);color:var(--paper)}
+    .btn--ghost{
+      background:transparent;color:var(--ink);border:0;
+      box-shadow:none;padding:.65rem 1.2rem;font-size:.82rem;
+      /* Mismo family que el CTA de la postal (Cormorant Garamond italic)
+         → coherencia con el resto del lenguaje japonés-elegante. */
+      font-family:var(--serif);font-style:italic;font-weight:500;
+      letter-spacing:.02em;
+      /* Override del .btn:hover base para que el ghost no tenga NINGÚN
+         efecto de fondo/transform — solo el cursor pointer da feedback. */
+    }
+    .btn--ghost:hover,
+    .btn--ghost:focus-visible{
+      background:transparent;
+      color:var(--ink);
+      transform:none;
+      box-shadow:none;
+      outline:none;
+    }
     .btn--small{padding:.6rem 1.1rem;font-size:.78rem}
     .btn__hover-text{
       display:block;font-size:.65rem;opacity:0;transform:translateY(4px);
@@ -1034,24 +1066,14 @@
     .state--no-topbar:not(.intro-done) .postal__cta-wrap:not(.is-revealing){
       opacity:0;
     }
-    /* === NOELIA — escritura real con un trazo (1700ms, clip-path + letter-spacing)
-         Animamos solo 2 propiedades (compositor-friendly, sin "salto"):
-         - clip-path: la letra emerge de izquierda a derecha
-         - letter-spacing: -.04em → -.02em (las letras se "abren" mientras se escriben
-           y terminan en el MISMO valor que el CSS estático, así al quitar la animación
-           vía .intro-done no hay salto de letter-spacing).
-         Sin filter:blur ni transform:translateY simultáneos → sin salto. === */
-    .postal__to.is-revealing{
-      animation:handWrite 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
-    }
-    /* handWrite SIN clip-path: Great Vibes tiene ascenders altos que el clip-path
-       recortaba por arriba durante el reveal. La sensación de "escritura" se mantiene
-       con opacity + letter-spacing (la palabra se "abre" mientras aparece). */
-    @keyframes handWrite{
-      0%  {opacity:0; letter-spacing:-.05em}
-      20% {opacity:1}
-      100%{opacity:1; letter-spacing:-.02em}
-    }
+    /* === NOELIA — escritura real con trazado SVG (1900ms)
+         La animación vive en .noelia-mask__wipe (rect de la <mask>): crece de
+         width=0 a 500 dentro de la viewBox del SVG. Visualmente el texto se
+         traza de izquierda a derecha como si alguien lo escribiese a mano.
+         Se anima SOLO el atributo width del rect (compositor-friendly) → sin
+         "salto" final. Al terminar, .intro-done fija width:500 y animation:none.
+         Los ascenders de Great Vibes están DENTRO de la viewBox (130 alto) →
+         nunca se cortan arriba, al revés que con clip-path sobre la caja CSS. === */
     /* === Resto de textos: wipe corto (700ms) === */
     .postal__title.is-revealing,
     .postal__body.is-revealing,
@@ -1073,12 +1095,17 @@
     .state--no-topbar.intro-done .postal__cta-wrap{
       opacity:1;animation:none;
     }
+    /* En intro-done, el wipe de la máscara debe quedar al 100% (texto completo) */
+    .state--no-topbar.intro-done .noelia-mask__wipe{
+      animation:none;transform:scaleX(1);
+    }
 
     /* prefers-reduced-motion: todo instantáneo, sin sobre, sin sakura */
     @media (prefers-reduced-motion:reduce){
       .envelope{display:none!important}
       .state--no-topbar .postal{opacity:1;transform:none;pointer-events:auto}
       .postal__to,.postal__title,.postal__body,.postal__cta-wrap{opacity:1;animation:none}
+      .noelia-mask__wipe{animation:none;transform:scaleX(1)}
       .intro-skip{display:none}
     }
 
@@ -1305,7 +1332,26 @@
           <text x="50" y="62" text-anchor="middle" fill="#F4ECE0" font-family="'Cormorant Garamond', serif" font-size="38" font-weight="600" font-style="italic">旅</text>
         </svg>
       </div>
-      <div class="postal__to">Noelia</div>
+      <!-- "Noelia" como SVG con máscara animada: el texto se traza de izquierda
+           a derecha como escritura a mano. La máscara recorta la viewBox, no la
+           caja del texto → los ascenders de Great Vibes nunca se cortan arriba. -->
+      <div class="postal__to">
+        <svg class="noelia-svg" viewBox="0 0 500 130" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-label="Noelia">
+          <defs>
+            <mask id="noelia-mask" maskUnits="userSpaceOnUse">
+              <!-- Rectángulo blanco ancho completo; lo escalamos con CSS
+                   (transform: scaleX 0→1) para revelar el texto de izq a der -->
+              <rect class="noelia-mask__wipe" x="0" y="0" width="500" height="130" fill="#fff"/>
+            </mask>
+          </defs>
+          <text x="250" y="98" text-anchor="middle"
+                font-family="'Great Vibes', cursive"
+                font-size="110"
+                font-weight="600"
+                fill="#C8382A"
+                mask="url(#noelia-mask)">Noelia</text>
+        </svg>
+      </div>
       <h1 class="postal__title">Se la requiere para una <br>AVENTURA</h1>
       <p class="postal__body">Llevamos años soñando con ir a Japón.<br>Esta vez, se hará realidad</p>
       <div class="postal__cta-wrap">
