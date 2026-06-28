@@ -516,12 +516,7 @@
       font-weight:400;
     }
     .act__cta{margin-top:auto;padding-top:1.25rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;width:100%}
-    .act__tag{
-      font-family:var(--ui);font-size:.62rem;letter-spacing:.18em;
-      text-transform:uppercase;color:var(--gold);font-weight:600;
-      padding:.25rem .65rem;border:1px solid rgba(184,137,62,.35);
-      border-radius:999px;
-    }
+    /* .act__tag eliminado — los tags "cruce", "figuras" etc. no aportaban */
 
     /* ---------- THOUGHT (pensamiento) — solo el texto rojo, sin imagen, como un momento antes de las cards ---------- */
     .state--thought{
@@ -2480,7 +2475,6 @@
               <p class="act__place">${act.place}</p>
               <p class="act__caption">${act.caption}</p>
               <p class="act__text">${act.text}</p>
-              ${act.tag ? `<span class="act__tag">${act.tag}</span>` : ''}
               <button class="btn btn--ghost btn--small act__cta" data-action="${ctaAction}">${ctaLabel}</button>
             </article>
           </section>`;
