@@ -159,7 +159,9 @@
       font-weight:600;
       color:var(--vermilion);
       margin-bottom:.5rem;
-      line-height:1.1;
+      /* line-height generoso para que los ascenders de Great Vibes no queden
+         pegados al borde superior de la caja. */
+      line-height:1.35;
       position:relative;
       display:inline-block;
       /* Compresión inicial leve: se "abre" mientras se escribe (handWrite). */
@@ -1041,12 +1043,14 @@
          Sin filter:blur ni transform:translateY simultáneos → sin salto. === */
     .postal__to.is-revealing{
       animation:handWrite 1700ms cubic-bezier(0.65, 0, 0.35, 1) both;
-      transform-origin:left center;
     }
+    /* handWrite SIN clip-path: Great Vibes tiene ascenders altos que el clip-path
+       recortaba por arriba durante el reveal. La sensación de "escritura" se mantiene
+       con opacity + letter-spacing (la palabra se "abre" mientras aparece). */
     @keyframes handWrite{
-      0%  {clip-path:inset(0 100% 0 0); letter-spacing:-.04em; opacity:.6}
+      0%  {opacity:0; letter-spacing:-.05em}
       20% {opacity:1}
-      100%{clip-path:inset(0 0 0 0); letter-spacing:-.02em; opacity:1}
+      100%{opacity:1; letter-spacing:-.02em}
     }
     /* === Resto de textos: wipe corto (700ms) === */
     .postal__title.is-revealing,
@@ -1768,8 +1772,12 @@
       // t=900    : flap empieza a abrirse (transition 1400ms, ease paper)
       // t=2200   : flap abierto; postal empieza a emerger (overlap con flap)
       // t=3100   : sobre se va hacia abajo + fade (900ms)
-      // t=3700   : sello se estampa (900ms ceremonial) + BURST sakura (28-40 pétalos)
-      // t=4400   : "Noelia" empieza a escribirse (1700ms handWrite + pluma sweep)
+      // t=3700   : sello se estampa (900ms ceremonial) — sin pétalos aún
+      // t=4400   : "Noelia" empieza a escribirse (1700ms handWrite) + ARRANCA LLUVIA
+      //            de pétalos: burst estrella + stream continuo (220ms ≈ 4-5/s).
+      //            NO SE DETIENE al terminar el intro: sigue durante TODO el
+      //            recorrido (preguntas, decisiones, final). Bursts periódicos
+      //            cada 9s refuerzan la sensación de "tandadas" más allá del intro.
       // t=6100   : handWrite terminado
       // t=6800   : título revela (wipe 800ms) — gap de 700ms para leer
       // t=7600   : título completo
@@ -1780,51 +1788,77 @@
       // Total: 10.6s en desktop, ~8.7s en móvil (T=0.82)
 
       function scheduleSequence(){
-        at(900 * T,  () => {
-          // El sobre se abre — primer momento cinemático donde los pétalos deben caer
-          env.classList.add('is-open');
-          if (window.SakuraField) {
-            window.SakuraField.burst({ count: isMobile ? 28 : 38, speed: 1.0 });
-          }
-        });
+        // Helper para burst compacto — usado en cada momento de reveal.
+        const burstAt = (time, count) => {
+          at(time, () => {
+            if (window.SakuraField) {
+              window.SakuraField.burst({
+                count: isMobile ? Math.round(count * 0.7) : count,
+                speed: 1.0,
+              });
+            }
+          });
+        };
 
-        at(2200 * T, () => {
-          sec.classList.add('postal-emerging');
-        });
+        // t=900 — sobre se abre (sin pétalos: la lluvia arranca con Noelia).
+        at(900 * T,  () => { env.classList.add('is-open'); });
 
+        // t=2200 — postal emerge (sin pétalos)
+        at(2200 * T, () => { sec.classList.add('postal-emerging'); });
+
+        // t=3100 — sobre se va
         at(3100 * T, () => { env.classList.add('is-leaving'); });
 
-        at(3700 * T, () => {
-          if (seal) seal.classList.add('is-stamping');
-          // Burst extra cuando se estampa el sello — refuerza el momento
-          if (window.SakuraField) {
-            window.SakuraField.burst({ count: isMobile ? 22 : 32, speed: 1.2 });
-          }
-        });
+        // t=3700 — sello se estampa (sin pétalos, lo importante es la marca)
+        at(3700 * T, () => { if (seal) seal.classList.add('is-stamping'); });
 
-        at(4400 * T, () => {
-          if (elTo) {
-            elTo.classList.add('is-revealing');
-          }
-        });
+        // === t=4400 — "Noelia" empieza a escribirse. AQUÍ ARRANCA LA LLUVIA. ===
+        // Burst estrella sincronizado + stream continuo (no se detiene nunca:
+        // sigue durante TODO el recorrido: intro, preguntas, decisiones, final).
+        at(4400 * T, () => { if (elTo) elTo.classList.add('is-revealing'); });
+        burstAt(4400 * T, 26);
 
-        // Stream continuo durante toda la cinemática — empieza pronto para que no
-        // se note un "hueco" entre los bursts puntuales
-        at(1500 * T, () => {
-          if (window.SakuraField) {
-            window.SakuraField.stream({ rate: 220, cap: isMobile ? 14 : 22, speed: 1 });
-          }
-        });
-
+        // t=6800 — título revela → tandada
         at(6800 * T, () => { if (elTitle) elTitle.classList.add('is-revealing'); });
-        at(8300 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
-        at(9800 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
+        burstAt(6800 * T, 14);
 
-        at(10600 * T, () => {
-          if (window.SakuraField) window.SakuraField.stop();
+        // t=8300 — cuerpo revela → tandada
+        at(8300 * T, () => { if (elBody)  elBody.classList.add('is-revealing'); });
+        burstAt(8300 * T, 14);
+
+        // t=9800 — CTA revela → tandada final
+        at(9800 * T, () => { if (elCta)   elCta.classList.add('is-revealing'); });
+        burstAt(9800 * T, 16);
+
+        // Stream continuo de fondo (1 pétalo cada 220ms ≈ 4-5/s) — ARRANCA en
+        // t=4400 y NO SE DETIENE al terminar el intro. Acompaña toda la
+        // experiencia: preguntas, decisiones, final.
+        at(4400 * T, () => {
+          if (window.SakuraField) {
+            window.SakuraField.stream({
+              rate: 220,
+              cap: isMobile ? 14 : 22,
+              speed: 1,
+            });
+          }
         });
 
+        // Bursts periódicos cada 9s — primero 12s tras arrancar el stream
+        // (un poco después del final del intro) para reforzar la sensación de
+        // "tandadas" durante todo el recorrido, no solo en el reveal.
+        setTimeout(() => {
+          setInterval(() => {
+            if (!window.SakuraField) return;
+            if (document.hidden) return;   // pausa si la pestaña no es visible
+            window.SakuraField.burst({
+              count: isMobile ? 10 : 16,
+              speed: 0.85,
+            });
+          }, 9000);
+        }, 12000);
+
         at(10600 * T, () => {
+          // NO stop(): los pétalos siguen durante toda la experiencia.
           finish();
         });
       }
@@ -2039,7 +2073,7 @@
             {
               value: 'kamakura',
               label: 'Kamakura: mar, Daibutsu y templos zen del siglo XIII',
-              micro: 'Un día de mar, de cedros viejos, de caminar sin metro. Una hora de Tokio.',
+              micro: 'Un día de mar, de cedros viejos, de caminar sin reloj, de templos viejos y budas gigantes',
               acts: [
                 { place: 'Kita-Kamakura', image: IMG.kama, caption: 'Kita-Kamakura · zen del XIII',
                   text: 'Bajamos en Kita-Kamakura, una parada antes. Engaku-ji y Kencho-ji, dos templos zen del siglo XIII. Cedros de ochocientos años, casi nadie. Es el tipo de sitio donde te callas sin darte cuenta.',
